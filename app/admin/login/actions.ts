@@ -8,14 +8,20 @@ import {
   verifyAdminPassword
 } from '@/lib/auth';
 import {
-  checkLoginRateLimit,
-  clearLoginFailures,
-  recordLoginFailure
+  LOGIN_LIMIT,
+  check,
+  consume,
+  reset
 } from '@/lib/rate-limit';
 
 export type LoginState = {
   error?: string;
 };
+
+function minutesLabel(seconds: number): string {
+  const minutes = Math.max(1, Math.ceil(seconds / 60));
+  return `${minutes} minute${minutes === 1 ? '' : 's'}`;
+}
 
 /**
  * Exchanges an admin password for a signed session cookie.
@@ -35,13 +41,14 @@ export async function loginAction(
     };
   }
 
-  const limiter = await checkLoginRateLimit();
-  if (!limiter.allowed) {
-    const minutes = Math.ceil(limiter.retryAfterSeconds / 60);
+  // Reject early if the window is already exhausted, so a locked-out client
+  // cannot burn a Redis round trip per attempt.
+  const before = await check('login', LOGIN_LIMIT);
+  if (!before.allowed) {
     return {
-      error: `Too many failed attempts. Try again in about ${minutes} minute${
-        minutes === 1 ? '' : 's'
-      }.`
+      error: `Too many failed attempts. Try again in about ${minutesLabel(
+        before.retryAfterSeconds
+      )}.`
     };
   }
 
@@ -50,22 +57,34 @@ export async function loginAction(
     return { error: 'Enter the admin password.' };
   }
 
+  const verdict = await consume('login', LOGIN_LIMIT);
+
   if (!verifyAdminPassword(password)) {
-    const result = await recordLoginFailure();
-    // Deliberately does not say whether the password was wrong or the account
-    // exists — the response is identical either way.
+    // Deliberately does not distinguish a wrong password from an empty one,
+    // so the response reveals nothing about the stored credential.
     return {
-      error: result.allowed
-        ? `Incorrect password. ${result.attemptsLeft} attempt${
-            result.attemptsLeft === 1 ? '' : 's'
-          } remaining before lockout.`
-        : `Incorrect password. Locked for ${Math.ceil(
-            result.retryAfterSeconds / 60
-          )} more minute(s).`
+      error:
+        verdict.attemptsLeft === 0
+          ? `Incorrect password. Locked for ${minutesLabel(
+              verdict.retryAfterSeconds
+            )}.`
+          : `Incorrect password. ${verdict.attemptsLeft} attempt${
+              verdict.attemptsLeft === 1 ? '' : 's'
+            } remaining before lockout.`
     };
   }
 
-  await clearLoginFailures();
+  // The attempt was wrong-window or the client had already exhausted it;
+  // either way there is no session to create.
+  if (!verdict.allowed) {
+    return {
+      error: `Too many failed attempts. Try again in about ${minutesLabel(
+        verdict.retryAfterSeconds
+      )}.`
+    };
+  }
+
+  await reset('login');
   await createSession();
 
   // `redirect` throws, so nothing below it runs.

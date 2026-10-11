@@ -13,12 +13,27 @@ import type { KvClient } from '@/lib/kv-types';
 
 type Store = Record<string, unknown>;
 
+/** Counter entries carry their own expiry, since a file has no TTL support. */
+type Counter = { value: number; expiresAt: number | null };
+
+const isCounter = (value: unknown): value is Counter =>
+  typeof value === 'object' &&
+  value !== null &&
+  'value' in value &&
+  typeof (value as Counter).value === 'number';
+
 const DATA_FILE =
   process.env.LOCAL_KV_FILE || join(process.cwd(), '.dev-store.json');
 
 // Survives dev-server reloads so reads and writes hit the same in-memory map.
 const globalForStore = globalThis as unknown as {
   __localKvStore?: Store;
+  /**
+   * Serialises read-modify-write sequences. Node runs the event loop
+   * single-threaded, so chaining promises is enough to make `incr` atomic
+   * within this process — the same guarantee Redis gives across processes.
+   */
+  __localKvQueue?: Promise<unknown>;
 };
 
 function readStore(): Store {
@@ -57,6 +72,24 @@ function writeStore(store: Store): void {
     // Read-only filesystems should not take the app down.
     console.warn(`[local-kv] Could not persist ${DATA_FILE}:`, error);
   }
+}
+
+/** Runs `task` after any previously queued mutation has settled. */
+function enqueue<T>(task: () => Promise<T>): Promise<T> {
+  const previous = globalForStore.__localKvQueue ?? Promise.resolve();
+  const result = previous.then(task, task);
+  // Keep the chain alive regardless of individual failures.
+  globalForStore.__localKvQueue = result.catch(() => undefined);
+  return result;
+}
+
+/** Reads a live counter, treating an expired one as absent. */
+function readCounter(store: Store, key: string): Counter {
+  const raw = store[key];
+  if (isCounter(raw) && (raw.expiresAt === null || raw.expiresAt > Date.now())) {
+    return raw;
+  }
+  return { value: 0, expiresAt: null };
 }
 
 /**
@@ -98,29 +131,40 @@ export function createLocalStore(): KvClient {
   return {
     async get<T>(key: string): Promise<T | null> {
       const store = readStore();
-      return key in store ? clone(store[key] as T) : null;
+      if (!(key in store)) return null;
+
+      // Counters are an internal shape; never leak them to callers.
+      if (isCounter(store[key])) {
+        return readCounter(store, key).value as T;
+      }
+
+      return clone(store[key] as T);
     },
 
     async set(key: string, value: unknown): Promise<unknown> {
-      const store = readStore();
-      store[key] = clone(value);
-      writeStore(store);
-      return 'OK';
+      return enqueue(async () => {
+        const store = readStore();
+        store[key] = clone(value);
+        writeStore(store);
+        return 'OK';
+      });
     },
 
     async del(...keys: string[]): Promise<number> {
-      const store = readStore();
-      let removed = 0;
-      for (const key of keys) {
-        if (key in store) {
-          delete store[key];
-          removed++;
+      return enqueue(async () => {
+        const store = readStore();
+        let removed = 0;
+        for (const key of keys) {
+          if (key in store) {
+            delete store[key];
+            removed++;
+          }
         }
-      }
-      if (removed > 0) {
-        writeStore(store);
-      }
-      return removed;
+        if (removed > 0) {
+          writeStore(store);
+        }
+        return removed;
+      });
     },
 
     async keys(pattern: string): Promise<string[]> {
@@ -131,9 +175,39 @@ export function createLocalStore(): KvClient {
 
     async mget<T>(...keys: string[]): Promise<(T | null)[]> {
       const store = readStore();
-      return keys.map((key) =>
-        key in store ? clone(store[key] as T) : null
-      );
+      return keys.map((key) => {
+        if (!(key in store)) return null;
+        if (isCounter(store[key])) {
+          return readCounter(store, key).value as T;
+        }
+        return clone(store[key] as T);
+      });
+    },
+
+    async incr(key: string, by = 1): Promise<number> {
+      return enqueue(async () => {
+        const store = readStore();
+        const current = readCounter(store, key);
+        const next: Counter = {
+          value: current.value + by,
+          expiresAt: current.expiresAt
+        };
+        store[key] = next;
+        writeStore(store);
+        return next.value;
+      });
+    },
+
+    async expire(key: string, seconds: number): Promise<unknown> {
+      return enqueue(async () => {
+        const store = readStore();
+        const current = readCounter(store, key);
+        // Redis returns 0 when the key does not exist; mirror that.
+        if (current.value === 0) return 0;
+        store[key] = { value: current.value, expiresAt: Date.now() + seconds * 1000 };
+        writeStore(store);
+        return 1;
+      });
     }
   };
 }

@@ -3,6 +3,7 @@
 import { redis } from '@/lib/redis';
 import { isValidIcon, sanitizeSubdomain } from '@/lib/subdomains';
 import { getSession } from '@/lib/auth';
+import { CREATE_LIMIT, consume } from '@/lib/rate-limit';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { rootDomain, protocol } from '@/lib/utils';
@@ -23,6 +24,18 @@ export async function createSubdomainAction(
   _prevState: CreateSubdomainState,
   formData: FormData
 ): Promise<CreateSubdomainState> {
+  // Tenant creation is intentionally public, but unthrottled it lets an
+  // automated client exhaust the namespace. Every attempt is counted, so the
+  // limit reflects requests rather than outcomes.
+  const limit = await consume('create', CREATE_LIMIT);
+  if (!limit.allowed) {
+    return {
+      error: `Too many subdomains created from your network. Try again in about ${
+        Math.max(1, Math.ceil(limit.retryAfterSeconds / 60))
+      } minutes.`
+    };
+  }
+
   const subdomain = formData.get('subdomain') as string;
   const icon = formData.get('icon') as string;
 

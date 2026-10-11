@@ -160,11 +160,16 @@ interface (`lib/kv-types.ts`) and selects an implementation at startup:
 | Both set                                 | `@upstash/redis`                     | Upstash Redis database         |
 | Either blank                              | `lib/local-store.ts` (file-backed KV) | `.dev-store.json` (git-ignored) |
 
-The local store implements the same `get` / `set` / `del` / `keys` / `mget`
-surface, persists across dev-server restarts, and deep-clones values so callers
-cannot mutate stored objects by reference. It exists so the project runs
-immediately after `git clone` — **production and preview deployments always use
-Upstash.**
+The local store implements the same `get` / `set` / `del` / `keys` / `mget` /
+`incr` / `expire` surface, persists across dev-server restarts, and deep-clones
+values so callers cannot mutate stored objects by reference. It exists so the
+project runs immediately after `git clone` — **production and preview
+deployments always use Upstash.**
+
+`lib/redis.ts` throws at startup if `NODE_ENV=production` and the Upstash
+credentials are missing, rather than silently serving from a throwaway file.
+The guard is skipped during `next build`, which also runs with
+`NODE_ENV=production` but never touches the store.
 
 Tenant records use the key pattern `subdomain:{name}`:
 
@@ -268,9 +273,10 @@ if (!session) return { error: 'Your session has expired.' };
 Add **both** to any new privileged action. Removing the page-level check is
 safe; removing the in-action check is not.
 
-Login is rate limited to 5 failures per IP per 15 minutes, but that counter is
-in-memory and per-instance — see [SECURITY.md](./SECURITY.md) for what to fix
-before production.
+Login is rate limited to 5 failures per IP per 15 minutes, and tenant creation
+to 10 per IP per hour. Both counters live in the configured store, so they hold
+across every instance rather than resetting per process. See
+[SECURITY.md](./SECURITY.md) for what to fix before production.
 
 ### Environment variable access
 
@@ -316,7 +322,7 @@ pnpm check
 | Symptom | Cause and fix |
 | ------- | ------------- |
 | `/admin` redirects to `/admin/login` and login says "not configured" | `ADMIN_PASSWORD` / `ADMIN_SESSION_SECRET` missing. Set both in `.env.local` and restart |
-| "Too many failed attempts" | 5 failed logins from your IP. Wait 15 minutes, or restart the dev server — the counter is in-memory |
+| "Too many failed attempts" | 5 failed logins from your IP in 15 minutes. Wait for the window, or delete the `ratelimit:login:*` key from `.dev-store.json` to reset it locally |
 | `/admin` returns 307 even after signing in | Session cookie dropped. Check it is not blocked over plain HTTP, and that `NEXT_PUBLIC_ROOT_DOMAIN` matches the host you are visiting |
 | All sessions invalid after a deploy | Expected — a new `ADMIN_SESSION_SECRET` invalidates old cookies |
 | `[next-env-port] No port configured.` and exit 1 | `.env.local` is missing or has no `PORT`. Run `cp .env.example .env.local` |

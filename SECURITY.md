@@ -36,64 +36,79 @@ Other properties:
 - Passwords are compared with `timingSafeEqual` over SHA-256 digests, so there
   is no length or content timing leak
 - Missing configuration **fails closed** — `/admin` denies every request rather
-  than falling open
+  than falling open, and renders no password form
 - Cookies are `HttpOnly`, `SameSite=Lax`, and `Secure` in production
-- Five failed attempts lock an IP out for 15 minutes
 - Rotating `ADMIN_SESSION_SECRET` invalidates every existing session immediately
+
+### Rate limiting is store-backed
+
+`lib/rate-limit.ts` keeps counters in the configured `KvClient`, so limits hold
+across every instance of a multi-instance or serverless deployment rather than
+resetting per process. `incr` is atomic, so concurrent attempts cannot lose a
+count. The window is encoded in the key and each key carries a TTL, which keeps
+the key space bounded without needing a sweep.
+
+| Limit           | Allowance       | Window |
+| --------------- | --------------- | ------ |
+| Admin login     | 5 failures / IP | 15 min |
+| Tenant creation | 10 / IP         | 1 hour |
+
+Both counters were confirmed to survive a full server restart, and a successful
+login clears its counter.
+
+The client identifier comes from `X-Forwarded-For` / `X-Real-IP` and is hashed
+with SHA-256 before use, so a spoofed header can be neither arbitrarily long nor
+able to forge a key in another namespace. It remains only as trustworthy as the
+proxy in front of you.
+
+### Production fails fast without Redis
+
+`lib/redis.ts` throws at startup when `NODE_ENV=production` and the Upstash
+credentials are missing, instead of silently serving from the local file store.
+The check is skipped during `next build`, which also runs with
+`NODE_ENV=production` but never touches the store — otherwise CI without
+production secrets could never build.
 
 ## Known limitations of this starter
 
 This repository is a **demonstration of multi-tenant routing**. The following
 remain open. Close them before exposing the app to untrusted users.
 
-### 1. Login rate limiting is per-instance and in-memory
+### 1. The rate limiter trusts proxy headers
 
-`lib/rate-limit.ts` keeps counters in process memory. They reset on restart and
-are **not shared between instances**, so on a multi-instance or serverless
-deployment the effective limit is N × 5 attempts.
+Counters are keyed on a hash of `X-Forwarded-For` / `X-Real-IP`. If the app is
+reachable directly from the internet, a caller can rotate that header and get a
+fresh budget per request, which reduces both limits to nothing.
 
-The client identifier comes from `X-Forwarded-For` / `X-Real-IP`, which a caller
-can spoof unless a trusted proxy overwrites them. This raises the cost of
-guessing; it is not an access control.
+**Fix** — key on an address your platform guarantees: `request.ip` on a Node
+server, or the platform's own header (Vercel, Cloudflare `CF-Connecting-IP`).
 
-**Fix** — move the counter to Redis through the existing `KvClient` interface,
-and key it on an address your platform guarantees (`request.ip`, a Vercel
-header, or a Cloudflare `CF-Connecting-IP`).
-
-### 2. Tenant creation is unauthenticated and unthrottled
+### 2. Tenant creation is unauthenticated
 
 `createSubdomainAction` is intentionally public — the landing page invites
-anyone to claim a subdomain. It has no rate limit or CAPTCHA, so an automated
-client can exhaust the namespace.
+anyone to claim a subdomain — and is now rate limited to 10 per hour per IP. It
+still has no CAPTCHA or ownership check, so a determined attacker with many
+addresses can still exhaust the namespace.
 
-**Fix** — rate-limit it with the same mechanism used for login, and add an
-authentication step if subdomains are a claimed or paid resource.
+**Fix** — add an authentication or claim-confirmation step if subdomains are a
+claimed or paid resource.
 
 ### 3. Subdomain squatting
 
 Subdomains are first-come, first-served with no ownership proof. Deletion is
-now protected, but anyone can still register a name you wanted.
+protected and creation is throttled, but anyone can still register a name you
+wanted.
 
-### 4. The local store must never run in production
+### 4. The local store is still selected outside production
 
-`lib/local-store.ts` is selected whenever `KV_REST_API_URL` or
-`KV_REST_API_TOKEN` is missing. It is a JSON file with no authentication, no
-concurrency control and no durability guarantees — suitable for local
-development only.
+`lib/local-store.ts` is selected whenever the Upstash credentials are missing,
+which is the intended behaviour for local development. The production guard
+above prevents it from reaching production, but a staging or preview
+environment running with `NODE_ENV=development` and no Redis would still use it —
+its data lives in one throwaway file.
 
-It also degrades **silently**: a misconfigured production deploy appears to
-work, then loses all data on restart.
-
-**Fix** — make missing credentials a hard startup error in production:
-
-```ts
-// lib/redis.ts
-if (process.env.NODE_ENV === 'production' && !hasUpstashCredentials()) {
-  throw new Error(
-    'KV_REST_API_URL and KV_REST_API_TOKEN must be set in production.'
-  );
-}
-```
+**Fix** — set the credentials in every deployed environment, or force the driver
+from an environment variable rather than inferring it from missing config.
 
 ### 5. Single shared admin credential
 
@@ -114,9 +129,10 @@ rejects requests for subdomains you have not registered rather than serving them
 ## Hardening checklist
 
 - [x] Add authentication and per-action authorisation to `/admin`
-- [ ] Move login rate limiting into Redis (a per-instance limit is a real weakness)
-- [ ] Rate-limit tenant creation
-- [ ] Fail fast in production when Redis credentials are missing
+- [x] Move login rate limiting into the shared store
+- [x] Rate-limit tenant creation
+- [x] Fail fast in production when Redis credentials are missing
+- [ ] Key the rate limiter on a header your platform guarantees
 - [ ] Replace the shared password with real identities if you need an audit trail
 - [ ] Review the proxy matcher whenever routes or Server Actions move
 - [ ] Decide whether tenant data is user-supplied and sanitise it accordingly

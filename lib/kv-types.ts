@@ -16,6 +16,17 @@ export interface KvClient {
   keys(pattern: string): Promise<string[]>;
   /** Reads several keys at once, preserving argument order. */
   mget<T>(...keys: string[]): Promise<(T | null)[]>;
+
+  /**
+   * Atomically increments a counter and returns its new value.
+   *
+   * Required by the rate limiter — a read-then-write built from `get`/`set`
+   * would lose increments under concurrency, which is exactly the race an
+   * attacker would aim for.
+   */
+  incr(key: string, by?: number): Promise<number>;
+  /** Sets a TTL in seconds on an existing key. */
+  expire(key: string, seconds: number): Promise<unknown>;
 }
 
 /** True when real Upstash credentials are available. */

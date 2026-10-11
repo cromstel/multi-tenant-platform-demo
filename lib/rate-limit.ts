@@ -1,121 +1,127 @@
 import 'server-only';
 
+import { createHash } from 'node:crypto';
 import { headers } from 'next/headers';
+import { redis } from '@/lib/redis';
 
 /**
- * Fixed-window rate limiting for the admin login endpoint.
+ * Fixed-window rate limiting, backed by the same `KvClient` as tenant data.
  *
- * An unauthenticated login form is trivially brute-forceable without this.
+ * Counters live in the configured store, so the limits hold across every
+ * instance of a multi-instance or serverless deployment rather than resetting
+ * per process. `incr` is atomic, so concurrent attempts cannot lose a count.
  *
- * IMPORTANT: state lives in-process memory, so limits reset when the server
- * restarts and are **per instance** — on a multi-instance or serverless
- * deployment every instance keeps its own counters. Move this to Redis (the
- * same `KvClient` interface used for tenant data) before exposing admin login
- * to real traffic.
+ * The window is derived from the clock and encoded in the key, and each key
+ * carries a TTL. That keeps the key space bounded without needing a sweep.
  */
 
-type Bucket = {
-  failures: number;
-  firstFailureAt: number;
-  lockedUntil: number;
+export type RateLimitResult = {
+  allowed: boolean;
+  /** Seconds until the current window ends. */
+  retryAfterSeconds: number;
+  /** Attempts still permitted before the limit is hit. */
+  attemptsLeft: number;
 };
-
-const MAX_FAILURES = 5;
-const WINDOW_MS = 15 * 60 * 1000; // failures expire after 15 minutes
-const LOCK_MS = 15 * 60 * 1000; // lockout after too many failures
-
-// Stored on globalThis so dev-server hot reloads do not reset the counters.
-const globalForLimiter = globalThis as unknown as {
-  __loginLimiter?: Map<string, Bucket>;
-};
-
-const buckets = (globalForLimiter.__loginLimiter ??= new Map<string, Bucket>());
 
 /**
  * Best-effort client identifier.
  *
  * These headers are only trustworthy when the app sits behind a proxy that
  * overwrites them. A direct-to-internet deployment lets a caller spoof them,
- * so treat this as a weak signal that raises the cost of guessing rather than
- * a real access control.
+ * so this raises the cost of abuse rather than acting as an access control.
+ * Point it at an address your platform guarantees if you need a hard bound.
+ *
+ * The value is hashed before use: a spoofed header could otherwise be
+ * arbitrarily long, or contain the `:` delimiter and forge a key that collides
+ * with a different namespace.
  */
 export async function getClientIdentifier(): Promise<string> {
   const headerList = await headers();
   const forwarded = headerList.get('x-forwarded-for');
-  if (forwarded) return forwarded.split(',')[0].trim();
+  const raw = forwarded
+    ? forwarded.split(',')[0].trim()
+    : (headerList.get('x-real-ip') ?? 'unknown');
 
-  return headerList.get('x-real-ip') ?? 'unknown';
+  return createHash('sha256').update(raw, 'utf8').digest('hex').slice(0, 16);
 }
 
-function getBucket(key: string): Bucket {
-  const now = Date.now();
-  const existing = buckets.get(key);
+/** 5 failed admin logins per IP per 15 minutes. */
+export const LOGIN_LIMIT = { max: 5, windowMs: 15 * 60 * 1000 };
 
-  if (!existing || now - existing.firstFailureAt > WINDOW_MS) {
-    const fresh: Bucket = {
-      failures: 0,
-      firstFailureAt: now,
-      lockedUntil: 0
-    };
-    buckets.set(key, fresh);
-    return fresh;
-  }
+/** 10 tenant creations per IP per hour. */
+export const CREATE_LIMIT = { max: 10, windowMs: 60 * 60 * 1000 };
 
-  return existing;
-}
-
-export type RateLimitResult = {
-  allowed: boolean;
+type Window = {
+  key: string;
   retryAfterSeconds: number;
-  /** Failed attempts still permitted before lockout. */
-  attemptsLeft: number;
 };
 
-/** Whether another login attempt is currently permitted for this client. */
-export async function checkLoginRateLimit(): Promise<RateLimitResult> {
-  const key = await getClientIdentifier();
-  const bucket = getBucket(key);
-  const remaining = bucket.lockedUntil - Date.now();
-
-  if (remaining > 0) {
-    return {
-      allowed: false,
-      retryAfterSeconds: Math.ceil(remaining / 1000),
-      attemptsLeft: 0
-    };
-  }
+function currentWindow(prefix: string, identifier: string, windowMs: number): Window {
+  const now = Date.now();
+  const windowIndex = Math.floor(now / windowMs);
+  const windowEnd = (windowIndex + 1) * windowMs;
 
   return {
-    allowed: true,
-    retryAfterSeconds: 0,
-    attemptsLeft: MAX_FAILURES - bucket.failures
+    key: `ratelimit:${prefix}:${identifier}:${windowIndex}`,
+    retryAfterSeconds: Math.max(1, Math.ceil((windowEnd - now) / 1000))
   };
 }
 
-/** Records a failed attempt; locks the client out once the limit is hit. */
-export async function recordLoginFailure(): Promise<RateLimitResult> {
-  const key = await getClientIdentifier();
-  const bucket = getBucket(key);
+/** Reads the current count without changing it. */
+async function peek(
+  prefix: string,
+  identifier: string,
+  limit: { max: number; windowMs: number }
+): Promise<RateLimitResult> {
+  const { key, retryAfterSeconds } = currentWindow(prefix, identifier, limit.windowMs);
+  const count = (await redis.get<number>(key)) ?? 0;
 
-  bucket.failures += 1;
+  return {
+    allowed: count < limit.max,
+    retryAfterSeconds,
+    attemptsLeft: Math.max(0, limit.max - count)
+  };
+}
 
-  if (bucket.failures >= MAX_FAILURES) {
-    bucket.lockedUntil = Date.now() + LOCK_MS;
-    return {
-      allowed: false,
-      retryAfterSeconds: Math.ceil(LOCK_MS / 1000),
-      attemptsLeft: 0
-    };
+/**
+ * Counts one attempt against the limit and reports whether it was allowed.
+ *
+ * Call this *before* performing the guarded operation: it must consume an
+ * attempt whether or not the attempt succeeds.
+ */
+export async function consume(
+  prefix: string,
+  limit: { max: number; windowMs: number }
+): Promise<RateLimitResult> {
+  const identifier = await getClientIdentifier();
+  const { key, retryAfterSeconds } = currentWindow(prefix, identifier, limit.windowMs);
+
+  const count = await redis.incr(key);
+
+  // Only the first hit in a window needs a TTL.
+  if (count === 1) {
+    await redis.expire(key, Math.ceil(limit.windowMs / 1000) + 60);
   }
 
   return {
-    allowed: true,
-    retryAfterSeconds: 0,
-    attemptsLeft: MAX_FAILURES - bucket.failures
+    allowed: count <= limit.max,
+    retryAfterSeconds,
+    attemptsLeft: Math.max(0, limit.max - count)
   };
+}
+
+/** Checks the limit without consuming an attempt. */
+export async function check(
+  prefix: string,
+  limit: { max: number; windowMs: number }
+): Promise<RateLimitResult> {
+  return peek(prefix, await getClientIdentifier(), limit);
 }
 
 /** Clears the counter after a successful login. */
-export async function clearLoginFailures(): Promise<void> {
-  buckets.delete(await getClientIdentifier());
+export async function reset(prefix: string): Promise<void> {
+  const identifier = await getClientIdentifier();
+  const windowMs = prefix === 'login' ? LOGIN_LIMIT.windowMs : CREATE_LIMIT.windowMs;
+  const { key } = currentWindow(prefix, identifier, windowMs);
+  await redis.del(key);
 }

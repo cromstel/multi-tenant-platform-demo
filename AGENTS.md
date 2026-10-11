@@ -74,6 +74,12 @@ under sanitisation rather than silently accepting the cleaned form.
   during render. `loginAction` is an action for exactly that reason.
 - `lib/auth.ts` and `lib/rate-limit.ts` both `import 'server-only'`. Keep it
   that way — it is what stops the session secret reaching the client bundle.
+- Rate limiting is backed by `KvClient`, so adding a limit means adding `incr`
+  and `expire` to the interface and both implementations. Never reintroduce
+  process-local counters; they reset per instance and per restart.
+- `lib/redis.ts` throws in production without Upstash credentials. Any guard
+  there must exempt `NEXT_PHASE === 'phase-production-build'`, or CI without
+  production secrets cannot build.
 - `proxy.ts` must not rely on shared modules or globals; it can run at the CDN.
 - Never hand-edit `next-env.d.ts`; Next.js regenerates it.
 
