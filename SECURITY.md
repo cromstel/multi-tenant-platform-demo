@@ -69,6 +69,20 @@ The check is skipped during `next build`, which also runs with
 `NODE_ENV=production` but never touches the store — otherwise CI without
 production secrets could never build.
 
+### Dependency posture
+
+`pnpm audit` reports **0 critical and 1 high**. The remaining advisory is
+`braces`, reached through `eslint-config-next → fast-glob → micromatch`; its
+`patched_versions` is `<0.0.0`, meaning no fix has been published, so it cannot
+be cleared from here. It is a lint-time-only devDependency and does not ship.
+
+Transitive advisories in `tar`, `postcss`, `nanoid` and `source-map-js` — all
+pulled in by `@tailwindcss/postcss` — are pinned above their fixed versions with
+`pnpm.overrides` in `package.json`. Those run at build time and likewise never
+reach the deployed server.
+
+Re-run `pnpm audit` after any dependency change.
+
 ## Known limitations of this starter
 
 This repository is a **demonstration of multi-tenant routing**. The following
