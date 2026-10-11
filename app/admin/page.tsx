@@ -2,6 +2,7 @@ import { getAllSubdomains } from '@/lib/subdomains';
 import type { Metadata } from 'next';
 import { AdminDashboard } from './dashboard';
 import { rootDomain } from '@/lib/utils';
+import { requireAdmin } from '@/lib/auth';
 
 export const metadata: Metadata = {
   title: `Admin Dashboard | ${rootDomain}`,
@@ -9,7 +10,13 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminPage() {
-  // TODO: You can add authentication here with your preferred auth provider
+  // Unauthenticated visitors are redirected to the sign-in screen.
+  //
+  // This controls only which UI renders. The Server Action behind the delete
+  // button re-checks independently — Server Actions are reachable by direct
+  // POST, so this line alone would not protect the data.
+  await requireAdmin();
+
   const tenants = await getAllSubdomains();
 
   return (

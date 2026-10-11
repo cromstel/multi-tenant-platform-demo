@@ -1,15 +1,28 @@
 'use server';
 
 import { redis } from '@/lib/redis';
-import { isValidIcon } from '@/lib/subdomains';
+import { isValidIcon, sanitizeSubdomain } from '@/lib/subdomains';
+import { getSession } from '@/lib/auth';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { rootDomain, protocol } from '@/lib/utils';
 
+export type CreateSubdomainState = {
+  error?: string;
+  success?: boolean;
+  subdomain?: string;
+  icon?: string;
+};
+
+export type DeleteSubdomainState = {
+  error?: string;
+  success?: string;
+};
+
 export async function createSubdomainAction(
-  prevState: any,
+  _prevState: CreateSubdomainState,
   formData: FormData
-) {
+): Promise<CreateSubdomainState> {
   const subdomain = formData.get('subdomain') as string;
   const icon = formData.get('icon') as string;
 
@@ -26,7 +39,17 @@ export async function createSubdomainAction(
     };
   }
 
-  const sanitizedSubdomain = subdomain.toLowerCase().replace(/[^a-z0-9-]/g, '');
+  const sanitizedSubdomain = sanitizeSubdomain(subdomain);
+
+  if (!sanitizedSubdomain) {
+    return {
+      subdomain,
+      icon,
+      success: false,
+      error:
+        'Subdomain can only have lowercase letters, numbers, and hyphens. Please try again.'
+    };
+  }
 
   if (sanitizedSubdomain !== subdomain) {
     return {
@@ -59,11 +82,24 @@ export async function createSubdomainAction(
 }
 
 export async function deleteSubdomainAction(
-  prevState: any,
+  _prevState: DeleteSubdomainState,
   formData: FormData
-) {
-  const subdomain = formData.get('subdomain');
-  await redis.del(`subdomain:${subdomain}`);
+): Promise<DeleteSubdomainState> {
+  // Authorise inside the action, not just on the page that renders its form.
+  // A Server Action is reachable by direct POST regardless of what the page
+  // checks, so this is the check that actually protects the data.
+  const session = await getSession();
+  if (!session) {
+    return { error: 'Your session has expired. Sign in again to continue.' };
+  }
+
+  const rawSubdomain = formData.get('subdomain');
+
+  if (typeof rawSubdomain !== 'string' || !rawSubdomain) {
+    return { error: 'A subdomain is required' };
+  }
+
+  await redis.del(`subdomain:${sanitizeSubdomain(rawSubdomain)}`);
   revalidatePath('/admin');
   return { success: 'Domain deleted successfully' };
 }

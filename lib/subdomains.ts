@@ -31,8 +31,13 @@ type SubdomainData = {
   createdAt: number;
 };
 
+/** Normalises a subdomain to the characters allowed in a Redis key segment. */
+export function sanitizeSubdomain(subdomain: string): string {
+  return subdomain.toLowerCase().replace(/[^a-z0-9-]/g, '');
+}
+
 export async function getSubdomainData(subdomain: string) {
-  const sanitizedSubdomain = subdomain.toLowerCase().replace(/[^a-z0-9-]/g, '');
+  const sanitizedSubdomain = sanitizeSubdomain(subdomain);
   const data = await redis.get<SubdomainData>(
     `subdomain:${sanitizedSubdomain}`
   );
@@ -46,7 +51,7 @@ export async function getAllSubdomains() {
     return [];
   }
 
-  const values = await redis.mget<SubdomainData[]>(...keys);
+  const values = await redis.mget<SubdomainData>(...keys);
 
   return keys.map((key, index) => {
     const subdomain = key.replace('subdomain:', '');

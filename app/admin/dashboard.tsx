@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Trash2, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { deleteSubdomainAction } from '@/app/actions';
+import { logoutAction } from '@/app/admin/login/actions';
 import { rootDomain, protocol } from '@/lib/utils';
 
 type Tenant = {
@@ -20,18 +21,21 @@ type DeleteState = {
 };
 
 function DashboardHeader() {
-  // TODO: You can add authentication here with your preferred auth provider
-
   return (
     <div className="flex justify-between items-center mb-8">
       <h1 className="text-3xl font-bold">Subdomain Management</h1>
       <div className="flex items-center gap-4">
         <Link
           href={`${protocol}://${rootDomain}`}
-          className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
+          className="text-sm text-gray-600 hover:text-gray-800 transition-colors"
         >
           {rootDomain}
         </Link>
+        <form action={logoutAction}>
+          <Button type="submit" variant="outline" size="sm">
+            Sign out
+          </Button>
+        </form>
       </div>
     </div>
   );
@@ -74,12 +78,15 @@ function TenantGrid({
                   size="icon"
                   type="submit"
                   disabled={isPending}
+                  // Icon-only buttons need an accessible name for screen readers.
+                  aria-label={`Delete subdomain ${tenant.subdomain}`}
+                  title={`Delete subdomain ${tenant.subdomain}`}
                   className="text-gray-500 hover:text-gray-700 hover:bg-gray-50"
                 >
                   {isPending ? (
-                    <Loader2 className="h-5 w-5 animate-spin" />
+                    <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />
                   ) : (
-                    <Trash2 className="h-5 w-5" />
+                    <Trash2 className="h-5 w-5" aria-hidden="true" />
                   )}
                 </Button>
               </form>
@@ -97,7 +104,9 @@ function TenantGrid({
                 href={`${protocol}://${tenant.subdomain}.${rootDomain}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-500 hover:underline text-sm"
+                // blue-600 (not blue-500) keeps the 4.5:1 contrast ratio WCAG AA requires
+                // for body text on a white card.
+                className="text-blue-600 hover:underline text-sm"
               >
                 Visit subdomain →
               </a>

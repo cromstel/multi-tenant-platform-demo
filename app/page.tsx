@@ -8,7 +8,7 @@ export default async function HomePage() {
       <div className="absolute top-4 right-4">
         <Link
           href="/admin"
-          className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
+          className="text-sm text-gray-600 hover:text-gray-800 transition-colors"
         >
           Admin
         </Link>

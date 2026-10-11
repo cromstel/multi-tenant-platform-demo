@@ -1,30 +1,35 @@
-'use client';
-
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
-import { usePathname } from 'next/navigation';
+import { headers } from 'next/headers';
 import { rootDomain, protocol } from '@/lib/utils';
 
-export default function NotFound() {
-  const [subdomain, setSubdomain] = useState<string | null>(null);
-  const pathname = usePathname();
+/**
+ * Resolves the tenant slug for a 404 page.
+ *
+ * Two shapes are handled:
+ *  - `/s/{subdomain}`  — how `proxy.ts` rewrites tenant requests
+ *  - `{subdomain}.{rootDomain}` — read from the Host header when a tenant
+ *    subdomain is requested directly (the rewrite never happened because the
+ *    subdomain simply has no record in the store)
+ */
+async function resolveSubdomain(): Promise<string | null> {
+  const headerList = await headers();
+  const host = (headerList.get('host') || '').split(':')[0];
+  const rootDomainHost = rootDomain.split(':')[0];
 
-  useEffect(() => {
-    // Extract subdomain from URL if we're on a subdomain page
-    if (pathname?.startsWith('/subdomain/')) {
-      const extractedSubdomain = pathname.split('/')[2];
-      if (extractedSubdomain) {
-        setSubdomain(extractedSubdomain);
-      }
-    } else {
-      // Try to extract from hostname for direct subdomain access
-      const hostname = window.location.hostname;
-      if (hostname.includes(`.${rootDomain.split(':')[0]}`)) {
-        const extractedSubdomain = hostname.split('.')[0];
-        setSubdomain(extractedSubdomain);
-      }
-    }
-  }, [pathname]);
+  if (host && host.endsWith(`.${rootDomainHost}`)) {
+    return host.replace(`.${rootDomainHost}`, '') || null;
+  }
+
+  if (host && host !== rootDomainHost && !host.endsWith('.vercel.app')) {
+    return host.split('.')[0] || null;
+  }
+
+  return null;
+}
+
+export default async function NotFound() {
+  const subdomain = await resolveSubdomain();
+  const apostrophe = '\u2019';
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-blue-50 to-white p-4">
@@ -33,14 +38,14 @@ export default function NotFound() {
           {subdomain ? (
             <>
               <span className="text-blue-600">{subdomain}</span>.{rootDomain}{' '}
-              doesn't exist
+              doesn{apostrophe}t exist
             </>
           ) : (
             'Subdomain Not Found'
           )}
         </h1>
         <p className="mt-3 text-lg text-gray-600">
-          This subdomain hasn't been created yet.
+          This subdomain hasn{apostrophe}t been created yet.
         </p>
         <div className="mt-6">
           <Link
