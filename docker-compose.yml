@@ -1,0 +1,75 @@
+# Local production-like stack for CITGROUP TENANCY SYSTEM.
+#
+#   docker compose up --build
+#
+# The app is served on http://localhost:3030 and MySQL on 3306. The database
+# is seeded with a schema and an administrator account on first start.
+#
+# Every secret here is a development default. Override them in a `.env`
+# file before using this anywhere that is not a laptop — see `.env.example`.
+
+services:
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_dev_only}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-multi_tenant}
+      MYSQL_USER: ${MYSQL_USER:-multi_tenant_admin}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-April--2024!!!!}
+    ports:
+      - '${MYSQL_PORT_FORWARD:-3306}:3306'
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      # The app waits for this to pass before it starts, so it never boots
+      # against a database that is not ready.
+      test: ['CMD', 'mysqladmin', 'ping', '-h', '127.0.0.1', '-p${MYSQL_ROOT_PASSWORD:-root_dev_only}']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3030
+      HOSTNAME: 0.0.0.0
+
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_USER: ${MYSQL_USER:-multi_tenant_admin}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-April--2024!!!!}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-multi_tenant}
+
+      NEXT_PUBLIC_ROOT_DOMAIN: ${NEXT_PUBLIC_ROOT_DOMAIN:-localhost:3030}
+
+      ADMIN_PATH: ${ADMIN_PATH:-ops-local}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@citgroup.local}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin_dev_password}
+      ADMIN_SESSION_SECRET: ${ADMIN_SESSION_SECRET:-change_me_to_a_real_64_char_random_secret_value}
+      TENANT_SESSION_SECRET: ${TENANT_SESSION_SECRET:-}
+
+      API_KEYS: ${API_KEYS:-}
+    ports:
+      - '${APP_PORT:-3030}:3030'
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:3030/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+volumes:
+  mysql-data:

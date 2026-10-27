@@ -1,4 +1,4 @@
-import { redis } from '@/lib/redis';
+import { getMySQLPool } from '@/lib/db/mysql';
 
 export function isValidIcon(str: string) {
   if (str.length > 10) {
@@ -26,41 +26,34 @@ export function isValidIcon(str: string) {
   return str.length >= 1 && str.length <= 10;
 }
 
-type SubdomainData = {
-  emoji: string;
-  createdAt: number;
-};
-
-/** Normalises a subdomain to the characters allowed in a Redis key segment. */
+/** Normalises a subdomain to the characters allowed in a MySQL key segment. */
 export function sanitizeSubdomain(subdomain: string): string {
   return subdomain.toLowerCase().replace(/[^a-z0-9-]/g, '');
 }
 
 export async function getSubdomainData(subdomain: string) {
   const sanitizedSubdomain = sanitizeSubdomain(subdomain);
-  const data = await redis.get<SubdomainData>(
-    `subdomain:${sanitizedSubdomain}`
+  const pool = await getMySQLPool();
+  const [rows] = await pool.execute(
+    'SELECT emoji, created_at FROM tenants WHERE subdomain = ?',
+    [sanitizedSubdomain]
   );
-  return data;
+  const row = (rows as Array<{ emoji: string; created_at: Date }>)[0];
+  if (!row) return null;
+  return {
+    emoji: row.emoji,
+    createdAt: new Date(row.created_at).getTime()
+  };
 }
 
 export async function getAllSubdomains() {
-  const keys = await redis.keys('subdomain:*');
-
-  if (!keys.length) {
-    return [];
-  }
-
-  const values = await redis.mget<SubdomainData>(...keys);
-
-  return keys.map((key, index) => {
-    const subdomain = key.replace('subdomain:', '');
-    const data = values[index];
-
-    return {
-      subdomain,
-      emoji: data?.emoji || '❓',
-      createdAt: data?.createdAt || Date.now()
-    };
-  });
+  const pool = await getMySQLPool();
+  const [rows] = await pool.execute(
+    'SELECT subdomain, emoji, created_at FROM tenants'
+  );
+  return (rows as Array<{ subdomain: string; emoji: string; created_at: Date }>).map(row => ({
+    subdomain: row.subdomain,
+    emoji: row.emoji,
+    createdAt: new Date(row.created_at).getTime()
+  }));
 }

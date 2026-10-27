@@ -1,25 +1,12 @@
 'use client';
 
-import type React from 'react';
-
 import { useState } from 'react';
 import { useActionState } from 'react';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger
-} from '@/components/ui/popover';
-import { Smile } from 'lucide-react';
-import { Card } from '@/components/ui/card';
-import {
-  EmojiPicker,
-  EmojiPickerContent,
-  EmojiPickerSearch,
-  EmojiPickerFooter
-} from '@/components/ui/emoji-picker';
+import { EmojiField } from '@/components/emoji-field';
 import { createSubdomainAction } from '@/app/actions';
 import { rootDomain } from '@/lib/utils';
 
@@ -32,94 +19,20 @@ type CreateState = {
 
 function SubdomainInput({ defaultValue }: { defaultValue?: string }) {
   return (
-    <div className="space-y-2">
-      <Label htmlFor="subdomain">Subdomain</Label>
-      <div className="flex items-center">
-        <div className="relative flex-1">
-          <Input
-            id="subdomain"
-            name="subdomain"
-            placeholder="your-subdomain"
-            defaultValue={defaultValue}
-            className="w-full rounded-r-none focus:z-10"
-            required
-          />
-        </div>
-        <span className="bg-gray-100 px-3 border border-l-0 border-input rounded-r-md text-gray-600 min-h-[36px] flex items-center">
-          .{rootDomain}
-        </span>
+    <div className="flex items-center">
+      <div className="relative flex-1">
+        <Input
+          id="subdomain"
+          name="subdomain"
+          placeholder="your-company"
+          defaultValue={defaultValue}
+          className="h-12 w-full rounded-r-none border-slate-200 bg-slate-50 focus:border-[#0078E2] focus:ring-2 focus:ring-[#0078E2]/20 focus:z-10"
+          required
+        />
       </div>
-    </div>
-  );
-}
-
-function IconPicker({
-  icon,
-  setIcon,
-  defaultValue
-}: {
-  icon: string;
-  setIcon: (icon: string) => void;
-  defaultValue?: string;
-}) {
-  const [isPickerOpen, setIsPickerOpen] = useState(false);
-
-  const handleEmojiSelect = ({ emoji }: { emoji: string }) => {
-    setIcon(emoji);
-    setIsPickerOpen(false);
-  };
-
-  return (
-    <div className="space-y-2">
-      <Label htmlFor="icon">Icon</Label>
-      <div className="flex flex-col gap-2">
-        <input type="hidden" name="icon" value={icon} required />
-        <div className="flex items-center gap-2">
-          <Card className="flex-1 flex flex-row items-center justify-between p-2 border border-input rounded-md">
-            <div className="min-w-[40px] min-h-[40px] flex items-center pl-[14px] select-none">
-              {icon ? (
-                <span className="text-3xl">{icon}</span>
-              ) : (
-                <span className="text-gray-600 text-sm font-normal">
-                  No icon selected
-                </span>
-              )}
-            </div>
-            <Popover open={isPickerOpen} onOpenChange={setIsPickerOpen}>
-              <PopoverTrigger asChild>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="ml-auto rounded-sm"
-                  onClick={() => setIsPickerOpen(!isPickerOpen)}
-                >
-                  <Smile className="h-4 w-4 mr-2" />
-                  Select Emoji
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent
-                className="p-0 w-[256px]"
-                align="end"
-                sideOffset={5}
-              >
-                <EmojiPicker
-                  className="h-[300px] w-[256px]"
-                  defaultValue={defaultValue}
-                  onEmojiSelect={handleEmojiSelect}
-                >
-                  <EmojiPickerSearch />
-                  <EmojiPickerContent />
-                  <EmojiPickerFooter />
-                </EmojiPicker>
-              </PopoverContent>
-            </Popover>
-          </Card>
-        </div>
-        <p className="text-xs text-gray-500">
-          Select an emoji to represent your subdomain
-        </p>
-      </div>
+      <span className="flex min-h-[48px] items-center rounded-r-xl border border-l-0 border-slate-200 bg-slate-100 px-3 text-sm font-medium text-slate-600">
+        .{rootDomain}
+      </span>
     </div>
   );
 }
@@ -134,16 +47,35 @@ export function SubdomainForm() {
 
   return (
     <form action={action} className="space-y-4">
-      <SubdomainInput defaultValue={state?.subdomain} />
+      <div>
+        <Label htmlFor="subdomain" className="mb-1.5 block text-sm font-medium text-slate-700">
+          Subdomain
+        </Label>
+        <SubdomainInput defaultValue={state?.subdomain} />
+      </div>
 
-      <IconPicker icon={icon} setIcon={setIcon} defaultValue={state?.icon} />
+      <EmojiField
+        label="Brand mark"
+        hint="An emoji shown on your tenant's page and in the admin dashboard. Pick one that represents your company."
+        value={icon}
+        onChange={setIcon}
+      />
 
       {state?.error && (
-        <div className="text-sm text-red-500">{state.error}</div>
+        <p
+          role="alert"
+          className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
+        >
+          {state.error}
+        </p>
       )}
 
-      <Button type="submit" className="w-full" disabled={isPending || !icon}>
-        {isPending ? 'Creating...' : 'Create Subdomain'}
+      <Button
+        type="submit"
+        disabled={isPending || !icon}
+        className="h-12 w-full rounded-xl bg-[#005cb3] text-base font-semibold text-white shadow-lg shadow-blue-600/25 transition-all hover:bg-[#004A94] active:scale-[0.99]"
+      >
+        {isPending ? 'Creating…' : 'Create Subdomain'}
       </Button>
     </form>
   );
