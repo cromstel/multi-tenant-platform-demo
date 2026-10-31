@@ -9,13 +9,14 @@ const NAV_LINKS = [
   { label: 'Features', href: '/#features' },
   { label: 'Architecture', href: '/#architecture' },
   { label: 'Security', href: '/#security' },
+  { label: 'FAQ', href: '/faq' },
   { label: 'Contact', href: '/contact' },
 ];
 
 const PRODUCT_LINKS = [
   { label: 'Create Tenant', href: '/auth/register' },
   { label: 'Tenant Sign In', href: '/auth/login' },
-  { label: 'Documentation', href: '/#faq' },
+  { label: 'Documentation', href: '/faq' },
 ];
 
 export function SiteHeader() {
@@ -31,7 +32,7 @@ export function SiteHeader() {
             to be inside the accessible name. The sr-only word adds the
             "you are on the home page" context without disturbing that. */}
         <Link href="/" className="group flex items-center gap-2.5">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#0078E2] to-[#5B9CF5] shadow-lg shadow-blue-600/25 transition-transform group-hover:scale-105">
+          <span className="flex h-9 w-9 items-center justify-center rounded-none bg-gradient-to-br from-[#0078E2] to-[#5B9CF5] shadow-lg shadow-blue-600/25 transition-transform group-hover:scale-105">
             <svg className="h-5 w-5 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
             </svg>
@@ -49,7 +50,7 @@ export function SiteHeader() {
             <a
               key={link.href}
               href={link.href}
-              className="rounded-lg px-3.5 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
+              className="rounded-none px-3.5 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
             >
               {link.label}
             </a>
@@ -62,7 +63,7 @@ export function SiteHeader() {
           >
             <button
               type="button"
-              className="flex items-center gap-1 rounded-lg px-3.5 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
+              className="flex items-center gap-1 rounded-none px-3.5 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
               aria-expanded={productsOpen}
               aria-haspopup="true"
               onClick={() => setProductsOpen((v) => !v)}
@@ -72,12 +73,12 @@ export function SiteHeader() {
             </button>
             {productsOpen && (
               <div className="absolute left-0 top-full w-60 pt-2">
-                <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white p-2 shadow-xl shadow-slate-900/5">
+                <div className="overflow-hidden rounded-none border border-slate-200 bg-white p-2 shadow-xl shadow-slate-900/5">
                   {PRODUCT_LINKS.map((link) => (
                     <Link
                       key={link.href}
                       href={link.href}
-                      className="block rounded-xl px-3 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 hover:text-[#005cb3]"
+                      className="block rounded-none px-3 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 hover:text-[#005cb3]"
                     >
                       {link.label}
                     </Link>
@@ -92,13 +93,13 @@ export function SiteHeader() {
         <div className="hidden items-center gap-2 lg:flex">
           <Link
             href="/auth/login"
-            className="rounded-lg px-3.5 py-2 text-sm font-semibold text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
+            className="rounded-none px-3.5 py-2 text-sm font-semibold text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
           >
             Sign In
           </Link>
           <Link
             href="/auth/register"
-            className="inline-flex items-center gap-1.5 rounded-lg bg-[#005cb3] px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-blue-600/25 transition-all hover:bg-[#004A94] hover:shadow-blue-600/35 active:scale-[0.98]"
+            className="inline-flex items-center gap-1.5 rounded-none bg-[#005cb3] px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-blue-600/25 transition-all hover:bg-[#004A94] hover:shadow-blue-600/35 active:scale-[0.98]"
           >
             Get Started
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
@@ -108,7 +109,7 @@ export function SiteHeader() {
         {/* Mobile toggle */}
         <button
           type="button"
-          className="rounded-lg p-2 text-slate-600 transition-colors hover:bg-slate-100 lg:hidden"
+          className="rounded-none p-2 text-slate-600 transition-colors hover:bg-slate-100 lg:hidden"
           onClick={() => setMobileOpen((v) => !v)}
           aria-expanded={mobileOpen}
           aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
@@ -126,7 +127,7 @@ export function SiteHeader() {
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileOpen(false)}
-                className="block rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 hover:text-[#005cb3]"
+                className="block rounded-none px-3 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 hover:text-[#005cb3]"
               >
                 {link.label}
               </a>
@@ -137,7 +138,7 @@ export function SiteHeader() {
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileOpen(false)}
-                className="block rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 hover:text-[#005cb3]"
+                className="block rounded-none px-3 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 hover:text-[#005cb3]"
               >
                 {link.label}
               </Link>
@@ -146,14 +147,14 @@ export function SiteHeader() {
               <Link
                 href="/auth/login"
                 onClick={() => setMobileOpen(false)}
-                className="rounded-lg border border-slate-300 px-4 py-2.5 text-center text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50"
+                className="rounded-none border border-slate-300 px-4 py-2.5 text-center text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50"
               >
                 Sign In
               </Link>
               <Link
                 href="/auth/register"
                 onClick={() => setMobileOpen(false)}
-                className="rounded-lg bg-[#005cb3] px-4 py-2.5 text-center text-sm font-semibold text-white shadow-lg shadow-blue-600/25 transition-colors hover:bg-[#004A94]"
+                className="rounded-none bg-[#005cb3] px-4 py-2.5 text-center text-sm font-semibold text-white shadow-lg shadow-blue-600/25 transition-colors hover:bg-[#004A94]"
               >
                 Get Started
               </Link>
@@ -164,3 +165,4 @@ export function SiteHeader() {
     </header>
   );
 }
+

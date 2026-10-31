@@ -488,7 +488,7 @@ export default function ContactPage() {
 
           <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
             <Link
-              href="/#faq"
+              href="/faq"
               className="inline-flex items-center justify-center gap-2 rounded-none bg-[#005cb3] px-6 py-3.5 text-sm font-bold text-white shadow-xl shadow-blue-600/30 transition-all hover:bg-[#004A94] active:scale-[0.98]"
             >
               Read the FAQ
@@ -512,3 +512,4 @@ export default function ContactPage() {
     </div>
   );
 }
+

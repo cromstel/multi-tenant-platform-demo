@@ -17,13 +17,13 @@ const FOOTER_SECTIONS = [
       { label: 'Create Tenant', href: '/auth/register' },
       { label: 'Tenant Sign In', href: '/auth/login' },
       { label: 'Contact & Support', href: '/contact' },
-      { label: 'FAQ', href: '/#faq' },
+      { label: 'FAQ', href: '/faq' },
     ],
   },
   {
     title: 'Resources',
     links: [
-      { label: 'Documentation', href: '/#faq' },
+      { label: 'Documentation', href: '/faq' },
       { label: 'API Reference', href: '/#platform' },
       { label: 'Status', href: '/#platform' },
       { label: 'Contact Us', href: '/contact' },
@@ -130,3 +130,4 @@ export function SiteFooter() {
     </footer>
   );
 }
+
