@@ -53,7 +53,7 @@ export function SiteFooter() {
 
   return (
     <footer className="border-t border-slate-200 bg-slate-50">
-      <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+      <div className="w-full px-4 py-14 sm:px-6 lg:px-8 xl:px-12">
         {/* Top: brand + link columns */}
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1.4fr)_repeat(3,minmax(0,1fr))]">
           <div>

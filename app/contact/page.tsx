@@ -137,7 +137,7 @@ export default function ContactPage() {
           <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.035)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.035)_1px,transparent_1px)] bg-[size:56px_56px]" />
         </div>
 
-        <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-24 lg:px-8">
+        <div className="relative w-full px-4 py-20 sm:px-6 sm:py-24 lg:px-8 xl:px-12">
           <div className="mx-auto max-w-3xl text-center">
             <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3.5 py-1.5 text-xs font-semibold text-blue-200 backdrop-blur-sm">
               <span className="relative flex h-2 w-2">
@@ -202,7 +202,7 @@ export default function ContactPage() {
 
       {/* ───────────── Channels ───────────── */}
       <section id="channels" className="scroll-mt-20 bg-white py-20 sm:py-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-12">
           <div className="max-w-2xl">
             <span className="text-xs font-bold uppercase tracking-[0.15em] text-[#005cb3]">
               Support channels
@@ -248,7 +248,7 @@ export default function ContactPage() {
 
       {/* ───────────── Form + Details ───────────── */}
       <section id="enquiry" className="scroll-mt-20 border-y border-slate-200 bg-slate-50 py-20 sm:py-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-12">
           <div className="grid gap-12 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-16">
             {/* Form */}
             <div className="rounded-none border border-slate-200 bg-white p-6 shadow-xl shadow-slate-200/40 sm:p-9">
@@ -386,7 +386,7 @@ export default function ContactPage() {
 
       {/* ───────────── Offices ───────────── */}
       <section className="bg-white py-20 sm:py-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-12">
           <div className="max-w-2xl">
             <span className="text-xs font-bold uppercase tracking-[0.15em] text-[#005cb3]">
               Offices
@@ -439,7 +439,7 @@ export default function ContactPage() {
 
       {/* ───────────── FAQ ───────────── */}
       <section className="border-y border-slate-200 bg-slate-50 py-20 sm:py-24">
-        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+        <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-12">
           <div className="text-center">
             <span className="text-xs font-bold uppercase tracking-[0.15em] text-[#005cb3]">
               FAQ
@@ -453,7 +453,7 @@ export default function ContactPage() {
             </p>
           </div>
 
-          <dl className="mt-12 divide-y divide-slate-200 overflow-hidden rounded-none border border-slate-200 bg-white shadow-sm">
+          <dl className="mx-auto mt-12 max-w-4xl divide-y divide-slate-200 overflow-hidden rounded-none border border-slate-200 bg-white shadow-sm">
             {FAQS.map((faq) => (
               <div key={faq.q} className="p-6 transition-colors hover:bg-slate-50">
                 <dt className="flex items-start gap-3">
@@ -477,7 +477,7 @@ export default function ContactPage() {
           <div className="absolute left-1/2 top-0 h-[400px] w-[800px] -translate-x-1/2 rounded-full bg-[#0078E2]/25 blur-[100px]" />
         </div>
 
-        <div className="relative mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
+        <div className="relative w-full px-4 text-center sm:px-6 lg:px-8 xl:px-12">
           <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
             Still stuck?
           </h2>

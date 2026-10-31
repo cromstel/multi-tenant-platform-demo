@@ -177,7 +177,7 @@ export default function HomePage() {
             <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:56px_56px]" />
           </div>
 
-          <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-28 lg:px-8">
+          <div className="relative w-full px-4 py-20 sm:px-6 sm:py-28 lg:px-8 xl:px-12">
             <div className="grid items-center gap-14 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]">
               {/* Copy */}
               <div>
@@ -266,7 +266,7 @@ export default function HomePage() {
 
         {/* ───────────── Platform ───────────── */}
         <section id="platform" className="scroll-mt-20 bg-white py-20 sm:py-24">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-12">
             <div className="max-w-2xl">
               <span className="text-xs font-bold uppercase tracking-[0.15em] text-[#005cb3]">
                 The platform
@@ -302,7 +302,7 @@ export default function HomePage() {
 
         {/* ───────────── Architecture ───────────── */}
         <section id="architecture" className="scroll-mt-20 border-y border-slate-200 bg-slate-50 py-20 sm:py-24">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-12">
             <div className="grid gap-14 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-20">
               <div>
                 <span className="text-xs font-bold uppercase tracking-[0.15em] text-[#005cb3]">
@@ -371,7 +371,7 @@ const rows = await db.query(
 
         {/* ───────────── Security ───────────── */}
         <section id="security" className="scroll-mt-20 bg-white py-20 sm:py-24">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-12">
             <div className="grid items-center gap-14 lg:grid-cols-2 lg:gap-20">
               <div>
                 <span className="text-xs font-bold uppercase tracking-[0.15em] text-[#005cb3]">
@@ -433,7 +433,7 @@ const rows = await db.query(
 
         {/* ───────────── Use cases ───────────── */}
         <section className="border-y border-slate-200 bg-slate-50 py-20 sm:py-24">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-12">
             <div className="mx-auto max-w-2xl text-center">
               <span className="text-xs font-bold uppercase tracking-[0.15em] text-[#005cb3]">
                 Built for
@@ -482,7 +482,7 @@ const rows = await db.query(
             <div className="absolute left-1/2 top-0 h-[400px] w-[800px] -translate-x-1/2 rounded-full bg-[#0078E2]/25 blur-[100px]" />
           </div>
 
-          <div className="relative mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
+          <div className="relative w-full px-4 text-center sm:px-6 lg:px-8 xl:px-12">
             <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
               Ready to launch your first tenant?
             </h2>

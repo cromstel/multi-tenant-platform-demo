@@ -183,8 +183,8 @@ export default function FaqPage() {
             <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:56px_56px]" />
           </div>
 
-          <div className="relative mx-auto max-w-3xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
-            <h1 className="mt-0 text-4xl font-extrabold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-6xl">
+          <div className="relative w-full px-4 py-16 sm:px-6 sm:py-24 lg:px-8 xl:px-12">
+            <h1 className="mt-0 max-w-4xl text-4xl font-extrabold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-6xl">
                 Frequently asked{' '}
                 <span className="bg-gradient-to-r from-[#4A9DFF] to-[#7DD3FC] bg-clip-text text-transparent">
                   questions
@@ -232,7 +232,7 @@ export default function FaqPage() {
         </section>
 
         {/* Groups */}
-        <div className="mx-auto max-w-3xl space-y-16 px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+        <div className="grid w-full items-start gap-10 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-2 lg:gap-12 lg:px-8 xl:px-12">
           {GROUPS.map((group) => (
             <section key={group.id} id={group.id} className="scroll-mt-24">
               <div className="flex items-start gap-3">
@@ -261,7 +261,7 @@ export default function FaqPage() {
 
         {/* CTA */}
         <section className="border-t border-slate-200 bg-slate-50 py-16 sm:py-20">
-          <div className="mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
+          <div className="w-full px-4 text-center sm:px-6 lg:px-8 xl:px-12">
             <span className="mx-auto flex h-11 w-11 items-center justify-center bg-[#005cb3] text-white">
               <LifeBuoy className="h-5 w-5" aria-hidden="true" />
             </span>

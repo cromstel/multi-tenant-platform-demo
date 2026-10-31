@@ -221,3 +221,17 @@ export function contactPageSchema() {
     about: { '@id': `${siteUrl()}/#organization` },
   };
 }
+
+/** The company page, described as an `AboutPage` about the organisation. */
+export function aboutPageSchema() {
+  return {
+    '@type': 'AboutPage',
+    '@id': `${siteUrl()}/about#aboutpage`,
+    url: absoluteUrl('/about'),
+    name: `About | ${SITE_NAME}`,
+    description:
+      'Why CITGROUP TENANCY SYSTEM exists: isolation by default, one source of truth, and infrastructure that scales without leaking tenant data.',
+    about: { '@id': `${siteUrl()}/#organization` },
+    mainEntity: { '@id': `${siteUrl()}/#organization` },
+  };
+}

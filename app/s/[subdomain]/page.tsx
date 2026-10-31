@@ -71,7 +71,7 @@ export default async function SubdomainPage({
       </header>
 
       <main className="flex-1 flex items-center justify-center px-4 py-20">
-        <div className="w-full max-w-3xl text-center">
+        <div className="w-full text-center">
           <div className="text-9xl mb-6">{subdomainData.emoji}</div>
           
           <div className="mb-4">
@@ -85,12 +85,12 @@ export default async function SubdomainPage({
             Welcome to <span className="text-blue-600">{subdomain}</span>
           </h1>
           
-          <p className="text-lg text-gray-600 mb-8 max-w-xl mx-auto">
+          <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
             This is your custom subdomain page on CITGROUP TENANCY SYSTEM. 
             Your tenant is configured and ready to use.
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-xl mx-auto mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl mx-auto mb-8">
             <div className="bg-white rounded-none p-5 border border-gray-200 shadow-sm">
               <div className="text-3xl mb-2">📅</div>
               <div className="text-sm text-gray-500">Created</div>
