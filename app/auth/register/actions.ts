@@ -60,11 +60,13 @@ async function performRegistration(
 ): Promise<RegisterState> {
   const subdomain = formData.get('subdomain') as string;
   const email = formData.get('email') as string;
+  const firstName = formData.get('firstName') as string || '';
+  const lastName = formData.get('lastName') as string || '';
   const password = formData.get('password') as string;
   const confirmPassword = formData.get('confirmPassword') as string;
-  const emoji = formData.get('icon') as string;
+  const emoji = (formData.get('icon') as string) || '⭐';
 
-  if (!subdomain || !email || !password || !confirmPassword || !emoji) {
+  if (!subdomain || !email || !firstName || !lastName || !password || !confirmPassword) {
     return { error: 'All fields are required' };
   }
 
@@ -133,8 +135,8 @@ async function performRegistration(
     tenantId = (tenantResult as { insertId: number }).insertId;
 
     const [userResult] = await conn.execute(
-      'INSERT INTO tenant_users (tenant_id, email, password_hash, role) VALUES (?, ?, ?, ?)',
-      [tenantId, email, passwordHash, 'owner']
+      'INSERT INTO tenant_users (tenant_id, email, first_name, last_name, password_hash, role) VALUES (?, ?, ?, ?, ?, ?)',
+      [tenantId, email, firstName, lastName, passwordHash, 'owner']
     );
     userId = (userResult as { insertId: number }).insertId;
 

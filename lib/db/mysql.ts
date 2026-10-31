@@ -107,6 +107,8 @@ export async function initializeMySQL(): Promise<void> {
         id INT AUTO_INCREMENT PRIMARY KEY,
         tenant_id INT NOT NULL,
         email VARCHAR(255) NOT NULL,
+        first_name VARCHAR(120) NOT NULL DEFAULT '',
+        last_name VARCHAR(120) NOT NULL DEFAULT '',
         password_hash VARCHAR(255) NOT NULL,
         role ENUM('owner', 'admin', 'member') DEFAULT 'member',
         is_active BOOLEAN DEFAULT TRUE,

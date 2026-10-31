@@ -54,6 +54,18 @@ export function TenantRegisterForm({
   return (
     <TooltipProvider>
       <form action={formAction} className="space-y-4">
+        {/* Contact — First / Last Name */}
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div>
+            <Label htmlFor="firstName" className="mb-1.5 block text-sm font-medium text-slate-700">First name</Label>
+            <Input id="firstName" name="firstName" type="text" autoComplete="given-name" placeholder="Jane" onChange={(e)=>setFirstName(e.target.value)} className={fieldClass} required />
+          </div>
+          <div>
+            <Label htmlFor="lastName" className="mb-1.5 block text-sm font-medium text-slate-700">Last name</Label>
+            <Input id="lastName" name="lastName" type="text" autoComplete="family-name" placeholder="Doe" onChange={(e)=>setLastName(e.target.value)} className={fieldClass} required />
+          </div>
+        </div>
+
         {/* Subdomain */}
         <div>
           <Label htmlFor="subdomain" className="mb-1.5 block text-sm font-medium text-slate-700">
@@ -77,18 +89,6 @@ export function TenantRegisterForm({
           <div>
             <Label htmlFor="confirmEmail" className="mb-1.5 block text-sm font-medium text-slate-700">Confirm email</Label>
             <Input id="confirmEmail" name="confirmEmail" type="email" autoComplete="email" placeholder="Re-enter email" onChange={(e)=>setConfirmEmail(e.target.value)} className={fieldClass} required />
-          </div>
-        </div>
-
-        {/* Contact — First / Last Name */}
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <div>
-            <Label htmlFor="firstName" className="mb-1.5 block text-sm font-medium text-slate-700">First name</Label>
-            <Input id="firstName" name="firstName" type="text" autoComplete="name" placeholder="Jane" onChange={(e)=>setFirstName(e.target.value)} className={fieldClass} required />
-          </div>
-          <div>
-            <Label htmlFor="lastName" className="mb-1.5 block text-sm font-medium text-slate-700">Last name</Label>
-            <Input id="lastName" name="lastName" type="text" autoComplete="name" placeholder="Doe" onChange={(e)=>setLastName(e.target.value)} className={fieldClass} required />
           </div>
         </div>
 
