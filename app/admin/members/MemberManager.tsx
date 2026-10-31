@@ -80,7 +80,7 @@ export function MemberManager({
       onClick={onClose}
     >
       <div
-        className="max-h-[85dvh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-2xl"
+        className="max-h-[85dvh] w-full max-w-2xl overflow-y-auto rounded-none bg-white shadow-2xl"
         onClick={(event) => event.stopPropagation()}
       >
         {/* Header */}
@@ -98,7 +98,7 @@ export function MemberManager({
             type="button"
             onClick={onClose}
             aria-label="Close member manager"
-            className="rounded-lg p-1.5 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700"
+            className="rounded-none p-1.5 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700"
           >
             <X className="h-5 w-5" aria-hidden="true" />
           </button>
@@ -107,19 +107,19 @@ export function MemberManager({
         <div className="space-y-5 p-5">
           {/* Feedback */}
           {feedback && (
-            <p role="alert" className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+            <p role="alert" className="rounded-none border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
               {feedback}
             </p>
           )}
           {success && (
-            <p role="status" className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+            <p role="status" className="rounded-none border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
               {success}
             </p>
           )}
 
           {/* Invite */}
           {inviteOpen ? (
-            <form action={inviteAction} className="space-y-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
+            <form action={inviteAction} className="space-y-3 rounded-none border border-slate-200 bg-slate-50 p-4">
               <input type="hidden" name="subdomain" value={subdomain} />
               <div className="grid gap-3 sm:grid-cols-[1fr_140px]">
                 <Input
@@ -134,7 +134,7 @@ export function MemberManager({
                   id="invite-role"
                   name="role"
                   defaultValue="member"
-                  className="h-11 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 focus:border-[#0078E2] focus:outline-none focus:ring-2 focus:ring-[#0078E2]/20"
+                  className="h-11 rounded-none border border-slate-200 bg-white px-3 text-sm text-slate-700 focus:border-[#0078E2] focus:outline-none focus:ring-2 focus:ring-[#0078E2]/20"
                 >
                   {ROLES.map((role) => (
                     <option key={role.value} value={role.value}>
@@ -174,7 +174,7 @@ export function MemberManager({
           )}
 
           {/* Member list */}
-          <ul className="divide-y divide-slate-100 overflow-hidden rounded-xl border border-slate-200">
+          <ul className="divide-y divide-slate-100 overflow-hidden rounded-none border border-slate-200">
             {members.length === 0 ? (
               <li className="p-6 text-center text-sm text-slate-500">
                 No members yet.
@@ -212,7 +212,7 @@ export function MemberManager({
                       defaultValue={member.role}
                       disabled={busy}
                       aria-label={`Role for ${member.email}`}
-                      className="h-8 rounded-lg border border-slate-200 bg-white px-2 text-xs text-slate-700 focus:border-[#0078E2] focus:outline-none focus:ring-1 focus:ring-[#0078E2]/30 disabled:opacity-50"
+                      className="h-8 rounded-none border border-slate-200 bg-white px-2 text-xs text-slate-700 focus:border-[#0078E2] focus:outline-none focus:ring-1 focus:ring-[#0078E2]/30 disabled:opacity-50"
                     >
                       {ROLES.map((role) => (
                         <option key={role.value} value={role.value}>

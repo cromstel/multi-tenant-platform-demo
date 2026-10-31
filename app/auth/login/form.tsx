@@ -77,7 +77,7 @@ export function TenantLoginForm() {
         {state.error && (
           <p
             role="alert"
-            className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
+            className="border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
           >
             {state.error}
           </p>
@@ -86,7 +86,7 @@ export function TenantLoginForm() {
         <Button
           type="submit"
           disabled={isPending}
-          className="h-12 w-full rounded-xl bg-[#005cb3] text-base font-semibold text-white shadow-lg shadow-blue-600/25 transition-all hover:bg-[#004A94] active:scale-[0.99]"
+          className="h-12 w-full rounded-none bg-[#005cb3] text-base font-semibold text-white shadow-lg shadow-blue-600/25 transition-all hover:bg-[#004A94] active:scale-[0.99]"
         >
           {isPending ? 'Signing in…' : 'Sign In'}
         </Button>

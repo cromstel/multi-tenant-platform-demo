@@ -22,11 +22,11 @@ function SubdomainInput({ defaultValue, onChange }: { defaultValue?: string; onC
           placeholder="your-company"
           defaultValue={defaultValue}
           onChange={(e) => onChange?.(e.target.value)}
-          className={`${fieldClass} w-full rounded-r-none focus:z-10`}
+          className={`${fieldClass} w-full rounded-none-none focus:z-10`}
           required
         />
       </div>
-      <span className="flex min-h-[48px] items-center rounded-r-none border border-l-0 border-slate-200 bg-slate-100 px-3 text-sm font-medium text-slate-600">
+      <span className="flex min-h-[48px] items-center rounded-none-none border border-l-0 border-slate-200 bg-slate-100 px-3 text-sm font-medium text-slate-600">
         .{rootDomain}
       </span>
     </div>

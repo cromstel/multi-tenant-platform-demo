@@ -24,11 +24,11 @@ function SubdomainInput({ defaultValue }: { defaultValue?: string }) {
           name="subdomain"
           placeholder="your-company"
           defaultValue={defaultValue}
-          className="h-12 w-full rounded-r-none border-slate-200 bg-slate-50 focus:border-[#0078E2] focus:ring-2 focus:ring-[#0078E2]/20 focus:z-10"
+          className="h-12 w-full rounded-none-none border-slate-200 bg-slate-50 focus:border-[#0078E2] focus:ring-2 focus:ring-[#0078E2]/20 focus:z-10"
           required
         />
       </div>
-      <span className="flex min-h-[48px] items-center rounded-r-none border border-l-0 border-slate-200 bg-slate-100 px-3 text-sm font-medium text-slate-600">
+      <span className="flex min-h-[48px] items-center rounded-none-none border border-l-0 border-slate-200 bg-slate-100 px-3 text-sm font-medium text-slate-600">
         .{rootDomain}
       </span>
     </div>

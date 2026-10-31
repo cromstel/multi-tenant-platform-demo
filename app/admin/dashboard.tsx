@@ -114,7 +114,7 @@ function StatsCard({
           <p className="text-sm text-slate-500">{title}</p>
           <p className="mt-1 text-2xl font-extrabold text-slate-900">{value}</p>
         </div>
-        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#0078E2]/10 text-[#005cb3]">
+        <div className="flex h-11 w-11 items-center justify-center rounded-none bg-[#0078E2]/10 text-[#005cb3]">
           <Icon className="h-5 w-5" aria-hidden="true" />
         </div>
       </CardContent>
@@ -137,7 +137,7 @@ function DashboardHeader({ stats }: { stats: Stats }) {
         <div className="flex items-center gap-2">
           <Link
             href="/"
-            className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
+            className="rounded-none px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
           >
             Back to System
           </Link>
@@ -195,7 +195,7 @@ function SearchAndFilters({
         <select
           value={sortBy}
           onChange={(e) => onSortBy(e.target.value)}
-          className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 focus:border-[#0078E2] focus:outline-none focus:ring-2 focus:ring-[#0078E2]/20"
+          className="rounded-none border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 focus:border-[#0078E2] focus:outline-none focus:ring-2 focus:ring-[#0078E2]/20"
           aria-label="Sort by"
         >
           <option value="createdAt">Created date</option>
@@ -205,7 +205,7 @@ function SearchAndFilters({
         <select
           value={sortOrder}
           onChange={(e) => onSortOrder(e.target.value)}
-          className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 focus:border-[#0078E2] focus:outline-none focus:ring-2 focus:ring-[#0078E2]/20"
+          className="rounded-none border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 focus:border-[#0078E2] focus:outline-none focus:ring-2 focus:ring-[#0078E2]/20"
           aria-label="Sort order"
         >
           <option value="desc">Descending</option>
@@ -252,7 +252,7 @@ function TenantModal({
       onClick={onClose}
     >
       <div
-        className="max-h-[85dvh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white shadow-2xl"
+        className="max-h-[85dvh] w-full max-w-lg overflow-y-auto rounded-none bg-white shadow-2xl"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="flex items-start justify-between gap-4 border-b border-slate-100 p-5">
@@ -273,7 +273,7 @@ function TenantModal({
             type="button"
             onClick={onClose}
             aria-label="Close details"
-            className="rounded-lg p-1.5 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700"
+            className="rounded-none p-1.5 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700"
           >
             <X className="h-5 w-5" aria-hidden="true" />
           </button>
@@ -281,7 +281,7 @@ function TenantModal({
 
         <div className="space-y-5 p-5">
           <dl className="grid grid-cols-2 gap-4">
-            <div className="rounded-xl bg-slate-50 p-3">
+            <div className="rounded-none bg-slate-50 p-3">
               <dt className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-slate-500">
                 <Calendar className="h-3.5 w-3.5" aria-hidden="true" />
                 Created
@@ -290,7 +290,7 @@ function TenantModal({
                 {formatDate(detail.tenant.createdAt)}
               </dd>
             </div>
-            <div className="rounded-xl bg-slate-50 p-3">
+            <div className="rounded-none bg-slate-50 p-3">
               <dt className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-slate-500">
                 <Mail className="h-3.5 w-3.5" aria-hidden="true" />
                 Owner
@@ -304,11 +304,11 @@ function TenantModal({
           <div>
             <h3 className="mb-2 text-sm font-bold text-slate-900">Team members</h3>
             {detail.users.length === 0 ? (
-              <p className="rounded-xl border border-dashed border-slate-200 p-4 text-center text-sm text-slate-500">
+              <p className="rounded-none border border-dashed border-slate-200 p-4 text-center text-sm text-slate-500">
                 No members yet.
               </p>
             ) : (
-              <ul className="divide-y divide-slate-100 overflow-hidden rounded-xl border border-slate-200">
+              <ul className="divide-y divide-slate-100 overflow-hidden rounded-none border border-slate-200">
                 {detail.users.map((user) => (
                   <li key={user.id} className="flex items-center gap-3 p-3">
                     <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#0078E2]/10 text-xs font-bold text-[#005cb3]">
@@ -340,7 +340,7 @@ function TenantModal({
             href={`/${detail.tenant.subdomain}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50"
+            className="rounded-none border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50"
           >
             Visit tenant
           </a>
@@ -637,14 +637,14 @@ export function AdminDashboard({
       {deleteState.error && (
         <div
           role="alert"
-          className="fixed bottom-4 right-4 rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700 shadow-lg"
+          className="fixed bottom-4 right-4 rounded-none border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700 shadow-lg"
         >
           {deleteState.error}
         </div>
       )}
 
       {deleteState.success && (
-        <div className="fixed bottom-4 right-4 rounded-lg border border-green-300 bg-green-50 px-4 py-3 text-sm text-green-700 shadow-lg">
+        <div className="fixed bottom-4 right-4 rounded-none border border-green-300 bg-green-50 px-4 py-3 text-sm text-green-700 shadow-lg">
           {deleteState.success}
         </div>
       )}
@@ -652,14 +652,14 @@ export function AdminDashboard({
       {bulkState.error && (
         <div
           role="alert"
-          className="fixed bottom-4 left-4 rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700 shadow-lg"
+          className="fixed bottom-4 left-4 rounded-none border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700 shadow-lg"
         >
           {bulkState.error}
         </div>
       )}
 
       {bulkState.success && (
-        <div className="fixed bottom-4 left-4 rounded-lg border border-green-300 bg-green-50 px-4 py-3 text-sm text-green-700 shadow-lg">
+        <div className="fixed bottom-4 left-4 rounded-none border border-green-300 bg-green-50 px-4 py-3 text-sm text-green-700 shadow-lg">
           {bulkState.success}
         </div>
       )}

@@ -164,14 +164,14 @@ export default function ContactPage() {
             <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
               <a
                 href="#enquiry"
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#005cb3] px-6 py-3.5 text-sm font-bold text-white shadow-xl shadow-blue-600/30 transition-all hover:bg-[#004A94] hover:shadow-blue-600/45 active:scale-[0.98]"
+                className="inline-flex items-center justify-center gap-2 rounded-none bg-[#005cb3] px-6 py-3.5 text-sm font-bold text-white shadow-xl shadow-blue-600/30 transition-all hover:bg-[#004A94] hover:shadow-blue-600/45 active:scale-[0.98]"
               >
                 Send an enquiry
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </a>
               <a
                 href="#channels"
-                className="inline-flex items-center justify-center rounded-xl border border-white/20 bg-white/5 px-6 py-3.5 text-sm font-bold text-white backdrop-blur-sm transition-all hover:border-white/35 hover:bg-white/10"
+                className="inline-flex items-center justify-center rounded-none border border-white/20 bg-white/5 px-6 py-3.5 text-sm font-bold text-white backdrop-blur-sm transition-all hover:border-white/35 hover:bg-white/10"
               >
                 Browse support channels
               </a>
@@ -185,7 +185,7 @@ export default function ContactPage() {
               ].map((stat) => (
                 <div
                   key={stat.label}
-                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 backdrop-blur-sm"
+                  className="rounded-none border border-white/10 bg-white/5 px-4 py-4 backdrop-blur-sm"
                 >
                   <dt className="text-2xl font-extrabold tracking-tight text-white">
                     {stat.value}
@@ -220,10 +220,10 @@ export default function ContactPage() {
             {CHANNELS.map((channel) => (
               <div
                 key={channel.title}
-                className="group flex flex-col rounded-2xl border border-slate-200 bg-white p-6 transition-all hover:-translate-y-1 hover:border-[#0078E2]/30 hover:shadow-xl hover:shadow-slate-200/60"
+                className="group flex flex-col rounded-none border border-slate-200 bg-white p-6 transition-all hover:-translate-y-1 hover:border-[#0078E2]/30 hover:shadow-xl hover:shadow-slate-200/60"
               >
                 <div
-                  className={`flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br ${channel.accent} text-white shadow-lg transition-transform group-hover:scale-105`}
+                  className={`flex h-11 w-11 items-center justify-center rounded-none bg-gradient-to-br ${channel.accent} text-white shadow-lg transition-transform group-hover:scale-105`}
                 >
                   <channel.icon className="h-5 w-5" aria-hidden="true" />
                 </div>
@@ -267,7 +267,7 @@ export default function ContactPage() {
 
             {/* Direct details */}
             <aside className="space-y-6">
-              <div className="rounded-2xl border border-slate-200 bg-white p-6">
+              <div className="rounded-none border border-slate-200 bg-white p-6">
                 <h3 className="text-lg font-bold text-slate-900">Direct contact</h3>
                 <p className="mt-1 text-sm text-slate-500">
                   Prefer your own email client? Reach us directly.
@@ -282,7 +282,7 @@ export default function ContactPage() {
                 <dl className="mt-5 space-y-4">
                   <div>
                     <dt className="flex items-start gap-3">
-                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#0078E2]/10 text-[#005cb3]">
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-none bg-[#0078E2]/10 text-[#005cb3]">
                         <Mail className="h-4 w-4" aria-hidden="true" />
                       </span>
                       <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">
@@ -301,7 +301,7 @@ export default function ContactPage() {
 
                   <div>
                     <dt className="flex items-start gap-3">
-                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#0078E2]/10 text-[#005cb3]">
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-none bg-[#0078E2]/10 text-[#005cb3]">
                         <Phone className="h-4 w-4" aria-hidden="true" />
                       </span>
                       <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">
@@ -320,7 +320,7 @@ export default function ContactPage() {
 
                   <div>
                     <dt className="flex items-start gap-3">
-                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#0078E2]/10 text-[#005cb3]">
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-none bg-[#0078E2]/10 text-[#005cb3]">
                         <Clock className="h-4 w-4" aria-hidden="true" />
                       </span>
                       <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">
@@ -337,7 +337,7 @@ export default function ContactPage() {
 
                   <div>
                     <dt className="flex items-start gap-3">
-                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#0078E2]/10 text-[#005cb3]">
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-none bg-[#0078E2]/10 text-[#005cb3]">
                         <LifeBuoy className="h-4 w-4" aria-hidden="true" />
                       </span>
                       <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">
@@ -357,7 +357,7 @@ export default function ContactPage() {
               </div>
 
               {/* Commitment card */}
-              <div className="rounded-2xl border border-[#0078E2]/20 bg-gradient-to-br from-[#0078E2]/[0.06] to-transparent p-6">
+              <div className="rounded-none border border-[#0078E2]/20 bg-gradient-to-br from-[#0078E2]/[0.06] to-transparent p-6">
                 <h3 className="flex items-center gap-2 text-base font-bold text-slate-900">
                   <ShieldCheck className="h-5 w-5 text-[#005cb3]" aria-hidden="true" />
                   Our commitment to you
@@ -404,10 +404,10 @@ export default function ContactPage() {
             {OFFICES.map((office) => (
               <div
                 key={office.city}
-                className="rounded-2xl border border-slate-200 bg-white p-6 transition-all hover:-translate-y-1 hover:shadow-lg"
+                className="rounded-none border border-slate-200 bg-white p-6 transition-all hover:-translate-y-1 hover:shadow-lg"
               >
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-900 text-white">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-none bg-slate-900 text-white">
                     <MapPin className="h-5 w-5" aria-hidden="true" />
                   </div>
                   <div>
@@ -453,11 +453,11 @@ export default function ContactPage() {
             </p>
           </div>
 
-          <dl className="mt-12 divide-y divide-slate-200 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <dl className="mt-12 divide-y divide-slate-200 overflow-hidden rounded-none border border-slate-200 bg-white shadow-sm">
             {FAQS.map((faq) => (
               <div key={faq.q} className="p-6 transition-colors hover:bg-slate-50">
                 <dt className="flex items-start gap-3">
-                  <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-[#0078E2]/10 text-[#005cb3]">
+                  <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-none bg-[#0078E2]/10 text-[#005cb3]">
                     <span className="text-xs font-bold">?</span>
                   </span>
                   <h3 className="text-base font-bold text-slate-900">{faq.q}</h3>
@@ -489,14 +489,14 @@ export default function ContactPage() {
           <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
             <Link
               href="/#faq"
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#005cb3] px-6 py-3.5 text-sm font-bold text-white shadow-xl shadow-blue-600/30 transition-all hover:bg-[#004A94] active:scale-[0.98]"
+              className="inline-flex items-center justify-center gap-2 rounded-none bg-[#005cb3] px-6 py-3.5 text-sm font-bold text-white shadow-xl shadow-blue-600/30 transition-all hover:bg-[#004A94] active:scale-[0.98]"
             >
               Read the FAQ
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
             <Link
               href="/auth/register"
-              className="inline-flex items-center justify-center rounded-xl border border-white/20 bg-white/5 px-6 py-3.5 text-sm font-bold text-white backdrop-blur-sm transition-all hover:border-white/35 hover:bg-white/10"
+              className="inline-flex items-center justify-center rounded-none border border-white/20 bg-white/5 px-6 py-3.5 text-sm font-bold text-white backdrop-blur-sm transition-all hover:border-white/35 hover:bg-white/10"
             >
               Create a tenant
             </Link>

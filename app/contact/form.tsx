@@ -28,7 +28,7 @@ export function ContactForm() {
 
   if (state.success) {
     return (
-      <div className="rounded-2xl border border-emerald-200 bg-emerald-50/70 p-8 text-center">
+      <div className="rounded-none border border-emerald-200 bg-emerald-50/70 p-8 text-center">
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500 text-white shadow-lg shadow-emerald-500/25">
           <svg className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
@@ -42,7 +42,7 @@ export function ContactForm() {
         </p>
         <Link
           href="/"
-          className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[#005cb3] px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-blue-600/25 transition-all hover:bg-[#004A94] active:scale-[0.98]"
+          className="mt-6 inline-flex items-center gap-2 rounded-none bg-[#005cb3] px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-blue-600/25 transition-all hover:bg-[#004A94] active:scale-[0.98]"
         >
           Back to the platform
         </Link>
@@ -57,7 +57,7 @@ export function ContactForm() {
       {state.error && (
         <p
           role="alert"
-          className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+          className="rounded-none border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
         >
           {state.error}
         </p>
@@ -175,7 +175,7 @@ export function ContactForm() {
           defaultValue={state.values?.message}
           aria-invalid={Boolean(errors.message)}
           aria-describedby={errors.message ? 'message-error' : 'message-hint'}
-          className={`w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-base text-slate-900 placeholder:text-slate-500 focus:border-[#0078E2] focus:outline-none focus:ring-2 focus:ring-[#0078E2]/20 ${
+          className={`w-full rounded-none border border-slate-200 bg-slate-50 px-3 py-2.5 text-base text-slate-900 placeholder:text-slate-500 focus:border-[#0078E2] focus:outline-none focus:ring-2 focus:ring-[#0078E2]/20 ${
             errors.message ? 'border-red-400 focus:border-red-500 focus:ring-red-500/20' : ''
           }`}
         />
@@ -199,7 +199,7 @@ export function ContactForm() {
       <Button
         type="submit"
         disabled={isPending}
-        className="h-12 w-full rounded-xl bg-[#005cb3] text-base font-bold text-white shadow-lg shadow-blue-600/25 transition-all hover:bg-[#004A94] active:scale-[0.99] disabled:opacity-60"
+        className="h-12 w-full rounded-none bg-[#005cb3] text-base font-bold text-white shadow-lg shadow-blue-600/25 transition-all hover:bg-[#004A94] active:scale-[0.99] disabled:opacity-60"
       >
         {isPending ? 'Sending…' : 'Send message'}
       </Button>

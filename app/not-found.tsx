@@ -36,7 +36,7 @@ export default async function NotFound() {
       <div className="text-center">
         <div className="mb-8 flex justify-center">
           <Link href="/" className="group flex items-center gap-2.5">
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#0078E2] to-[#5B9CF5] shadow-lg shadow-blue-600/25 transition-transform group-hover:scale-105">
+            <span className="flex h-10 w-10 items-center justify-center rounded-none bg-gradient-to-br from-[#0078E2] to-[#5B9CF5] shadow-lg shadow-blue-600/25 transition-transform group-hover:scale-105">
               <svg className="h-6 w-6 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
               </svg>
@@ -65,7 +65,7 @@ export default async function NotFound() {
         <div className="mt-6">
           <Link
             href={`${protocol}://localhost:3030`}
-            className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+            className="rounded-noned bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
           >
             {subdomain ? `Create ${subdomain}` : 'Go to CITGROUP TENANCY SYSTEM'}
           </Link>

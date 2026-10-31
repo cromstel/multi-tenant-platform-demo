@@ -231,14 +231,14 @@ export default function HomePage() {
                 <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                   <Link
                     href="/auth/register"
-                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#005cb3] px-6 py-3.5 text-sm font-bold text-white shadow-xl shadow-blue-600/30 transition-all hover:bg-[#004A94] hover:shadow-blue-600/45 active:scale-[0.98]"
+                    className="inline-flex items-center justify-center gap-2 rounded-none bg-[#005cb3] px-6 py-3.5 text-sm font-bold text-white shadow-xl shadow-blue-600/30 transition-all hover:bg-[#004A94] hover:shadow-blue-600/45 active:scale-[0.98]"
                   >
                     Create your tenant
                     <ArrowRight className="h-4 w-4" aria-hidden="true" />
                   </Link>
                   <Link
                     href="/auth/login"
-                    className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/5 px-6 py-3.5 text-sm font-bold text-white backdrop-blur-sm transition-all hover:border-white/35 hover:bg-white/10"
+                    className="inline-flex items-center justify-center gap-2 rounded-none border border-white/20 bg-white/5 px-6 py-3.5 text-sm font-bold text-white backdrop-blur-sm transition-all hover:border-white/35 hover:bg-white/10"
                   >
                     Sign in to your tenant
                   </Link>
@@ -272,12 +272,12 @@ export default function HomePage() {
                         Live in under ten seconds
                       </p>
                     </div>
-                    <span className="rounded-lg border border-white/15 bg-white/5 px-2.5 py-1 font-mono text-[10px] font-semibold text-blue-200/70">
+                    <span className="rounded-none border border-white/15 bg-white/5 px-2.5 py-1 font-mono text-[10px] font-semibold text-blue-200/70">
                       POST /tenants
                     </span>
                   </div>
 
-                  <div className="rounded-2xl bg-white p-5 shadow-lg">
+                  <div className="rounded-none bg-white p-5 shadow-lg">
                     <SubdomainForm />
                   </div>
 
@@ -318,9 +318,9 @@ export default function HomePage() {
               {FEATURES.map((feature) => (
                 <div
                   key={feature.title}
-                  className="group rounded-2xl border border-slate-200 bg-white p-6 transition-all hover:-translate-y-1 hover:border-[#0078E2]/30 hover:shadow-xl hover:shadow-slate-200/60"
+                  className="group rounded-none border border-slate-200 bg-white p-6 transition-all hover:-translate-y-1 hover:border-[#0078E2]/30 hover:shadow-xl hover:shadow-slate-200/60"
                 >
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#0078E2]/10 text-[#005cb3] transition-colors group-hover:bg-[#005cb3] group-hover:text-white">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-none bg-[#0078E2]/10 text-[#005cb3] transition-colors group-hover:bg-[#005cb3] group-hover:text-white">
                     <feature.icon className="h-5 w-5" aria-hidden="true" />
                   </div>
                   <h3 className="mt-4 text-base font-bold text-slate-900">{feature.title}</h3>
@@ -349,7 +349,7 @@ export default function HomePage() {
                   authorization. There is no configuration to get wrong and no shared state to leak.
                 </p>
 
-                <div className="mt-8 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                <div className="mt-8 overflow-hidden rounded-none border border-slate-200 bg-white shadow-sm">
                   <div className="flex items-center gap-2 border-b border-slate-200 bg-slate-100 px-4 py-2.5">
                     <Terminal className="h-3.5 w-3.5 text-slate-500" aria-hidden="true" />
                     <span className="font-mono text-xs text-slate-600">tenant-resolution.ts</span>
@@ -374,10 +374,10 @@ const rows = await db.query(
                 {ARCHITECTURE_STEPS.map((step, index) => (
                   <li
                     key={step.title}
-                    className="flex gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-colors hover:border-[#0078E2]/30"
+                    className="flex gap-4 rounded-none border border-slate-200 bg-white p-5 shadow-sm transition-colors hover:border-[#0078E2]/30"
                   >
                     <div className="flex flex-col items-center gap-2">
-                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#005cb3] text-white shadow-lg shadow-blue-600/25">
+                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-none bg-[#005cb3] text-white shadow-lg shadow-blue-600/25">
                         <step.icon className="h-5 w-5" aria-hidden="true" />
                       </span>
                       {index < ARCHITECTURE_STEPS.length - 1 && (
@@ -433,7 +433,7 @@ const rows = await db.query(
 
                 <Link
                   href="/auth/register"
-                  className="mt-8 inline-flex items-center gap-2 rounded-xl bg-[#005cb3] px-5 py-3 text-sm font-bold text-white shadow-lg shadow-blue-600/25 transition-all hover:bg-[#004A94] active:scale-[0.98]"
+                  className="mt-8 inline-flex items-center gap-2 rounded-none bg-[#005cb3] px-5 py-3 text-sm font-bold text-white shadow-lg shadow-blue-600/25 transition-all hover:bg-[#004A94] active:scale-[0.98]"
                 >
                   Create a tenant workspace
                   <ArrowRight className="h-4 w-4" aria-hidden="true" />
@@ -450,7 +450,7 @@ const rows = await db.query(
                 ].map((card) => (
                   <div
                     key={card.label}
-                    className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
+                    className="rounded-none border border-slate-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
                   >
                     <card.icon className="h-6 w-6 text-[#005cb3]" aria-hidden="true" />
                     <p className="mt-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
@@ -496,9 +496,9 @@ const rows = await db.query(
               ].map((item) => (
                 <div
                   key={item.title}
-                  className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
+                  className="rounded-none border border-slate-200 bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
                 >
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-900 text-white">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-none bg-slate-900 text-white">
                     <item.icon className="h-5 w-5" aria-hidden="true" />
                   </div>
                   <h3 className="mt-4 text-base font-bold text-slate-900">{item.title}</h3>
@@ -519,11 +519,11 @@ const rows = await db.query(
               </h2>
             </div>
 
-            <dl className="mt-12 divide-y divide-slate-200 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <dl className="mt-12 divide-y divide-slate-200 overflow-hidden rounded-none border border-slate-200 bg-white shadow-sm">
               {FAQS.map((faq) => (
                 <div key={faq.q} className="group p-6 transition-colors hover:bg-slate-50">
                   <dt className="flex items-start gap-3">
-                    <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-[#0078E2]/10 text-[#005cb3]">
+                    <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-none bg-[#0078E2]/10 text-[#005cb3]">
                       <span className="text-xs font-bold">?</span>
                     </span>
                     <h3 className="text-base font-bold text-slate-900">{faq.q}</h3>
@@ -553,14 +553,14 @@ const rows = await db.query(
             <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
               <Link
                 href="/auth/register"
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#005cb3] px-6 py-3.5 text-sm font-bold text-white shadow-xl shadow-blue-600/30 transition-all hover:bg-[#004A94] active:scale-[0.98]"
+                className="inline-flex items-center justify-center gap-2 rounded-none bg-[#005cb3] px-6 py-3.5 text-sm font-bold text-white shadow-xl shadow-blue-600/30 transition-all hover:bg-[#004A94] active:scale-[0.98]"
               >
                 Create your tenant
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
               <Link
                 href="/auth/login"
-                className="inline-flex items-center justify-center rounded-xl border border-white/20 bg-white/5 px-6 py-3.5 text-sm font-bold text-white backdrop-blur-sm transition-all hover:border-white/35 hover:bg-white/10"
+                className="inline-flex items-center justify-center rounded-none border border-white/20 bg-white/5 px-6 py-3.5 text-sm font-bold text-white backdrop-blur-sm transition-all hover:border-white/35 hover:bg-white/10"
               >
                 I already have a tenant
               </Link>
