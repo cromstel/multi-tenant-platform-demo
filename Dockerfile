@@ -25,6 +25,14 @@ WORKDIR /app
 
 RUN corepack enable
 
+# `NEXT_PUBLIC_*` values are inlined into the client bundle at build time,
+# so they cannot be fixed with a runtime env var. This has to match the
+# domain the app is served from, or client-rendered tenant URLs fall back
+# to `localhost`. `.dockerignore` excludes `.env*`, so this is the only
+# channel into the build.
+ARG NEXT_PUBLIC_ROOT_DOMAIN=localhost:3030
+ENV NEXT_PUBLIC_ROOT_DOMAIN=$NEXT_PUBLIC_ROOT_DOMAIN
+
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 

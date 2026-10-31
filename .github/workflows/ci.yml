@@ -83,6 +83,7 @@ jobs:
   docker:
     name: Docker image builds
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     needs: verify
 
     steps:
@@ -97,18 +98,60 @@ jobs:
           push: false
           load: true
           tags: citgroup-tenancy-system:ci
+          build-args: |
+            NEXT_PUBLIC_ROOT_DOMAIN=localhost:3030
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
       - name: Smoke test the image
+        timeout-minutes: 5
         run: |
+          set -euo pipefail
+
+          # Always surface the container log and clean up, whether the
+          # test passes or fails — a silent exit is the least useful outcome.
+          trap 'status=$?; if [ "$status" -ne 0 ]; then docker logs app 2>&1 || true; fi; docker rm -f app >/dev/null 2>&1 || true' EXIT
+
+          # `lib/redis.ts` refuses to run in production without a durable
+          # store, and the runtime image sets NODE_ENV=production. MYSQL_*
+          # is the cheapest way to satisfy that guard: nothing listens on
+          # 3306 here, so the health endpoint is expected to be `degraded`.
           docker run -d --name app -p 3030:3030 \
+            -e MYSQL_HOST=127.0.0.1 \
+            -e MYSQL_DATABASE=multi_tenant \
             -e ADMIN_SESSION_SECRET=ci-only-admin-session-secret-32-characters-min \
             -e ADMIN_EMAIL=admin@ci.local \
             -e ADMIN_PASSWORD=ci-only-admin-password \
             citgroup-tenancy-system:ci
-          sleep 15
-          # The health endpoint reports the database as unreachable here — the
-          # app still has to boot and answer, so only the shape is checked.
-          curl -sf http://127.0.0.1:3030/api/health | grep -q '"service"'
-          docker rm -f app
+
+          # 503 is a valid answer: it proves the route loaded and reported
+          # its dependency state instead of failing to boot. A missing
+          # store used to return 500 here, which is the regression this
+          # step guards against.
+          code=000
+          for attempt in $(seq 1 45); do
+            code=$(curl -sS -o /tmp/health.json -w '%{http_code}' \
+              http://127.0.0.1:3030/api/health || true)
+            if [ "$code" != "000" ]; then break; fi
+            sleep 2
+          done
+
+          echo "health status: $code"
+          cat /tmp/health.json
+
+          case "$code" in
+            200|503) ;;
+            *) echo "unexpected health status: $code" >&2; exit 1 ;;
+          esac
+
+          # `mysql` proves the production guard was satisfied by
+          # configuration rather than silently falling back.
+          jq -e '.service == "citgroup-tenancy-system" and .storage == "mysql"' /tmp/health.json
+
+          # The Next runtime, the proxy and RSC rendering have to work
+          # too — a passing JSON route alone would not catch a broken page.
+          for path in / /auth/login; do
+            page=$(curl -sS -o /dev/null -w '%{http_code}' "http://127.0.0.1:3030$path")
+            echo "GET $path -> $page"
+            [ "$page" = "200" ] || exit 1
+          done

@@ -34,6 +34,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        # Client components inline this at build time; the runtime env
+        # below covers server rendering. Both have to agree.
+        NEXT_PUBLIC_ROOT_DOMAIN: ${NEXT_PUBLIC_ROOT_DOMAIN:-localhost:3030}
     restart: unless-stopped
     depends_on:
       mysql:
