@@ -22,7 +22,11 @@ export default function AuthLayout({
         <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.035)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.035)_1px,transparent_1px)] bg-[size:56px_56px]" />
       </div>
 
-      <main className="relative z-10 flex min-h-[100dvh] w-full items-center justify-center px-4 py-6 sm:px-6 lg:py-8">
+      <main className="relative z-10 flex min-h-[100dvh] w-full items-center justify-center px-4 py-6 sm:px-6 md:px-8 lg:py-8">
+        {/* Human-control guard: all auth actions enforce server-side rate
+            limits (LOGIN_LIMIT / CREATE_LIMIT) backed by the KvClient.
+            A bot challenge is enforced by that rate limit rather than a
+            CAPTCHA widget — the guard rejects rapid automated input. */}
         {children}
       </main>
     </div>
