@@ -44,9 +44,10 @@ export function TenantRegisterForm({
   );
   const [subdomain, setSubdomain] = useState('');
   const [email, setEmail] = useState('');
+  const [confirmEmail, setConfirmEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
-  const complete = subdomain.trim() && email.trim() && password.length >= 8 && confirm.length >= 8;
+  const complete = subdomain.trim() && email.trim() && confirmEmail.trim() && password.length >= 8 && confirm.length >= 8;
 
   return (
     <TooltipProvider>
@@ -65,67 +66,31 @@ export function TenantRegisterForm({
           </p>
         </div>
 
-        {/* Email */}
-        <div>
-          <Label htmlFor="email" className="mb-1.5 block text-sm font-medium text-slate-700">
-            Work email
-          </Label>
-          <Input
-            id="email"
-            name="email"
-            type="email"
-            autoComplete="email"
-            placeholder="you@company.com"
-            defaultValue={state?.email}
-            onChange={(e) => setEmail(e.target.value)}
-            className={fieldClass}
-            required
-          />
-        </div>
-
-        {/* Password */}
-        <div>
-          <div className="mb-1.5 flex items-center gap-1.5">
-            <Label htmlFor="password" className="text-sm font-medium text-slate-700">
-              Password
-            </Label>
-            <FieldHint
-              id="register-password-hint"
-              label="Password requirements"
-              content="At least 8 characters. Mix letters, numbers and symbols — a long passphrase is stronger than a short complex one."
-            />
+        {/* Email — inline Confirm Email */}
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div>
+            <Label htmlFor="email" className="mb-1.5 block text-sm font-medium text-slate-700">Work email</Label>
+            <Input id="email" name="email" type="email" autoComplete="email" placeholder="you@company.com" defaultValue={state?.email} onChange={(e)=>setEmail(e.target.value)} className={fieldClass} required />
           </div>
-          <Input
-            id="password"
-            name="password"
-            type="password"
-            autoComplete="new-password"
-            placeholder="Enter a password of 8+ characters"
-            aria-describedby="register-password-hint"
-            onChange={(e) => setPassword(e.target.value)}
-            className={fieldClass}
-            required
-            minLength={8}
-          />
+          <div>
+            <Label htmlFor="confirmEmail" className="mb-1.5 block text-sm font-medium text-slate-700">Confirm email</Label>
+            <Input id="confirmEmail" name="confirmEmail" type="email" autoComplete="email" placeholder="Re-enter email" onChange={(e)=>setConfirmEmail(e.target.value)} className={fieldClass} required />
+          </div>
         </div>
 
-        {/* Confirm password */}
-        <div>
-          <Label htmlFor="confirmPassword" className="mb-1.5 block text-sm font-medium text-slate-700">
-            Confirm password
-          </Label>
-          <Input
-            id="confirmPassword"
-            name="confirmPassword"
-            type="password"
-            autoComplete="new-password"
-            placeholder="Re-enter your password"
-            aria-describedby="register-password-hint"
-            onChange={(e) => setConfirm(e.target.value)}
-            className={fieldClass}
-            required
-            minLength={8}
-          />
+        {/* Password + Confirm — inline */}
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div>
+            <div className="mb-1.5 flex items-center gap-1.5">
+              <Label htmlFor="password" className="text-sm font-medium text-slate-700">Password</Label>
+              <FieldHint id="register-password-hint" label="Password requirements" content="At least 8 characters. Mix letters, numbers and symbols — a long passphrase is stronger than a short complex one." />
+            </div>
+            <Input id="password" name="password" type="password" autoComplete="new-password" placeholder="Enter a password of 8+ characters" aria-describedby="register-password-hint" onChange={(e)=>setPassword(e.target.value)} className={fieldClass} required minLength={8} />
+          </div>
+          <div>
+            <Label htmlFor="confirmPassword" className="mb-1.5 block text-sm font-medium text-slate-700">Confirm password</Label>
+            <Input id="confirmPassword" name="confirmPassword" type="password" autoComplete="new-password" placeholder="Re-enter your password" aria-describedby="register-password-hint" onChange={(e)=>setConfirm(e.target.value)} className={fieldClass} required minLength={8} />
+          </div>
         </div>
 
 
