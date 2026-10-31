@@ -12,3 +12,4 @@ import { adminUrl } from '@/lib/admin-path';
 export default function AdminRedirect() {
   redirect(adminUrl());
 }
+

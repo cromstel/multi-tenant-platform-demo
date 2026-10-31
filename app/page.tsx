@@ -228,10 +228,10 @@ export default function HomePage() {
               {/* Provisioning card */}
               <div className="relative">
                 <div
-                  className="pointer-events-none absolute -inset-4 rounded-[2rem] bg-gradient-to-tr from-[#0078E2]/25 to-transparent blur-2xl"
+                  className="pointer-events-none absolute -inset-4 rounded-none bg-gradient-to-tr from-[#0078E2]/25 to-transparent blur-2xl"
                   aria-hidden="true"
                 />
-                <div className="relative rounded-3xl border border-white/12 bg-white/[0.07] p-6 shadow-2xl shadow-black/30 backdrop-blur-xl sm:p-8">
+                <div className="relative rounded-none border border-white/12 bg-white/[0.07] p-6 shadow-2xl shadow-black/30 backdrop-blur-xl sm:p-8">
                   <div className="mb-5 flex items-center justify-between">
                     <div>
                       <p className="text-sm font-bold text-white">Provision a tenant</p>
@@ -518,3 +518,4 @@ const rows = await db.query(
     </div>
   );
 }
+

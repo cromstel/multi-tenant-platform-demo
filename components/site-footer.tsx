@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { rootDomain } from '@/lib/utils';
 
 const FOOTER_SECTIONS = [
   {
@@ -59,7 +58,7 @@ export function SiteFooter() {
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1.4fr)_repeat(3,minmax(0,1fr))]">
           <div>
             <Link href="/" className="group flex items-center gap-2.5">
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#0078E2] to-[#5B9CF5] shadow-lg shadow-blue-600/25">
+              <span className="flex h-9 w-9 items-center justify-center rounded-none bg-gradient-to-br from-[#0078E2] to-[#5B9CF5] shadow-lg shadow-blue-600/25">
                 <svg className="h-5 w-5 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                 </svg>
@@ -84,7 +83,7 @@ export function SiteFooter() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={social.label}
-                  className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition-all hover:border-[#0078E2]/40 hover:bg-[#004A94] hover:text-white"
+                  className="flex h-9 w-9 items-center justify-center rounded-none border border-slate-200 bg-white text-slate-500 transition-all hover:border-[#0078E2]/40 hover:bg-[#004A94] hover:text-white"
                 >
                   <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path d={social.path} />
@@ -119,15 +118,23 @@ export function SiteFooter() {
             © {year} CITGROUP. All rights reserved.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
-            <span className="inline-flex items-center gap-1.5 text-xs text-slate-500">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden="true" />
-              All systems operational
+            <span className="text-xs text-slate-500">
+              Powered By{' '}
+              <a
+                href="https://cromstelit.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold text-[#005cb3] underline-offset-4 hover:underline"
+              >
+                CITGROUP
+              </a>
             </span>
-            <span className="text-xs text-slate-500">Running on {rootDomain}</span>
           </div>
         </div>
       </div>
     </footer>
   );
 }
+
+
 

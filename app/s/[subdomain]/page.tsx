@@ -64,7 +64,7 @@ export default async function SubdomainPage({
       <header className="fixed top-4 right-4 z-10">
         <Link
           href={`http://${rootDomain}`}
-          className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800 transition-colors bg-white/80 backdrop-blur-sm rounded-lg shadow-sm border border-gray-200"
+          className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800 transition-colors bg-white/80 backdrop-blur-sm rounded-none shadow-sm border border-gray-200"
         >
           CITGROUP TENANCY SYSTEM
         </Link>
@@ -91,7 +91,7 @@ export default async function SubdomainPage({
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-xl mx-auto mb-8">
-            <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+            <div className="bg-white rounded-none p-5 border border-gray-200 shadow-sm">
               <div className="text-3xl mb-2">📅</div>
               <div className="text-sm text-gray-500">Created</div>
               <div className="font-medium text-gray-900">
@@ -103,7 +103,7 @@ export default async function SubdomainPage({
               </div>
             </div>
             
-            <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+            <div className="bg-white rounded-none p-5 border border-gray-200 shadow-sm">
               <div className="text-3xl mb-2">🔗</div>
               <div className="text-sm text-gray-500">Subdomain</div>
               <div className="font-medium text-gray-900 text-sm">
@@ -111,7 +111,7 @@ export default async function SubdomainPage({
               </div>
             </div>
             
-            <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+            <div className="bg-white rounded-none p-5 border border-gray-200 shadow-sm">
               <div className="text-3xl mb-2">✨</div>
               <div className="text-sm text-gray-500">Status</div>
               <div className="font-medium text-green-700">Active</div>
@@ -121,13 +121,13 @@ export default async function SubdomainPage({
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/auth/login"
-              className="px-6 py-3 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors"
+              className="px-6 py-3 rounded-none bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors"
             >
               Tenant Sign In
             </Link>
             <Link
               href="http://{subdomain}.{rootDomain}/auth/login"
-              className="px-6 py-3 rounded-lg bg-white text-gray-700 font-medium hover:bg-gray-50 border border-gray-300 transition-colors"
+              className="px-6 py-3 rounded-none bg-white text-gray-700 font-medium hover:bg-gray-50 border border-gray-300 transition-colors"
             >
               Admin Access
             </Link>

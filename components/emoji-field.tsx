@@ -79,12 +79,12 @@ export function EmojiField({
             <button
               type="button"
               aria-labelledby={`${labelId} ${nameId}`}
-              className="flex h-12 w-full items-center rounded-lg border border-slate-200 bg-slate-50 px-3 text-left transition-colors hover:border-slate-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0078E2]/40"
+              className="flex h-12 w-full items-center rounded-none border border-slate-200 bg-slate-50 px-3 text-left transition-colors hover:border-slate-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0078E2]/40"
             >
               <span id={nameId} className="flex w-full items-center justify-between gap-3">
                 <span className="flex items-center gap-3">
                   <span
-                    className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-xl shadow-sm ring-1 ring-slate-200"
+                    className="flex h-8 w-8 items-center justify-center rounded-none bg-white text-xl shadow-sm ring-1 ring-slate-200"
                     aria-hidden="true"
                   >
                     {value || <Smile className="h-4 w-4 text-slate-500" />}
@@ -122,3 +122,4 @@ export function EmojiField({
     </TooltipProvider>
   );
 }
+

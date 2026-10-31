@@ -45,7 +45,7 @@ function TooltipContent({
       <TooltipPrimitive.Content
         sideOffset={sideOffset}
         className={cn(
-          'z-50 max-w-xs rounded-lg bg-slate-900 px-3 py-2 text-xs leading-relaxed text-white shadow-xl',
+          'z-50 max-w-xs rounded-none bg-slate-900 px-3 py-2 text-xs leading-relaxed text-white shadow-xl',
           'animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95',
           'data-[side=bottom]:slide-in-from-top-1 data-[side=left]:slide-in-from-right-1 data-[side=right]:slide-in-from-left-1 data-[side=top]:slide-in-from-bottom-1',
           className
@@ -173,3 +173,4 @@ export {
   TooltipTrigger,
   FieldHint,
 };
+

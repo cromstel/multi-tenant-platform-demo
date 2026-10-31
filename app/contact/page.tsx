@@ -251,7 +251,7 @@ export default function ContactPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid gap-12 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-16">
             {/* Form */}
-            <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-200/40 sm:p-9">
+            <div className="rounded-none border border-slate-200 bg-white p-6 shadow-xl shadow-slate-200/40 sm:p-9">
               <div className="mb-7">
                 <h2 className="text-2xl font-extrabold tracking-tight text-slate-900">
                   Send us a message
@@ -512,4 +512,5 @@ export default function ContactPage() {
     </div>
   );
 }
+
 
