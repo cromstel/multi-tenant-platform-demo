@@ -3,7 +3,7 @@
 import { redirect } from 'next/navigation';
 
 import { getMySQLPool, deleteTenant } from '@/lib/db/mysql';
-import { isValidIcon, sanitizeSubdomain } from '@/lib/subdomains';
+import { sanitizeSubdomain } from '@/lib/subdomains';
 import { getAdminSession } from '@/app/auth/admin/login/actions';
 import { CREATE_LIMIT, consume } from '@/lib/rate-limit';
 import { rootDomain, protocol } from '@/lib/utils';
@@ -44,19 +44,10 @@ export async function createSubdomainAction(
   }
 
   const subdomain = formData.get('subdomain') as string;
-  const icon = formData.get('icon') as string;
+  const icon = (formData.get('icon') as string) || '⭐';
 
-  if (!subdomain || !icon) {
-    return { success: false, error: 'Subdomain and icon are required' };
-  }
-
-  if (!isValidIcon(icon)) {
-    return {
-      subdomain,
-      icon,
-      success: false,
-      error: 'Please enter a valid emoji (maximum 10 characters)'
-    };
+  if (!subdomain) {
+    return { success: false, error: 'Subdomain is required' };
   }
 
   const sanitizedSubdomain = sanitizeSubdomain(subdomain);
