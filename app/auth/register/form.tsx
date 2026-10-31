@@ -12,7 +12,7 @@ import { type RegisterState } from './actions';
 const fieldClass =
   'h-12 bg-slate-50 border-slate-200 focus:border-[#0078E2] focus:ring-2 focus:ring-[#0078E2]/20 text-base';
 
-function SubdomainInput({ defaultValue }: { defaultValue?: string }) {
+function SubdomainInput({ defaultValue, onChange }: { defaultValue?: string; onChange?: (v: string) => void }) {
   return (
     <div className="flex items-center">
       <div className="relative flex-1">
@@ -21,6 +21,7 @@ function SubdomainInput({ defaultValue }: { defaultValue?: string }) {
           name="subdomain"
           placeholder="your-company"
           defaultValue={defaultValue}
+          onChange={(e) => onChange?.(e.target.value)}
           className={`${fieldClass} w-full rounded-r-none focus:z-10`}
           required
         />
@@ -41,6 +42,11 @@ export function TenantRegisterForm({
     action,
     {}
   );
+  const [subdomain, setSubdomain] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirm, setConfirm] = useState('');
+  const complete = subdomain.trim() && email.trim() && password.length >= 8 && confirm.length >= 8;
 
   return (
     <TooltipProvider>
@@ -50,7 +56,7 @@ export function TenantRegisterForm({
           <Label htmlFor="subdomain" className="mb-1.5 block text-sm font-medium text-slate-700">
             Subdomain
           </Label>
-          <SubdomainInput defaultValue={state?.subdomain} />
+          <SubdomainInput defaultValue={state?.subdomain} onChange={setSubdomain} />
           <p className="mt-1.5 text-xs text-slate-500">
             Your tenant is reachable at{' '}
             <span className="font-medium text-slate-600">
@@ -71,6 +77,7 @@ export function TenantRegisterForm({
             autoComplete="email"
             placeholder="you@company.com"
             defaultValue={state?.email}
+            onChange={(e) => setEmail(e.target.value)}
             className={fieldClass}
             required
           />
@@ -95,6 +102,7 @@ export function TenantRegisterForm({
             autoComplete="new-password"
             placeholder="Enter a password of 8+ characters"
             aria-describedby="register-password-hint"
+            onChange={(e) => setPassword(e.target.value)}
             className={fieldClass}
             required
             minLength={8}
@@ -113,6 +121,7 @@ export function TenantRegisterForm({
             autoComplete="new-password"
             placeholder="Re-enter your password"
             aria-describedby="register-password-hint"
+            onChange={(e) => setConfirm(e.target.value)}
             className={fieldClass}
             required
             minLength={8}
@@ -131,8 +140,8 @@ export function TenantRegisterForm({
 
         <Button
           type="submit"
-          disabled={isPending}
-          className="h-12 w-full rounded-none bg-[#005cb3] text-base font-semibold text-white shadow-lg shadow-blue-600/25 transition-all hover:bg-[#004A94] active:scale-[0.99]"
+          disabled={isPending || !complete}
+          className={`h-12 w-full rounded-none bg-[#005cb3] text-base font-semibold text-white shadow-lg shadow-blue-600/25 transition-all hover:bg-[#004A94] active:scale-[0.99] ${!complete ? 'opacity-40' : ''}`}
         >
           {isPending ? 'Creating…' : 'Create Tenant'}
         </Button>
