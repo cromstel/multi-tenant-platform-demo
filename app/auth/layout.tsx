@@ -23,16 +23,9 @@ export default function AuthLayout({
       </div>
 
       <main className="relative z-10 flex min-h-[100dvh] w-full items-center justify-center px-4 py-6 sm:px-6 md:px-8 lg:py-8">
-        {/* Human control — bot/human verification enforced server-side via
-            rate limits (LOGIN_LIMIT / CREATE_LIMIT) backed by KvClient.
-            Rapid automated input is rejected; this protection applies to
-            every auth screen: sign in, register, and admin login. */}
-        <div className="mb-3 w-full max-w-md text-center">
-          <p className="inline-flex items-center gap-2 rounded-full bg-[#005cb3]/10 px-4 py-1.5 text-xs font-semibold text-[#005cb3]">
-            <span aria-hidden="true" className="h-2 w-2 rounded-full bg-[#005cb3]" />
-            Human verification active — server-side rate limits block automated input
-          </p>
-        </div>
+        {/* Human-control guard: server-side rate limits (LOGIN_LIMIT /
+            CREATE_LIMIT) backed by KvClient enforce bot/human verification
+            on every auth screen — rapid automated input is rejected. */}
         {children}
       </main>
     </div>
