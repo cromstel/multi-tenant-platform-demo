@@ -28,6 +28,39 @@ const nextConfig: NextConfig = {
     '/**': ['./node_modules/mysql2/**/*'],
   },
   poweredByHeader: false,
+
+  // Strict CSP: default-deny with exceptions for the application's own
+  // origin, inline scripts/styles (Next.js requires them for RSC/HMR),
+  // and the data/health endpoints. No third-party scripts or images.
+  async headers() {
+    const csp = [
+      "default-src 'self'",
+      "script-src 'self' 'unsafe-inline'",
+      "style-src 'self' 'unsafe-inline'",
+      "img-src 'self' data:",
+      "font-src 'self'",
+      "connect-src 'self'",
+      "media-src 'self'",
+      "object-src 'none'",
+      "base-uri 'self'",
+      "form-action 'self'",
+      "frame-ancestors 'none'",
+      "upgrade-insecure-requests",
+    ].join('; ');
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          { key: 'Content-Security-Policy', value: csp },
+          { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
+          { key: 'X-Frame-Options', value: 'DENY' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          { key: 'Permissions-Policy', value: 'geolocation=(), microphone=(), camera=()' },
+        ],
+      },
+    ];
+  },
   // Ensure proper handling of Vercel Analytics and Speed Insights
   // headers: async () => {
   //   return [
