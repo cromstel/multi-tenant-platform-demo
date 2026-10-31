@@ -5,7 +5,6 @@ import { useActionState, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { EmojiField } from '@/components/emoji-field';
 import { FieldHint, TooltipProvider } from '@/components/ui/tooltip';
 import { rootDomain } from '@/lib/utils';
 import { type RegisterState } from './actions';
@@ -26,7 +25,7 @@ function SubdomainInput({ defaultValue }: { defaultValue?: string }) {
           required
         />
       </div>
-      <span className="flex min-h-[48px] items-center rounded-r-xl border border-l-0 border-slate-200 bg-slate-100 px-3 text-sm font-medium text-slate-600">
+      <span className="flex min-h-[48px] items-center rounded-r-none border border-l-0 border-slate-200 bg-slate-100 px-3 text-sm font-medium text-slate-600">
         .{rootDomain}
       </span>
     </div>
@@ -38,8 +37,6 @@ export function TenantRegisterForm({
 }: {
   action: (state: RegisterState, formData: FormData) => Promise<RegisterState>;
 }) {
-  const [icon, setIcon] = useState('');
-
   const [state, formAction, isPending] = useActionState<RegisterState, FormData>(
     action,
     {}
@@ -122,18 +119,11 @@ export function TenantRegisterForm({
           />
         </div>
 
-        {/* Brand mark */}
-        <EmojiField
-          label="Brand mark"
-          hint="An emoji shown on your tenant's page and in the admin dashboard. Pick one that represents your company."
-          value={icon}
-          onChange={setIcon}
-        />
 
         {state?.error && (
           <p
             role="alert"
-            className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
+            className="border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
           >
             {state.error}
           </p>
@@ -141,8 +131,8 @@ export function TenantRegisterForm({
 
         <Button
           type="submit"
-          disabled={isPending || !icon}
-          className="h-12 w-full rounded-xl bg-[#005cb3] text-base font-semibold text-white shadow-lg shadow-blue-600/25 transition-all hover:bg-[#004A94] active:scale-[0.99]"
+          disabled={isPending}
+          className="h-12 w-full rounded-none bg-[#005cb3] text-base font-semibold text-white shadow-lg shadow-blue-600/25 transition-all hover:bg-[#004A94] active:scale-[0.99]"
         >
           {isPending ? 'Creating…' : 'Create Tenant'}
         </Button>
