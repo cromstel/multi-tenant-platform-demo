@@ -175,44 +175,66 @@ export default function FaqPage() {
       <ScrollProgress />
 
       <main className="flex-1">
-        {/* Hero */}
-        <section className="border-b border-slate-200 bg-slate-50 py-16 sm:py-20">
-          <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-            <nav aria-label="Breadcrumb" className="text-xs font-semibold text-slate-500">
-              <ol className="flex items-center gap-2">
-                <li>
-                  <Link href="/" className="text-[#005cb3] underline-offset-4 hover:underline">
-                    Home
-                  </Link>
-                </li>
-                <li aria-hidden="true">/</li>
-                <li aria-current="page">FAQ</li>
-              </ol>
-            </nav>
+        {/* Hero banner */}
+        <section className="relative overflow-hidden bg-[#0c2238]">
+          <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+            <div className="absolute -top-40 left-1/4 h-[560px] w-[560px] rounded-full bg-[#0078E2]/25 blur-[100px]" />
+            <div className="absolute -right-32 top-24 h-[420px] w-[420px] rounded-full bg-blue-400/15 blur-[90px]" />
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:56px_56px]" />
+          </div>
 
-            <h1 className="mt-5 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
-              Frequently asked questions
-            </h1>
-            <p className="mt-4 text-base leading-relaxed text-slate-600">
-              How tenants are created, how their data stays separate, how sign-in is protected and
-              what the platform runs on. If something is still unclear, the contact form reaches a
-              person.
-            </p>
+          <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+            <div className="max-w-3xl">
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-200/80">
+                Help centre
+              </p>
 
-            {/* Jump links */}
-            <ul className="mt-8 flex flex-wrap gap-2">
-              {GROUPS.map((group) => (
-                <li key={group.id}>
-                  <a
-                    href={`#${group.id}`}
-                    className="inline-flex items-center gap-1.5 border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition-colors hover:border-[#0078E2] hover:text-[#005cb3]"
-                  >
-                    <group.icon className="h-3.5 w-3.5" aria-hidden="true" />
-                    {group.title}
-                  </a>
-                </li>
-              ))}
-            </ul>
+              <h1 className="mt-4 text-4xl font-extrabold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-6xl">
+                Frequently asked
+                <br />
+                <span className="bg-gradient-to-r from-[#4A9DFF] to-[#7DD3FC] bg-clip-text text-transparent">
+                  questions
+                </span>
+              </h1>
+
+              <p className="mt-6 max-w-2xl text-base leading-relaxed text-blue-100/70 sm:text-lg">
+                How tenants are created, how their data stays separate, how sign-in is protected and
+                what the platform runs on. If something is still unclear, the contact form reaches a
+                person.
+              </p>
+
+              {/* Jump links */}
+              <ul className="mt-9 flex flex-wrap gap-2">
+                {GROUPS.map((group) => (
+                  <li key={group.id}>
+                    <a
+                      href={`#${group.id}`}
+                      className="inline-flex items-center gap-1.5 border border-white/20 bg-white/5 px-3.5 py-2 text-xs font-semibold text-blue-100 backdrop-blur-sm transition-colors hover:border-white/40 hover:bg-white/10 hover:text-white"
+                    >
+                      <group.icon className="h-3.5 w-3.5" aria-hidden="true" />
+                      {group.title}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+
+              <dl className="mt-12 grid grid-cols-2 gap-x-6 gap-y-6 sm:grid-cols-3">
+                {[
+                  { value: `${ALL_FAQS.length}`, label: 'Answered questions' },
+                  { value: `${GROUPS.length}`, label: 'Topic areas' },
+                  { value: '24/7', label: 'Tenant availability' },
+                ].map((stat) => (
+                  <div key={stat.label}>
+                    <dt className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
+                      {stat.value}
+                    </dt>
+                    <dd className="mt-1 text-xs font-medium uppercase tracking-wide text-blue-200/75">
+                      {stat.label}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
           </div>
         </section>
 
