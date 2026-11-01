@@ -17,6 +17,7 @@ const FOOTER_SECTIONS = [
       { label: 'Tenant Sign In', href: '/auth/login' },
       { label: 'Contact & Support', href: '/contact' },
       { label: 'FAQ', href: '/faq' },
+      { label: 'Services', href: '/services' },
     ],
   },
   {

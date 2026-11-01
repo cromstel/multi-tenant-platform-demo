@@ -1,6 +1,9 @@
 import 'server-only';
 
-import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
+import { createHash, randomBytes, timingSafeEqual, scrypt } from 'node:crypto';
+import { promisify } from 'node:util';
+
+const scryptAsync = promisify(scrypt);
 
 /**
  * Password hashing, in one place.
@@ -20,11 +23,11 @@ import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
 
 const SALT_BYTES = 16;
 
-/** Hashes a password with a fresh random salt. */
+/** Memory-hard KDF (scrypt) with random salt. Stored as `salt:hash` hex. */
 export async function hashPassword(password: string): Promise<string> {
   const salt = randomBytes(SALT_BYTES).toString('hex');
-  const hash = createHash('sha256').update(password + salt).digest('hex');
-  return `${salt}:${hash}`;
+  const hash = (await scryptAsync(password, salt, 32)) as Buffer;
+  return `${salt}:${hash.toString('hex')}`;
 }
 
 /**
@@ -40,11 +43,13 @@ export async function verifyPassword(
   const parts = stored.split(':');
   if (parts.length !== 2) return false;
 
-  const [salt, hash] = parts;
-  if (!salt || !hash) return false;
+  const [salt, hashHex] = parts;
+  if (!salt || !hashHex) return false;
 
-  const computed = createHash('sha256').update(password + salt).digest('hex');
-  return safeEqual(computed, hash);
+  const hash = (await scryptAsync(password, salt, 32)) as Buffer;
+  const storedHash = Buffer.from(hashHex, 'hex');
+  if (storedHash.length !== hash.length) return false;
+  return timingSafeEqual(hash, storedHash);
 }
 
 /**

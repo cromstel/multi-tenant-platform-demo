@@ -87,10 +87,10 @@ export async function initializeMySQL(): Promise<void> {
       )
     `);
     
-    await conn.query(`
-      CREATE INDEX IF NOT EXISTS idx_admin_sessions_expires 
-      ON admin_sessions(expires_at)
-    `);
+    const [existingIdx] = await conn.query(`SELECT 1 FROM information_schema.STATISTICS WHERE table_name = 'admin_sessions' AND index_name = 'idx_admin_sessions_expires'`);
+    if ((existingIdx as Array<{1: number}>).length === 0) {
+      await conn.query(`CREATE INDEX idx_admin_sessions_expires ON admin_sessions(expires_at)`);
+    }
     
     await conn.query(`
       CREATE TABLE IF NOT EXISTS tenants (
@@ -131,10 +131,10 @@ export async function initializeMySQL(): Promise<void> {
       )
     `);
     
-    await conn.query(`
-      CREATE INDEX IF NOT EXISTS idx_tenant_sessions_expires 
-      ON tenant_sessions(expires_at)
-    `);
+    const [existingTenantIdx] = await conn.query(`SELECT 1 FROM information_schema.STATISTICS WHERE table_name = 'tenant_sessions' AND index_name = 'idx_tenant_sessions_expires'`);
+    if ((existingTenantIdx as Array<{1: number}>).length === 0) {
+      await conn.query(`CREATE INDEX idx_tenant_sessions_expires ON tenant_sessions(expires_at)`);
+    }
     
     await conn.query(`
       CREATE TABLE IF NOT EXISTS contact_enquiries (
@@ -150,6 +150,17 @@ export async function initializeMySQL(): Promise<void> {
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         INDEX idx_contact_enquiries_status (status),
         INDEX idx_contact_enquiries_created (created_at)
+      )
+    `);
+
+    await conn.query(`
+      CREATE TABLE IF NOT EXISTS docs_sections (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        role ENUM('owner', 'admin', 'member') NOT NULL DEFAULT 'member',
+        title VARCHAR(255) NOT NULL,
+        body TEXT NOT NULL,
+        sort_order INT DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
     

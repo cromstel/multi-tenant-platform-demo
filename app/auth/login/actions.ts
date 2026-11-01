@@ -153,39 +153,31 @@ export async function logoutAction() {
 }
 
 export async function getTenantSession(): Promise<{ userId: number; tenantId: number; email: string } | null> {
-  try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get(SESSION_COOKIE)?.value;
-    if (!token) return null;
+  // `cookies()` deliberately sits outside the `try`. While a route is being
+  // prerendered Next.js signals "this page is dynamic" by throwing from it;
+  // catching that error would let the build snapshot the page with no session
+  // and serve that snapshot to everyone. An expired or tampered token is a
+  // different case — that is ours to handle, and it means "signed out".
+  const cookieStore = await cookies();
+  const token = cookieStore.get(SESSION_COOKIE)?.value;
+  if (!token) return null;
 
-    try {
-      const { payload } = await jwtVerify(token, await getSessionSecret(), {
-        issuer: 'multi-tenant-tenant'
-      });
-      return { 
-        userId: payload.userId as number, 
-        tenantId: payload.tenantId as number, 
-        email: payload.email as string 
-      };
-    } catch {
-      return null;
-    }
-  } catch (error) {
-    console.error('[auth] Failed to get tenant session:', error instanceof Error ? error.message : 'Unknown error');
+  try {
+    const { payload } = await jwtVerify(token, await getSessionSecret(), {
+      issuer: 'multi-tenant-tenant'
+    });
+    return { 
+      userId: payload.userId as number, 
+      tenantId: payload.tenantId as number, 
+      email: payload.email as string 
+    };
+  } catch {
     return null;
   }
 }
 
 export async function requireTenantSession(): Promise<{ userId: number; tenantId: number; email: string }> {
-  try {
-    const session = await getTenantSession();
-    if (!session) redirect('/auth/login');
-    return session;
-  } catch (error) {
-    if (isRedirectError(error)) {
-      throw error;
-    }
-    console.error('[auth] Failed to require tenant session:', error instanceof Error ? error.message : 'Unknown error');
-    redirect('/auth/login');
-  }
+  const session = await getTenantSession();
+  if (!session) redirect('/auth/login');
+  return session;
 }

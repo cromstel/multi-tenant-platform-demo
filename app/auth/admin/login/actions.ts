@@ -187,32 +187,25 @@ export async function logoutAction() {
 }
 
 export async function getAdminSession(): Promise<{ userId: number; email: string } | null> {
+  // `cookies()` deliberately sits outside the `try`. While a route is being
+  // prerendered Next.js signals "this page is dynamic" by throwing from it;
+  // catching that error would let the build snapshot the page with no session
+  // and serve that snapshot to everyone. An expired or tampered token is a
+  // different case — that is ours to handle, and it means "signed out".
+  const cookieStore = await cookies();
+  const token = cookieStore.get(SESSION_COOKIE)?.value;
+  if (!token) return null;
+
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get(SESSION_COOKIE)?.value;
-    if (!token) return null;
-    try {
-      const { payload } = await jwtVerify(token, await getSessionSecret(), { issuer: "multi-tenant-admin" });
-      return { userId: payload.userId as number, email: payload.email as string };
-    } catch {
-      return null;
-    }
-  } catch (error) {
-    console.error("[auth] Failed to get admin session:", error instanceof Error ? error.message : "Unknown error");
+    const { payload } = await jwtVerify(token, await getSessionSecret(), { issuer: "multi-tenant-admin" });
+    return { userId: payload.userId as number, email: payload.email as string };
+  } catch {
     return null;
   }
 }
 
 export async function requireAdminSession(): Promise<{ userId: number; email: string }> {
-  try {
-    const session = await getAdminSession();
-    if (!session) redirect(adminUrl('/login'));
-    return session;
-  } catch (error) {
-    if (isRedirectError(error)) {
-      throw error;
-    }
-    console.error("[auth] Failed to require admin session:", error instanceof Error ? error.message : "Unknown error");
-    redirect(adminUrl('/login'));
-  }
+  const session = await getAdminSession();
+  if (!session) redirect(adminUrl('/login'));
+  return session;
 }

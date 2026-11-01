@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getSubdomainData } from '@/lib/subdomains';
 import { protocol, rootDomain } from '@/lib/utils';
-import { pageMetadata, structuredData } from '@/lib/seo';
+import { pageMetadata, structuredData, siteUrl } from '@/lib/seo';
 
 export async function generateMetadata({
   params
@@ -25,7 +25,9 @@ export async function generateMetadata({
   return pageMetadata({
     title: subdomain,
     description: `${subdomain} is a tenant workspace on CITGROUP TENANCY SYSTEM. Sign in to manage members, settings and integrations.`,
-    path: `/${subdomain}`,
+    // The page is served from the tenant's own subdomain, so the canonical
+    // has to be absolute. `/{subdomain}` on the platform host is a 404.
+    canonical: `${protocol}://${subdomain}.${rootDomain}/`,
     keywords: [subdomain, 'tenant workspace', 'CITGROUP tenancy'],
   });
 }
@@ -43,16 +45,44 @@ export default async function SubdomainPage({
   }
 
   // Structured data describing the tenant as an organisation of its own,
-  // parented by the platform.
-  const jsonLd = structuredData({
-    '@context': 'https://schema.org',
-    '@type': 'Organization',
-    '@id': `${rootDomain}/${subdomain}#organization`,
-    name: subdomain,
-    url: `${protocol}://${subdomain}.${rootDomain}`,
-    logo: { '@type': 'ImageObject', url: '/icon.svg' },
-    parentOrganization: { '@id': `${rootDomain}#organization` },
-  });
+  // parented by the platform. Both `@id`s are absolute so a crawler can tell
+  // the tenant apart from the platform's own organisation node.
+  const jsonLd = structuredData([
+    {
+      '@context': 'https://schema.org',
+      '@type': 'Organization',
+      '@id': `${protocol}://${subdomain}.${rootDomain}/#organization`,
+      name: subdomain,
+      url: `${protocol}://${subdomain}.${rootDomain}`,
+      logo: {
+        '@type': 'ImageObject',
+        url: `${protocol}://${subdomain}.${rootDomain}/icon.svg`,
+      },
+      parentOrganization: { '@id': `${siteUrl()}/#organization` },
+    },
+    {
+      '@type': 'FAQPage',
+      '@id': `${protocol}://${subdomain}.${rootDomain}/#faqpage`,
+      url: `${protocol}://${subdomain}.${rootDomain}/faq`,
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'How does tenant isolation work?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Each tenant is bound to a subdomain and tenant id; queries filter by tenant id with foreign keys enforcing boundaries.',
+          },
+        },
+      ],
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: `/` },
+        { '@type': 'ListItem', position: 2, name: subdomain, item: `/${subdomain}` },
+      ],
+    },
+  ]);
 
   return (
     <div className="flex min-h-screen flex-col bg-gradient-to-b from-blue-50 to-white p-4">
@@ -63,7 +93,7 @@ export default async function SubdomainPage({
 
       <header className="fixed top-4 right-4 z-10">
         <Link
-          href={`http://${rootDomain}`}
+          href={`${protocol}://${rootDomain}`}
           className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800 transition-colors bg-white/80 backdrop-blur-sm rounded-none shadow-sm border border-gray-200"
         >
           CITGROUP TENANCY SYSTEM
@@ -126,10 +156,10 @@ export default async function SubdomainPage({
               Tenant Sign In
             </Link>
             <Link
-              href="http://{subdomain}.{rootDomain}/auth/login"
+              href="/dashboard"
               className="px-6 py-3 rounded-none bg-white text-gray-700 font-medium hover:bg-gray-50 border border-gray-300 transition-colors"
             >
-              Admin Access
+              Open Dashboard
             </Link>
           </div>
         </div>

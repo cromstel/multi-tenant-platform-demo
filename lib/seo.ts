@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 
+import { protocol, rootDomain } from '@/lib/utils';
+
 /**
  * Central SEO configuration.
  *
@@ -22,9 +24,10 @@ export function siteUrl(): string {
   const configured = process.env.NEXT_PUBLIC_ROOT_DOMAIN?.trim();
 
   if (!configured) {
-    // Local development — the port has to be included, browsers read it from
-    // the hostname.
-    return 'http://localhost:3030';
+    // No literal host or port here: `rootDomain` already falls back to
+    // `localhost` (and warns), and it is the same value the proxy and the
+    // tenant links route on. `protocol` matches it.
+    return `${protocol}://${rootDomain}`;
   }
 
   if (/^https?:\/\//i.test(configured)) {
@@ -57,18 +60,26 @@ export function pageMetadata({
   title,
   description = SITE_DESCRIPTION,
   path = '/',
+  canonical,
   keywords = [],
   noIndex = false,
   type = 'website',
 }: {
   title: string;
   description?: string;
+  /** Path on this origin. Ignored when `canonical` is supplied. */
   path?: string;
+  /**
+   * Absolute canonical URL, for pages served from a different origin — a
+   * tenant page lives on its own subdomain, so `path` alone would point at a
+   * route that does not exist on the platform host.
+   */
+  canonical?: string;
   keywords?: string[];
   noIndex?: boolean;
   type?: 'website' | 'article';
 }): Metadata {
-  const url = absoluteUrl(path);
+  const url = canonical ?? absoluteUrl(path);
   const fullTitle = title;
 
   return {

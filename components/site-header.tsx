@@ -5,11 +5,9 @@ import Link from 'next/link';
 import { Menu, X, ChevronDown, ArrowRight } from 'lucide-react';
 
 const NAV_LINKS = [
-  { label: 'Platform', href: '/#platform' },
-  { label: 'Features', href: '/#features' },
+  { label: 'Home', href: '/' },
   { label: 'About', href: '/about' },
-  { label: 'Architecture', href: '/#architecture' },
-  { label: 'Security', href: '/#security' },
+  { label: 'Services', href: '/services' },
   { label: 'FAQ', href: '/faq' },
   { label: 'Contact', href: '/contact' },
 ];

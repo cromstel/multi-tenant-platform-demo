@@ -281,7 +281,7 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mx-auto mt-14 grid max-w-7xl gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {FEATURES.map((feature) => (
                 <div
                   key={feature.title}
@@ -443,7 +443,7 @@ const rows = await db.query(
               </h2>
             </div>
 
-            <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mx-auto mt-14 grid max-w-7xl gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {[
                 {
                   icon: Building2,
