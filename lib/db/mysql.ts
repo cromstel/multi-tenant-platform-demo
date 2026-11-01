@@ -160,8 +160,13 @@ export async function initializeMySQL(): Promise<void> {
         title VARCHAR(255) NOT NULL,
         body TEXT NOT NULL,
         sort_order INT DEFAULT 0,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
       )
+    `);
+
+    await conn.query(`
+      CREATE INDEX IF NOT EXISTS idx_docs_sections_role_sort ON docs_sections(role, sort_order)
     `);
     
   } finally {
