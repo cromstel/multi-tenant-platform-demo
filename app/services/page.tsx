@@ -2,7 +2,6 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import {
   ArrowRight,
-  Building2,
   CheckCircle2,
   Database,
   Gauge,
