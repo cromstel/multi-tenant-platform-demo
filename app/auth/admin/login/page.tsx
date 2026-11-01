@@ -20,7 +20,7 @@ export default async function AdminLoginPage() {
   }
 
   return (
-    <div className="w-full max-w-3xl">
+    <div className="w-full max-w-md">
       <div className="max-h-[calc(100dvh-3rem)] overflow-y-auto rounded-none bg-white/[0.97] p-7 shadow-2xl shadow-black/30 backdrop-blur-xl sm:p-8">
         <div className="mb-5 text-center">
           <Link href="/" className="group inline-flex items-center gap-2.5">
