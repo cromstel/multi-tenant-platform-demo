@@ -9,7 +9,7 @@ import { FieldHint, TooltipProvider } from '@/components/ui/tooltip';
 import { loginAction, type LoginState } from './actions';
 
 const fieldClass =
-  'h-12 bg-slate-50 border-slate-200 focus:border-[#0078E2] focus:ring-2 focus:ring-[#0078E2]/20 text-base';
+  'h-10 bg-slate-50 border-slate-200 focus:border-[#0078E2] focus:ring-2 focus:ring-[#0078E2]/20 text-base';
 
 export function TenantLoginForm() {
   const [state, action, isPending] = useActionState<LoginState, FormData>(
@@ -82,6 +82,10 @@ export function TenantLoginForm() {
             className="h-4 w-4 rounded-none border-slate-300 text-[#005cb3] focus:ring-[#005cb3]"
           />
           <Label htmlFor="remember" className="text-sm font-medium text-slate-700">Remember me</Label>
+          <span className="text-xs font-medium text-[#005cb3] hover:underline leading-relaxed">
+            Forgotten your password?{' '}
+            <a href="/auth/reset" className="hover:underline">Reset it</a>.
+          </span>
         </div>
 
         {state.error && (
@@ -100,10 +104,6 @@ export function TenantLoginForm() {
         >
           {isPending ? 'Signing in…' : 'Sign In'}
         </Button>
-
-        <div className="flex items-center justify-between pt-1">
-          <a href="/auth/reset" className="text-xs font-medium text-[#005cb3] hover:underline">Forgotten your password?</a>
-        </div>
       </form>
     </TooltipProvider>
   );
