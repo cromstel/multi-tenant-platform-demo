@@ -67,13 +67,13 @@ export default async function TenantLoginPage() {
             </Link>
           </p>
         </div>
-      </div>
 
-      <p className="mt-4 text-center">
-        <Link href="/" className="text-sm font-medium text-blue-200/75 transition-colors hover:text-white">
-          ← Back to System
-        </Link>
-      </p>
+        <p className="mt-4 text-center">
+          <Link href="/" className="text-sm font-medium text-[#005cb3] transition-colors hover:text-[#004A94] hover:underline">
+            ← Back to System
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }
