@@ -125,6 +125,10 @@ export function TenantRegisterForm({
           {isPending ? 'Creating…' : 'Create Tenant'}
         </Button>
 
+        <div className="flex items-center justify-between pt-1">
+          <a href="/auth/login" className="text-xs font-medium text-[#005cb3] hover:underline">Already have an account? Sign in</a>
+        </div>
+
         <p className="text-center text-xs leading-relaxed text-slate-500">
           Your tenant is provisioned with its own subdomain and isolated data.
           You can add members from the dashboard afterwards.

@@ -26,7 +26,8 @@ export default async function VerifyResetPage({ params }: { params: { token: str
           </p>
         </div>
 
-        <form action={verifyResetTokenAction} method="post" className="space-y-4">
+        <form // @ts-expect-error server action return type
+          action={verifyResetTokenAction} method="post" className="space-y-4">
           <input type="hidden" name="token" value={params.token} />
           <div>
             <label htmlFor="new-password" className="block text-sm font-medium text-slate-700">New password</label>

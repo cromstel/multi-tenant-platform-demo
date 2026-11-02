@@ -3,6 +3,7 @@ import { Geist } from 'next/font/google';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import './globals.css';
 import { siteUrl, SITE_NAME, SITE_DESCRIPTION, BRAND_COLOR } from '@/lib/seo';
+import FloatingBar from '@/components/floating-bar';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -92,6 +93,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${geistSans.variable} antialiased`}>
         {children}
+        <FloatingBar />
         <SpeedInsights />
       </body>
     </html>

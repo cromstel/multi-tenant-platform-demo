@@ -59,6 +59,11 @@ export function AdminLoginForm() {
           />
         </div>
 
+        <div className="flex items-center gap-2">
+          <input id="remember" name="remember" type="checkbox" className="h-4 w-4 rounded-none border-slate-300 text-[#005cb3] focus:ring-[#005cb3]" />
+          <Label htmlFor="remember" className="text-sm font-medium text-slate-700">Remember me</Label>
+        </div>
+
         {state.error && (
           <p
             role="alert"
@@ -75,6 +80,10 @@ export function AdminLoginForm() {
         >
           {isPending ? 'Signing in…' : 'Sign In'}
         </Button>
+
+        <div className="flex items-center justify-between pt-1">
+          <a href="/auth/reset" className="text-xs font-medium text-[#005cb3] hover:underline">Forgotten your password?</a>
+        </div>
       </form>
     </TooltipProvider>
   );

@@ -42,7 +42,7 @@ export async function resetRequestAction(prevState: unknown, formData: FormData)
   return { success: true, message: 'A reset token has been generated.' };
 }
 
-export async function verifyResetTokenAction(token: string | FormData) {
+export async function verifyResetTokenAction(token: string | FormData): Promise<{ success: boolean; error?: string; message?: string; user?: number }> {
   const tokenStr = typeof token === 'string' ? token : (token.get('token') as string) || '';
   if (!tokenStr) {
     return { success: false, error: 'Token is required' };
@@ -59,9 +59,11 @@ export async function verifyResetTokenAction(token: string | FormData) {
   }
 
   const entry = results[0];
+  if (!entry) {
+    return { success: false, error: 'Token not found' };
+  }
   const now = Date.now();
   if (entry.expires_at < now) {
-    // Clean up expired token
     await pool.execute('DELETE FROM password_reset_tokens WHERE token = ?', [tokenStr]);
     return { success: false, error: 'Token has expired. Please request a new reset link.' };
   }
@@ -78,5 +80,5 @@ export async function verifyResetTokenAction(token: string | FormData) {
     return { success: true, message: 'Password updated successfully. Please sign in.' };
   }
 
-  return { success: true, user: entry.user_id };
+  return { success: true, user: entry.user_id, error: undefined, message: undefined };
 }

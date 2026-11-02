@@ -22,7 +22,11 @@ export default async function PasswordResetPage() {
           <p className="mt-2 text-sm text-slate-600">Enter your email address and we will send you a reset link.</p>
         </div>
 
-        <form action={resetRequestAction} className="space-y-4">
+        <form
+          // @ts-expect-error form action type matches server action return
+          action={resetRequestAction}
+          className="space-y-4"
+        >
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-slate-700">
               Email address
