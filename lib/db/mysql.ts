@@ -168,6 +168,22 @@ export async function initializeMySQL(): Promise<void> {
     await conn.query(`
       CREATE INDEX IF NOT EXISTS idx_docs_sections_role_sort ON docs_sections(role, sort_order)
     `);
+
+    await conn.query(`
+      CREATE INDEX IF NOT EXISTS idx_docs_sections_role_sort ON docs_sections(role, sort_order)
+    `);
+
+    await conn.query(`
+      CREATE TABLE IF NOT EXISTS password_reset_tokens (
+        token VARCHAR(64) PRIMARY KEY,
+        email VARCHAR(255) NOT NULL,
+        user_id INT NOT NULL,
+        expires_at BIGINT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES tenant_users(id) ON DELETE CASCADE,
+        INDEX idx_password_reset_email_expires (email, expires_at)
+      )
+    `);
     
   } finally {
     conn.release();
