@@ -3,7 +3,7 @@ import type { Metadata, Viewport } from 'next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import './globals.css';
 import { siteUrl, SITE_NAME, SITE_DESCRIPTION, BRAND_COLOR } from '@/lib/seo';
-import { headers } from 'next/headers';
+import FloatingBar from '@/components/floating-bar';
 
 
 export const metadata: Metadata = {
@@ -80,24 +80,16 @@ export const viewport: Viewport = {
   colorScheme: 'light',
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const h = await headers();
-  let pathname = h.get('x-invoke-path') || h.get('next-url') || '';
-  if (pathname.includes('://')) {
-    try { pathname = new URL(pathname).pathname; } catch { /* leave */ }
-  }
-  const p = pathname.split('?')[0];
-  const hideBar = p.startsWith('/auth') || p.startsWith('/admin');
-
   return (
     <html lang="en">
       <body className="antialiased">
         {children}
-        {/* FloatingBar removed per user requirement */}
+        <FloatingBar />
         <SpeedInsights />
       </body>
     </html>
