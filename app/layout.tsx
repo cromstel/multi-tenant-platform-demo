@@ -3,6 +3,7 @@ import { Geist } from 'next/font/google';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import './globals.css';
 import { siteUrl, SITE_NAME, SITE_DESCRIPTION, BRAND_COLOR } from '@/lib/seo';
+import { headers } from 'next/headers';
 import FloatingBar from '@/components/floating-bar';
 
 const geistSans = Geist({
@@ -84,16 +85,24 @@ export const viewport: Viewport = {
   colorScheme: 'light',
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const h = await headers();
+  let pathname = h.get('x-invoke-path') || h.get('next-url') || '';
+  if (pathname.includes('://')) {
+    try { pathname = new URL(pathname).pathname; } catch { /* leave */ }
+  }
+  const p = pathname.split('?')[0];
+  const hideBar = p.startsWith('/auth') || p.startsWith('/admin');
+
   return (
     <html lang="en">
       <body className={`${geistSans.variable} antialiased`}>
         {children}
-        <FloatingBar />
+        {!hideBar && <FloatingBar />}
         <SpeedInsights />
       </body>
     </html>

@@ -54,7 +54,7 @@ export function SiteFooter() {
 
   return (
     <footer className="border-t border-slate-200 bg-slate-50">
-      <div className="w-full px-4 py-14 sm:px-6 lg:px-8 xl:px-12">
+      <div className="w-full px-4 py-8 sm:px-6 lg:px-8 xl:px-12">
         {/* Top: brand + link columns */}
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1.4fr)_repeat(3,minmax(0,1fr))]">
           <div>
@@ -114,7 +114,7 @@ export function SiteFooter() {
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-slate-200 pt-6 sm:flex-row">
+        <div className="mt-6 flex flex-col items-center justify-between gap-4 border-t border-slate-200 pt-4 sm:flex-row">
           <p className="text-xs text-slate-500">
             © {year} CITGROUP. All rights reserved.
           </p>
