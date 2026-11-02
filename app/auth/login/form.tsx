@@ -1,6 +1,7 @@
 'use client';
 
 import { useActionState } from 'react';
+import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -84,7 +85,7 @@ export function TenantLoginForm() {
           <Label htmlFor="remember" className="text-sm font-medium text-slate-700">Remember me</Label>
           <span className="text-xs font-medium text-[#005cb3] hover:underline leading-relaxed">
             Forgotten your password?{' '}
-            <a href="/auth/reset" className="hover:underline">Reset it</a>.
+            <Link href="/auth/reset" className="hover:underline">Reset it</Link>.
           </span>
         </div>
 
