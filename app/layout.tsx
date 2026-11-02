@@ -4,7 +4,7 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import './globals.css';
 import { siteUrl, SITE_NAME, SITE_DESCRIPTION, BRAND_COLOR } from '@/lib/seo';
 import { headers } from 'next/headers';
-import FloatingBar from '@/components/floating-bar';
+
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -102,7 +102,7 @@ export default async function RootLayout({
     <html lang="en">
       <body className={`${geistSans.variable} antialiased`}>
         {children}
-        {!hideBar && <FloatingBar />}
+        {/* FloatingBar removed per user requirement */}
         <SpeedInsights />
       </body>
     </html>
