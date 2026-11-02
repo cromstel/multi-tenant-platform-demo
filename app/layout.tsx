@@ -1,15 +1,10 @@
 import type { Metadata, Viewport } from 'next';
-import { Geist } from 'next/font/google';
+
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import './globals.css';
 import { siteUrl, SITE_NAME, SITE_DESCRIPTION, BRAND_COLOR } from '@/lib/seo';
 import { headers } from 'next/headers';
 
-
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin']
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl()),
@@ -100,7 +95,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} antialiased`}>
+      <body className="antialiased">
         {children}
         {/* FloatingBar removed per user requirement */}
         <SpeedInsights />
