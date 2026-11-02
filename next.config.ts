@@ -28,6 +28,7 @@ const nextConfig: NextConfig = {
     '/**': ['./node_modules/mysql2/**/*'],
   },
   poweredByHeader: false,
+  devIndicators: false,
 
   // Strict CSP: default-deny with exceptions for the application's own
   // origin, inline scripts/styles (Next.js requires them for RSC/HMR),
