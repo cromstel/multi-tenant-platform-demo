@@ -22,9 +22,7 @@ export function TenantLoginForm() {
     <TooltipProvider>
       <form action={action} className="space-y-4">
         <div>
-          <Label htmlFor="subdomain" className="mb-1.5 block text-sm font-medium text-slate-700">
-            Subdomain
-          </Label>
+          <Label htmlFor="subdomain" className="sr-only">Subdomain</Label>
           <Input
             id="subdomain"
             name="subdomain"
@@ -38,9 +36,7 @@ export function TenantLoginForm() {
         </div>
 
         <div>
-          <Label htmlFor="email" className="mb-1.5 block text-sm font-medium text-slate-700">
-            Work email
-          </Label>
+          <Label htmlFor="email" className="sr-only">Work email</Label>
           <Input
             id="email"
             name="email"
@@ -54,9 +50,7 @@ export function TenantLoginForm() {
 
         <div>
           <div className="mb-1.5 flex items-center gap-1.5">
-            <Label htmlFor="password" className="text-sm font-medium text-slate-700">
-              Password
-            </Label>
+            <Label htmlFor="password" className="sr-only">Password</Label>
             <FieldHint
               id="tenant-login-password-hint"
               label="About your password"
