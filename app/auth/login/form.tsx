@@ -62,6 +62,9 @@ export function TenantLoginForm() {
               label="About your password"
               content="Passwords are case sensitive. If you have forgotten yours, ask a tenant owner to reset it from the admin dashboard."
             />
+            <Link href="/auth/reset" className="ml-auto text-xs font-medium text-[#005cb3] hover:underline whitespace-nowrap">
+              Forgotten your password?
+            </Link>
           </div>
           <Input
             id="password"
@@ -75,7 +78,7 @@ export function TenantLoginForm() {
           />
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 mt-1">
           <input
             id="remember"
             name="remember"
@@ -83,10 +86,6 @@ export function TenantLoginForm() {
             className="h-4 w-4 rounded-none border-slate-300 text-[#005cb3] focus:ring-[#005cb3]"
           />
           <Label htmlFor="remember" className="text-sm font-medium text-slate-700">Remember me</Label>
-          <span className="text-xs font-medium text-[#005cb3] hover:underline leading-relaxed">
-            Forgotten your password?{' '}
-            <Link href="/auth/reset" className="hover:underline">Reset it</Link>.
-          </span>
         </div>
 
         {state.error && (

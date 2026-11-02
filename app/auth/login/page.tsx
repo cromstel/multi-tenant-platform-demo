@@ -38,7 +38,7 @@ export default async function TenantLoginPage() {
   }
 
   return (
-    <div className="w-full max-w-md">
+    <div className="w-full md:max-w-lg lg:max-w-xl">
       <div className="max-h-[calc(100dvh-3rem)] overflow-y-auto rounded-none bg-white/[0.97] p-7 shadow-2xl shadow-black/30 backdrop-blur-xl sm:p-8">
         <div className="mb-5 text-center">
           <Link href="/" className="group inline-flex items-center gap-2.5">
@@ -48,7 +48,7 @@ export default async function TenantLoginPage() {
               </svg>
             </span>
             <div className="text-left leading-none">
-              <span className="block text-[15px] font-extrabold tracking-tight text-slate-900">CITGROUP</span>
+              <span className="block text-[13px] md:text-[15px] font-extrabold tracking-tight text-slate-900">CITGROUP</span>
               <span className="block text-[10px] font-bold tracking-[0.2em] text-[#005cb3] uppercase">Tenancy System</span>
             </div>
             <span className="sr-only">home</span>
