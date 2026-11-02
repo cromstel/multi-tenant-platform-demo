@@ -39,7 +39,7 @@ export default async function TenantLoginPage() {
 
   return (
     <div className="w-full max-w-md">
-      <div className="max-h-[calc(100dvh-3rem)] overflow-y-auto rounded-none bg-white/[0.97] p-7 shadow-2xl shadow-black/30 backdrop-blur-xl sm:p-8">
+      <div className="w-full max-w-md rounded-none bg-white/[0.97] p-7 shadow-2xl shadow-black/30 backdrop-blur-xl sm:p-8">
         <div className="mb-5 text-center">
           <Link href="/" className="group inline-flex items-center gap-2.5">
             <span className="flex h-11 w-11 items-center justify-center rounded-none bg-gradient-to-br from-[#0078E2] to-[#5B9CF5] shadow-lg shadow-blue-600/30 transition-transform group-hover:scale-105">
