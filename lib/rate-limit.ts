@@ -48,6 +48,9 @@ export async function getClientIdentifier(): Promise<string> {
 /** 5 failed admin logins per IP per 15 minutes. */
 export const LOGIN_LIMIT = { max: 5, windowMs: 15 * 60 * 1000 };
 
+/** 20 SAM chat requests per IP per 15 minutes. */
+export const SAM_LIMIT = { max: 20, windowMs: 15 * 60 * 1000 };
+
 /** 10 tenant creations per IP per hour. */
 export const CREATE_LIMIT = { max: 10, windowMs: 60 * 60 * 1000 };
 

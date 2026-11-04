@@ -1,0 +1,6 @@
+- [x] Fix `lib/auth/jwt.ts` role enum and admin payload
+- [x] Wire `role` into tenant session (`app/auth/login/actions.ts`)
+- [x] Wire `role` into admin session (`app/auth/admin/login/actions.ts`)
+- [x] Seed `docs_sections` for owner/admin/member
+- [x] Add `lib/auth/role-check.ts` (optional helpers)
+- [x] Verify `pnpm check`, `pnpm test`, `pnpm build`

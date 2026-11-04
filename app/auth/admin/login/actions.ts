@@ -9,12 +9,14 @@ import { getMySQLPool } from '@/lib/db/mysql';
 import { hashPassword, safeEqual, verifyPassword } from '@/lib/password';
 import { LOGIN_LIMIT, check, consume, reset } from '@/lib/rate-limit';
 import { adminUrl } from '@/lib/admin-path';
+import { issueSession } from '@/lib/auth/jwt';
 
 export type LoginState = {
   error?: string;
 };
 
 const SESSION_COOKIE = "admin_session";
+const AUTH_COOKIE = "AUTH_COOKIE";
 const SESSION_TTL = 8 * 60 * 60;
 
 async function getSessionSecret(): Promise<Uint8Array> {
@@ -69,11 +71,11 @@ async function ensureAdminUser(email: string, password: string): Promise<boolean
 async function verifyAdminPassword(
   email: string,
   password: string
-): Promise<{ id: number; email: string } | null> {
+): Promise<{ id: number; email: string; role: string } | null> {
   try {
     const pool = await getMySQLPool();
     const [rows] = await pool.execute(
-      "SELECT id, email, password_hash FROM admin_users WHERE email = ? AND is_active = TRUE LIMIT 1",
+      'SELECT id, email, password_hash, role FROM admin_users WHERE email = ? AND is_active = TRUE LIMIT 1',
       [email]
     );
 
@@ -81,6 +83,7 @@ async function verifyAdminPassword(
       id: number;
       email: string;
       password_hash: string;
+      role: string;
     }>)[0];
 
     if (!user) return null;
@@ -88,7 +91,7 @@ async function verifyAdminPassword(
     const isValid = await verifyPassword(password, user.password_hash);
     if (!isValid) return null;
 
-    return { id: user.id, email: user.email };
+    return { id: user.id, email: user.email, role: user.role || 'admin' };
   } catch (error) {
     console.error("[auth] Failed to verify admin password:", error instanceof Error ? error.message : "Unknown error");
     return null;
@@ -138,7 +141,7 @@ export async function loginAction(
 
     await reset("admin_login");
 
-    const token = await new SignJWT({ userId: user.id, email: user.email })
+    const token = await new SignJWT({ userId: user.id, email: user.email, role: user.role })
       .setProtectedHeader({ alg: "HS256" })
       .setIssuedAt()
       .setIssuer("multi-tenant-admin")
@@ -148,6 +151,20 @@ export async function loginAction(
 
     const cookieStore = await cookies();
     cookieStore.set(SESSION_COOKIE, token, {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: SESSION_TTL
+    });
+
+    // Also set AUTH_COOKIE so the auth middleware (app/middleware.ts) can
+    // verify this session on protected routes.
+    const authCookie = await issueSession({
+      sub: user.email,
+      role: (user.role as import('@/lib/auth/jwt').JwtPayload['role'])
+    });
+    cookieStore.set(AUTH_COOKIE, authCookie, {
       httpOnly: true,
       sameSite: "lax",
       secure: process.env.NODE_ENV === "production",
@@ -176,6 +193,7 @@ export async function logoutAction() {
   try {
     const cookieStore = await cookies();
     cookieStore.delete(SESSION_COOKIE);
+    cookieStore.delete(AUTH_COOKIE);
     redirect(adminUrl('/login'));
   } catch (error) {
     if (isRedirectError(error)) {
@@ -186,7 +204,7 @@ export async function logoutAction() {
   }
 }
 
-export async function getAdminSession(): Promise<{ userId: number; email: string } | null> {
+export async function getAdminSession(): Promise<{ userId: number; email: string; role: string } | null> {
   // `cookies()` deliberately sits outside the `try`. While a route is being
   // prerendered Next.js signals "this page is dynamic" by throwing from it;
   // catching that error would let the build snapshot the page with no session
@@ -198,13 +216,13 @@ export async function getAdminSession(): Promise<{ userId: number; email: string
 
   try {
     const { payload } = await jwtVerify(token, await getSessionSecret(), { issuer: "multi-tenant-admin" });
-    return { userId: payload.userId as number, email: payload.email as string };
+    return { userId: payload.userId as number, email: payload.email as string, role: (payload.role as string) || 'admin' };
   } catch {
     return null;
   }
 }
 
-export async function requireAdminSession(): Promise<{ userId: number; email: string }> {
+export async function requireAdminSession(): Promise<{ userId: number; email: string; role: string }> {
   const session = await getAdminSession();
   if (!session) redirect(adminUrl('/login'));
   return session;

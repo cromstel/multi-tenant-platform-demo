@@ -62,7 +62,7 @@ function TenantDashboardLayout({
 }: {
   subdomain: string;
   subdomainData: { emoji: string; createdAt: number };
-  session: { userId: number; tenantId: number; email: string };
+  session: { userId: number; tenantId: number; email: string; role: string };
   children: React.ReactNode;
 }) {
   return (

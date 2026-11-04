@@ -8,12 +8,14 @@ import { verifyPassword } from '@/lib/password';
 import { LOGIN_LIMIT, check, consume, reset } from '@/lib/rate-limit';
 import { sanitizeSubdomain } from '@/lib/subdomains';
 import { protocol, rootDomain } from '@/lib/utils';
+import { issueSession } from '@/lib/auth/jwt';
 
 export type LoginState = {
   error?: string;
 };
 
 const SESSION_COOKIE = 'tenant_session';
+const AUTH_COOKIE = 'AUTH_COOKIE';
 const SESSION_TTL = 24 * 60 * 60; // 24 hours
 
 async function getSessionSecret(): Promise<Uint8Array> {
@@ -80,9 +82,9 @@ export async function loginAction(
 
     // Verify user credentials
     const [userRows] = (await pool.execute(
-      'SELECT id, password_hash FROM tenant_users WHERE tenant_id = ? AND email = ? AND is_active = TRUE LIMIT 1',
+      'SELECT id, password_hash, role FROM tenant_users WHERE tenant_id = ? AND email = ? AND is_active = TRUE LIMIT 1',
       [tenantId, email]
-    )) as [Array<{ id: number; password_hash: string }>, unknown];
+    )) as [Array<{ id: number; password_hash: string; role: string }>, unknown];
 
     const user = userRows[0];
     const verdict = await consume(`tenant_login:${tenantId}`, LOGIN_LIMIT);
@@ -107,7 +109,8 @@ export async function loginAction(
     const token = await new SignJWT({ 
       userId: user.id, 
       tenantId,
-      email 
+      email,
+      role: (user as { role?: string }).role || 'member'
     })
       .setProtectedHeader({ alg: 'HS256' })
       .setIssuedAt()
@@ -118,6 +121,22 @@ export async function loginAction(
 
     const cookieStore = await cookies();
     cookieStore.set(SESSION_COOKIE, token, {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      path: '/',
+      maxAge: SESSION_TTL
+    });
+
+    // Also set AUTH_COOKIE so the auth middleware (app/middleware.ts) can
+    // verify this session on protected routes without relying on a separate
+    // signing secret. Uses AUTH_JWT_SECRET via lib/auth/jwt.ts.
+    const authCookie = await issueSession({
+      sub: email,
+      role: ((user as { role?: string }).role || 'member') as import('@/lib/auth/jwt').JwtPayload['role'],
+      tenantId
+    });
+    cookieStore.set(AUTH_COOKIE, authCookie, {
       httpOnly: true,
       sameSite: 'lax',
       secure: process.env.NODE_ENV === 'production',
@@ -142,6 +161,7 @@ export async function logoutAction() {
   try {
     const cookieStore = await cookies();
     cookieStore.delete(SESSION_COOKIE);
+    cookieStore.delete(AUTH_COOKIE);
     redirect('/auth/login');
   } catch (error) {
     if (isRedirectError(error)) {
@@ -152,7 +172,7 @@ export async function logoutAction() {
   }
 }
 
-export async function getTenantSession(): Promise<{ userId: number; tenantId: number; email: string } | null> {
+export async function getTenantSession(): Promise<{ userId: number; tenantId: number; email: string; role: string } | null> {
   // `cookies()` deliberately sits outside the `try`. While a route is being
   // prerendered Next.js signals "this page is dynamic" by throwing from it;
   // catching that error would let the build snapshot the page with no session
@@ -169,14 +189,15 @@ export async function getTenantSession(): Promise<{ userId: number; tenantId: nu
     return { 
       userId: payload.userId as number, 
       tenantId: payload.tenantId as number, 
-      email: payload.email as string 
+      email: payload.email as string,
+      role: (payload.role as string) || 'member'
     };
   } catch {
     return null;
   }
 }
 
-export async function requireTenantSession(): Promise<{ userId: number; tenantId: number; email: string }> {
+export async function requireTenantSession(): Promise<{ userId: number; tenantId: number; email: string; role: string }> {
   const session = await getTenantSession();
   if (!session) redirect('/auth/login');
   return session;

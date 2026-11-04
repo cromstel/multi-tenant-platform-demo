@@ -9,6 +9,17 @@ identified by subdomain (`acme.localhost:3030` locally, `acme.example.com` in
 production). `proxy.ts` maps the `Host` header to a tenant record and rewrites
 the request to `app/s/[subdomain]/page.tsx`.
 
+**New / in-progress module**: SAM chatbot (`components/sam/`, `lib/sam/`,
+`app/admin/sam/`, `app/api/sam/`, DB `conversations/messages/escalations`,
+`.env.example` keys `OPENROUTER_API_KEY` / `CHATGPT_API_KEY` / `SAM_MODEL`).
+Also new auth middleware (`app/middleware.ts`) and JWT helper (`lib/auth/jwt.ts`)
+with cookie `AUTH_COOKIE`; floating bar (`components/floating-bar.tsx`) is
+rendered globally but suppresses itself on `/auth/*` and `/admin/*`.
+
+**Context7 required**: Always consult Context7 before writing code that uses
+`jsonwebtoken`, `jose`, `react`, `next`, `lucide-react`, or any framework/API
+library. See system reminder `AGENTS.md` update (Context7 MCP rule).
+
 ## Commands
 
 ```bash

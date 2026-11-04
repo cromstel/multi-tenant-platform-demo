@@ -4,6 +4,8 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import './globals.css';
 import { siteUrl, SITE_NAME, SITE_DESCRIPTION, BRAND_COLOR } from '@/lib/seo';
 import FloatingBar from '@/components/floating-bar';
+import SAMWidget from '@/components/sam/widget';
+import ScrollToTop from '@/components/scroll-to-top';
 
 
 export const metadata: Metadata = {
@@ -90,6 +92,8 @@ export default function RootLayout({
       <body className="antialiased">
         {children}
         <FloatingBar />
+        <SAMWidget />
+        <ScrollToTop />
         <SpeedInsights />
       </body>
     </html>
