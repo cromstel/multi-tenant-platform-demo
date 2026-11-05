@@ -1,4 +1,7 @@
 import { getMySQLPool } from '@/lib/db/mysql';
+import { sanitizeSubdomain } from '@/lib/utils';
+
+export { sanitizeSubdomain } from '@/lib/utils';
 
 export function isValidIcon(str: string) {
   if (str.length > 10) {
@@ -6,28 +9,18 @@ export function isValidIcon(str: string) {
   }
 
   try {
-    // Primary validation: Check if the string contains at least one emoji character
-    // This regex pattern matches most emoji Unicode ranges
     const emojiPattern = /[\p{Emoji}]/u;
     if (emojiPattern.test(str)) {
       return true;
     }
   } catch (error) {
-    // If the regex fails (e.g., in environments that don't support Unicode property escapes),
-    // fall back to a simpler validation
     console.warn(
       'Emoji regex validation failed, using fallback validation',
       error
     );
   }
 
-  // Fallback validation: not an emoji, reject
   return false;
-}
-
-/** Normalises a subdomain to the characters allowed in a MySQL key segment. */
-export function sanitizeSubdomain(subdomain: string): string {
-  return subdomain.toLowerCase().replace(/[^a-z0-9-]/g, '');
 }
 
 export async function getSubdomainData(subdomain: string) {

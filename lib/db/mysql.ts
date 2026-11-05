@@ -1,4 +1,4 @@
-import mysql from 'mysql2/promise';
+import type { Pool, RowDataPacket, FieldPacket } from 'mysql2/promise';
 import type { KvClient } from '@/lib/kv-types';
 
 export interface DBRow {
@@ -16,7 +16,7 @@ interface MySQLConfig {
   queueLimit?: number;
 }
 
-let pool: mysql.Pool | null = null;
+let pool: Pool | null = null;
 
 /**
  * The schema is created once per process, on first use.
@@ -40,8 +40,9 @@ function getMySQLConfig(): MySQLConfig {
   };
 }
 
-function getPool(): mysql.Pool {
+async function getPool(): Promise<Pool> {
   if (!pool) {
+    const mysql = await import('mysql2/promise');
     const config = getMySQLConfig();
     pool = mysql.createPool(config);
   }
@@ -51,7 +52,7 @@ function getPool(): mysql.Pool {
 export async function initializeMySQL(): Promise<void> {
   // The raw pool, deliberately NOT `getMySQLPool()` — that function awaits
   // the schema promise this one produces, so calling it here would deadlock.
-  const pool = getPool();
+  const pool = await getPool();
   const conn = await pool.getConnection();
   
   try {
@@ -224,7 +225,7 @@ export async function initializeMySQL(): Promise<void> {
  * process no matter how many requests arrive at the same moment. A fresh
  * checkout therefore only needs an empty database — no migration step.
  */
-export async function getMySQLPool(): Promise<mysql.Pool> {
+export async function getMySQLPool(): Promise<Pool> {
   if (!schemaPromise) {
     schemaPromise = initializeMySQL().catch((error) => {
       // Clear the memo so the next request retries rather than caching a
@@ -436,7 +437,7 @@ export function createMySQLStore(): KvClient {
       const [rowsResult] = await pool.execute(
         'SELECT value, expires_at FROM kv_store WHERE `key` = ? AND (expires_at IS NULL OR expires_at > ?)',
         [key, Date.now()]
-      ) as [mysql.RowDataPacket[], mysql.FieldPacket[]];
+      ) as [RowDataPacket[], FieldPacket[]];
       const row = rowsResult[0];
       if (!row) return null;
       return row.value as T;
@@ -477,7 +478,7 @@ export function createMySQLStore(): KvClient {
         'SELECT `key` FROM kv_store WHERE `key` REGEXP ? AND (expires_at IS NULL OR expires_at > ?)',
         [`^${regexPattern}$`, Date.now()]
       );
-      const rows = rowsResult as mysql.RowDataPacket[];
+      const rows = rowsResult as RowDataPacket[];
       return rows.map(r => String(r.key));
     },
 
@@ -488,7 +489,7 @@ export function createMySQLStore(): KvClient {
       const [rowsResult] = await pool.execute(
         `SELECT \`key\`, value FROM kv_store WHERE \`key\` IN (${placeholders}) AND (expires_at IS NULL OR expires_at > ?)`,
         [...keys, Date.now()]
-      ) as [mysql.RowDataPacket[], mysql.FieldPacket[]];
+      ) as [RowDataPacket[], FieldPacket[]];
       const rows = rowsResult;
       const map = new Map(rows.map(r => [r.key, r.value]));
       return keys.map(k => map.get(k) as T | null);
@@ -502,7 +503,7 @@ export function createMySQLStore(): KvClient {
         const [rows] = await conn.execute(
           'SELECT value, expires_at FROM kv_store WHERE `key` = ? FOR UPDATE',
           [key]
-        ) as [mysql.RowDataPacket[], mysql.FieldPacket[]];
+        ) as [RowDataPacket[], FieldPacket[]];
         const current = rows[0];
         let newValue = by;
         let expiresAt: number | null = (current?.expires_at as number) ?? null;

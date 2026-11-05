@@ -1,10 +1,11 @@
 'use server';
+import 'server-only';
 
 import { redirect } from 'next/navigation';
 
 import { getMySQLPool } from '@/lib/db/mysql';
 import { deleteTenant, bulkDeleteTenants } from '@/lib/db/tenants';
-import { sanitizeSubdomain } from '@/lib/subdomains';
+import { sanitizeSubdomain } from '@/lib/utils';
 import { getAdminSession } from '@/app/auth/admin/login/actions';
 import { CREATE_LIMIT, consume } from '@/lib/rate-limit';
 import { rootDomain, protocol, validateSubdomain } from '@/lib/utils';

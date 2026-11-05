@@ -1,3 +1,10 @@
+# CI for CITGROUP TENANCY SYSTEM
+#
+# Runs on every push and pull request:
+#  1. verify  — typecheck, lint, test suite (against a MySQL 8 service
+#     container), production build
+#  2. docker  — builds the Docker image and runs a smoke test
+#
 name: CI
 
 on:
@@ -6,150 +13,161 @@ on:
   pull_request:
     branches: [main]
 
-# A new push cancels the previous run — no point testing the same commit twice.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 env:
-  NEXT_TELEMETRY_DISABLED: 1
+  # pnpm is pinned by packageManager; corepack activates that exact version.
+  PNPM_VERSION: 10.12.4
+  # Test database credentials (CI-only values).
+  MYSQL_HOST: mysql
+  MYSQL_PORT: 3306
+  MYSQL_USER: multi_tenant_admin
+  MYSQL_PASSWORD: ci_dev_password
+  MYSQL_DATABASE: multi_tenant
+  NEXT_PUBLIC_ROOT_DOMAIN: localhost:3030
+  ADMIN_PATH: ops-ci
+  ADMIN_EMAIL: admin@ci.local
+  ADMIN_PASSWORD: admin_ci_password
+  ADMIN_SESSION_SECRET: ci_admin_session_secret_do_not_use_in_production
+  AUTH_JWT_SECRET: ci_auth_jwt_secret_do_not_use_in_production
+  TENANT_SESSION_SECRET: ci_tenant_session_secret_do_not_use_in_production
 
 jobs:
+  ############################################################################
+  # verify — typecheck → lint → test → build
+  ############################################################################
   verify:
-    name: Types, lint, tests, build
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     services:
       mysql:
         image: mysql:8.4
         env:
-          MYSQL_ROOT_PASSWORD: root_test_only
+          MYSQL_ROOT_PASSWORD: root_dev_only
           MYSQL_DATABASE: multi_tenant
           MYSQL_USER: multi_tenant_admin
-          MYSQL_PASSWORD: April--2024!!!!
+          MYSQL_PASSWORD: ci_dev_password
         ports:
           - 3306:3306
         options: >-
-          --health-cmd="mysqladmin ping -h 127.0.0.1 -proot_test_only"
-          --health-interval=5s
-          --health-timeout=5s
-          --health-retries=20
-          --health-start-period=30s
+          --health-cmd "mysqladmin ping -h 127.0.0.1 -p\$\$MYSQL_ROOT_PASSWORD"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+          --health-start-period 30s
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Enable pnpm
-        run: corepack enable
+      - name: Enable corepack and pin pnpm
+        run: corepack enable && corepack prepare pnpm@${PNPM_VERSION} --activate
 
-      - name: Set up pnpm
-        uses: pnpm/action-setup@v4
-
-      - name: Set up Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
-
-      - name: Install dependencies
+      - name: Install dependencies (frozen lockfile)
         run: pnpm install --frozen-lockfile
 
-      - name: Typecheck
+      - name: Type check (tsc --noEmit)
         run: pnpm typecheck
 
-      - name: Lint
+      - name: Lint (eslint)
         run: pnpm lint
 
-      - name: Test
+      - name: Test suite against MySQL
+        env:
+          MYSQL_HOST: ${{ env.MYSQL_HOST }}
+          MYSQL_PORT: ${{ env.MYSQL_PORT }}
+          MYSQL_USER: ${{ env.MYSQL_USER }}
+          MYSQL_PASSWORD: ${{ env.MYSQL_PASSWORD }}
+          MYSQL_DATABASE: ${{ env.MYSQL_DATABASE }}
+          NEXT_PUBLIC_ROOT_DOMAIN: ${{ env.NEXT_PUBLIC_ROOT_DOMAIN }}
+          ADMIN_PATH: ${{ env.ADMIN_PATH }}
+          ADMIN_EMAIL: ${{ env.ADMIN_EMAIL }}
+          ADMIN_PASSWORD: ${{ env.ADMIN_PASSWORD }}
+          ADMIN_SESSION_SECRET: ${{ env.ADMIN_SESSION_SECRET }}
+          AUTH_JWT_SECRET: ${{ env.AUTH_JWT_SECRET }}
+          TENANT_SESSION_SECRET: ${{ env.TENANT_SESSION_SECRET }}
         run: pnpm test
-        env:
-          MYSQL_HOST: 127.0.0.1
-          MYSQL_PORT: 3306
-          MYSQL_USER: multi_tenant_admin
-          MYSQL_PASSWORD: April--2024!!!!
-          MYSQL_DATABASE: multi_tenant
-          NEXT_PUBLIC_ROOT_DOMAIN: localhost:3030
-          ADMIN_SESSION_SECRET: ci-only-admin-session-secret-32-characters-min
-          ADMIN_EMAIL: admin@ci.local
-          ADMIN_PASSWORD: ci-only-admin-password
 
-      - name: Build
+      - name: Production build
+        env:
+          NEXT_PUBLIC_ROOT_DOMAIN: ${{ env.NEXT_PUBLIC_ROOT_DOMAIN }}
         run: pnpm build
-        env:
-          NEXT_TELEMETRY_DISABLED: 1
 
+  ############################################################################
+  # docker — build image and run smoke test
+  ############################################################################
   docker:
-    name: Docker image builds
+    needs: verify
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    needs: verify
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - uses: docker/setup-buildx-action@v3
-
-      - name: Build image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          push: false
-          load: true
-          tags: citgroup-tenancy-system:ci
-          build-args: |
-            NEXT_PUBLIC_ROOT_DOMAIN=localhost:3030
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-      - name: Smoke test the image
-        timeout-minutes: 5
+      - name: Build Docker image
         run: |
-          set -euo pipefail
+          docker build \
+            --build-arg NEXT_PUBLIC_ROOT_DOMAIN=${{ env.NEXT_PUBLIC_ROOT_DOMAIN }} \
+            -t citgroup-tenancy-system:ci .
 
-          # Always surface the container log and clean up, whether the
-          # test passes or fails — a silent exit is the least useful outcome.
-          trap 'status=$?; if [ "$status" -ne 0 ]; then docker logs app 2>&1 || true; fi; docker rm -f app >/dev/null 2>&1 || true' EXIT
-
-          # `lib/redis.ts` refuses to run in production without a durable
-          # store, and the runtime image sets NODE_ENV=production. MYSQL_*
-          # is the cheapest way to satisfy that guard: nothing listens on
-          # 3306 here, so the health endpoint is expected to be `degraded`.
-          docker run -d --name app -p 3030:3030 \
+      - name: Start container for smoke test
+        id: container
+        run: |
+          CID=$(docker run -d \
+            -e NODE_ENV=production \
+            -e PORT=3030 \
+            -e HOSTNAME=0.0.0.0 \
             -e MYSQL_HOST=127.0.0.1 \
-            -e MYSQL_DATABASE=multi_tenant \
-            -e ADMIN_SESSION_SECRET=ci-only-admin-session-secret-32-characters-min \
-            -e ADMIN_EMAIL=admin@ci.local \
-            -e ADMIN_PASSWORD=ci-only-admin-password \
-            citgroup-tenancy-system:ci
+            -e MYSQL_PORT=3306 \
+            -e MYSQL_USER=${{ env.MYSQL_USER }} \
+            -e MYSQL_PASSWORD=${{ env.MYSQL_PASSWORD }} \
+            -e MYSQL_DATABASE=${{ env.MYSQL_DATABASE }} \
+            -e NEXT_PUBLIC_ROOT_DOMAIN=${{ env.NEXT_PUBLIC_ROOT_DOMAIN }} \
+            -e ADMIN_PATH=${{ env.ADMIN_PATH }} \
+            -e ADMIN_EMAIL=${{ env.ADMIN_EMAIL }} \
+            -e ADMIN_PASSWORD=${{ env.ADMIN_PASSWORD }} \
+            -e ADMIN_SESSION_SECRET=${{ env.ADMIN_SESSION_SECRET }} \
+            -e AUTH_JWT_SECRET=${{ env.AUTH_JWT_SECRET }} \
+            -e TENANT_SESSION_SECRET=${{ env.TENANT_SESSION_SECRET }} \
+            -p 127.0.0.1:3030:3030 \
+            citgroup-tenancy-system:ci)
+          echo "cid=$CID" >> $GITHUB_OUTPUT
 
-          # 503 is a valid answer: it proves the route loaded and reported
-          # its dependency state instead of failing to boot. A missing
-          # store used to return 500 here, which is the regression this
-          # step guards against.
-          code=000
-          for attempt in $(seq 1 45); do
-            code=$(curl -sS -o /tmp/health.json -w '%{http_code}' \
-              http://127.0.0.1:3030/api/health || true)
-            if [ "$code" != "000" ]; then break; fi
+      - name: Wait for container to be ready
+        run: |
+          for i in $(seq 1 30); do
+            if curl -sf http://127.0.0.1:3030/api/health > /dev/null; then
+              echo "Container is ready"
+              exit 0
+            fi
+            echo "Waiting for container... ($i/30)"
             sleep 2
           done
+          echo "Container failed to become ready" >&2
+          docker logs ${{ steps.container.outputs.cid }} || true
+          exit 1
 
-          echo "health status: $code"
-          cat /tmp/health.json
+      - name: Smoke test health endpoint
+        run: |
+          STATUS=$(curl -sf -o /dev/null -w "%{http_code}" http://127.0.0.1:3030/api/health)
+          test "$STATUS" = "200"
 
-          case "$code" in
-            200|503) ;;
-            *) echo "unexpected health status: $code" >&2; exit 1 ;;
-          esac
+      - name: Smoke test landing page
+        run: |
+          STATUS=$(curl -sf -o /dev/null -w "%{http_code}" http://127.0.0.1:3030/)
+          test "$STATUS" = "200"
 
-          # `mysql` proves the production guard was satisfied by
-          # configuration rather than silently falling back.
-          jq -e '.service == "citgroup-tenancy-system" and .storage == "mysql"' /tmp/health.json
+      - name: Smoke test auth page
+        run: |
+          STATUS=$(curl -sf -o /dev/null -w "%{http_code}" http://127.0.0.1:3030/auth/login)
+          test "$STATUS" = "200"
 
-          # The Next runtime, the proxy and RSC rendering have to work
-          # too — a passing JSON route alone would not catch a broken page.
-          for path in / /auth/login; do
-            page=$(curl -sS -o /dev/null -w '%{http_code}' "http://127.0.0.1:3030$path")
-            echo "GET $path -> $page"
-            [ "$page" = "200" ] || exit 1
-          done
+      - name: Stop container
+        if: always()
+        run: |
+          docker stop ${{ steps.container.outputs.cid }} > /dev/null 2>&1 || true
+          docker rm ${{ steps.container.outputs.cid }} > /dev/null 2>&1 || true

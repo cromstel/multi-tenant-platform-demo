@@ -5,10 +5,10 @@ const nextConfig: NextConfig = {
   // actually imported. This is what the Docker runtime stage copies, and
   // it keeps the image small.
   output: 'standalone',
-  // Empty Turbopack config to silence the Next.js 16 warning about
-  // mixing webpack config with Turbopack. mysql2 aliasing is done via
-  // the webpack config below, which applies when running with --webpack.
-  turbopack: {},
+  // mysql2 requires Node-only built-ins (net, tls) and must never reach
+  // the client bundle. It is imported dynamically in lib/db/mysql.ts and
+  // only used server-side via Server Actions.
+  serverExternalPackages: ['mysql2'],
   // The dev server blocks cross-origin requests to /_next/* (HMR, chunk
   // loading) from hosts it does not recognise. `localhost` and the LAN IP
   // are covered by default, but `127.0.0.1` is a different origin — it has
@@ -19,18 +19,6 @@ const nextConfig: NextConfig = {
   // project's own files (and the `mysql2` native bindings) at runtime.
   outputFileTracingIncludes: {
     '/**': ['./node_modules/mysql2/**/*'],
-  },
-  // Prevent mysql2 (Node-only, requires net/tls) from being bundled into
-  // client components. mysql2 is only used server-side via Server Actions.
-  webpack: (config, { isServer }) => {
-    if (!isServer) {
-      config.resolve.alias = {
-        ...(config.resolve.alias || {}),
-        'mysql2': false,
-        'mysql2/promise': false,
-      };
-    }
-    return config;
   },
   poweredByHeader: false,
   devIndicators: false,
@@ -67,20 +55,6 @@ const nextConfig: NextConfig = {
       },
     ];
   },
-  // Ensure proper handling of Vercel Analytics and Speed Insights
-  // headers: async () => {
-  //   return [
-  //     {
-  //       source: '/_vercel/speed-insights/script.js',
-  //       headers: [
-  //         {
-  //           key: 'Cache-Control',
-  //           value: 'public, max-age=31536000, immutable',
-  //         },
-  //       ],
-  //     },
-  //   ];
-  // },
 };
 
 export default nextConfig;

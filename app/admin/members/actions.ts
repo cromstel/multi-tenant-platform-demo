@@ -4,7 +4,7 @@
 import { getMySQLPool } from '@/lib/db/mysql';
 import { assertLastOwner } from '@/lib/db/tenants';
 import { hashPassword } from '@/lib/password';
-import { sanitizeSubdomain } from '@/lib/subdomains';
+import { sanitizeSubdomain } from '@/lib/utils';
 import { revalidateAdmin } from '@/lib/admin-path';
 import { getAdminSession } from '@/app/auth/admin/login/actions';
 import { CREATE_LIMIT, consume } from '@/lib/rate-limit';

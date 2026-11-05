@@ -1,7 +1,8 @@
 import 'server-only';
 
 import { getMySQLPool } from '@/lib/db/mysql';
-import { isValidIcon, sanitizeSubdomain } from '@/lib/subdomains';
+import { isValidIcon } from '@/lib/subdomains';
+import { sanitizeSubdomain } from '@/lib/utils';
 import type { Pool as MySQLPool } from 'mysql2/promise';
 
 /**

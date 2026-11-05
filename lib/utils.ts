@@ -1,8 +1,6 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
-import { sanitizeSubdomain } from '@/lib/subdomains';
-
 export const protocol =
   process.env.NODE_ENV === 'production' ? 'https' : 'http';
 
@@ -31,6 +29,14 @@ export const rootDomain = rootDomainEnv || 'localhost';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
+}
+
+/**
+ * Normalises a subdomain to the characters allowed in a URL segment.
+ * Lowercases and strips anything that isn't a lowercase letter, digit, or hyphen.
+ */
+export function sanitizeSubdomain(subdomain: string): string {
+  return subdomain.toLowerCase().replace(/[^a-z0-9-]/g, '');
 }
 
 /**
