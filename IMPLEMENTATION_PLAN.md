@@ -23,10 +23,10 @@ Generated from `docs/Project Auditor.md` audit (sections 1–6). All task IDs, p
 | DEV-003 | Unify `bulkDeleteSubdomainsAction` with `lib/db/tenants.ts:bulkDeleteTenants` | P2 | Completed | `app/actions.ts`, `lib/db/tenants.ts` | DEV-002 | Single canonical bulk-delete path in tenants.ts |
 | DEV-004 | Unify `safeEqual` (`lib/password.ts` vs `lib/api.ts`) | P3 | Completed | `lib/password.ts`, `lib/api.ts` | None | Single canonical constant-time compare; lib/api.ts imports from lib/password.ts |
 | DEV-005 | Remove duplicate `CREATE INDEX IF NOT EXISTS idx_docs_sections_role_sort` DDL | P3 | Completed | `lib/db/mysql.ts` | None | Index created once |
-| TEST-001 | Add API route tests (all 8 documented endpoints + `/api/sam/chat`) | P1 | In Progress | `tests/api/` | SEC-004 | Route-level tests pass against test DB |
-| TEST-002 | Add auth tests (JWT verify/issue, role-check, admin login actions) | P1 | Not Started | `tests/auth/` | SEC-001 | Auth flows verified; no secret values in test fixtures |
-| TEST-003 | Add SAM tests (lib/sam/* + chat route) | P2 | In Progress | `tests/sam/` | DEV-001 | SAM flow tested |
-| TEST-004 | Add component tests (jsdom configured but unused) | P2 | Not Started | `tests/components/` | None | At least one component test suite passes |
+| TEST-001 | Add API route tests (all 8 documented endpoints + `/api/sam/chat`) | P1 | Completed | `tests/api/api.test.ts` | SEC-004 | 25 route-level tests pass against test DB; 146 total tests pass |
+| TEST-002 | Add auth tests (JWT verify/issue, role-check, admin login actions) | P1 | Completed | `tests/auth/jwt.test.ts`, `tests/auth/role-check.test.ts`, `tests/auth/admin-login.test.ts` | SEC-001 | 20 auth tests pass; no secret values in fixtures |
+| TEST-003 | Add SAM tests (lib/sam/* + chat route) | P2 | Completed | `tests/sam/filter.test.ts`, `tests/sam/escalation.test.ts`, `tests/sam/llm.test.ts`, `tests/sam/chat.test.ts` | DEV-001 | 36 SAM tests pass; fetch mocked (no network) |
+| TEST-004 | Add component tests (jsdom configured but unused) | P2 | In Progress | `tests/components/` | None | At least one component test suite passes |
 | TEST-005 | Add Server Action tests (`app/actions.ts`, reset, contact) | P2 | Not Started | `tests/actions/` | DEV-002 | Actions tested with DB |
 | DOC-001 | Create `IMPLEMENTATION_STATUS.md` (current implementation status) | P2 | Not Started | `IMPLEMENTATION_STATUS.md` | Audit complete | Status report exists, consistent with codebase |
 | DOC-002 | Create `IMPLEMENTATION_PLAN.md` (this file — TODO plan) | P1 | Completed | `IMPLEMENTATION_PLAN.md` | None | This file exists; updated as tasks progress |
