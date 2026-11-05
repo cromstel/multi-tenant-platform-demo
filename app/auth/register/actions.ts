@@ -8,8 +8,7 @@ import { getMySQLPool } from '@/lib/db/mysql';
 import { randomUUID } from 'node:crypto';
 import { hashPassword } from '@/lib/password';
 import { CREATE_LIMIT, consume } from '@/lib/rate-limit';
-import { sanitizeSubdomain } from '@/lib/subdomains';
-import { protocol, rootDomain } from '@/lib/utils';
+import { protocol, rootDomain, getTenantSessionSecret, isRedirectError, validateSubdomain } from '@/lib/utils';
 
 export type RegisterState = {
   error?: string;
@@ -22,22 +21,6 @@ export type RegisterState = {
 const SESSION_COOKIE = 'tenant_session';
 const SESSION_TTL = 24 * 60 * 60; // 24 hours
 
-function isRedirectError(error: unknown): boolean {
-  return typeof error === 'object' && error !== null && 'digest' in error && typeof (error as { digest?: unknown }).digest === 'string' && (error as { digest: string }).digest.startsWith('NEXT_REDIRECT');
-}
-
-async function getSessionSecret(): Promise<Uint8Array> {
-  try {
-    const secret = process.env.TENANT_SESSION_SECRET || process.env.ADMIN_SESSION_SECRET;
-    if (!secret || secret.length < 32) {
-      throw new Error('TENANT_SESSION_SECRET or ADMIN_SESSION_SECRET must be set (32+ chars)');
-    }
-    return new TextEncoder().encode(secret);
-  } catch (error) {
-    console.error('[auth] Failed to get tenant session secret:', error instanceof Error ? error.message : 'Unknown error');
-    throw error;
-  }
-}
 
 export async function registerAction(
   _prevState: RegisterState,
@@ -87,20 +70,19 @@ async function performRegistration(
     };
   }
 
-  // Sanitise the subdomain. A value that changes under sanitisation is
-  // rejected rather than silently accepted, so the user sees what they typed.
-  const sanitizedSubdomain = sanitizeSubdomain(subdomain);
+  // Validate and sanitise the subdomain. A value that changes under
+  // sanitisation is rejected rather than silently accepted, so the user sees
+  // what they typed.
+  const validation = validateSubdomain(subdomain);
+  if (!validation.ok) {
+    return { error: validation.error ?? 'Invalid subdomain' };
+  }
+  const sanitizedSubdomain = validation.subdomain!;
 
-  if (!sanitizedSubdomain || sanitizedSubdomain.length > 63) {
+  if (sanitizedSubdomain.length > 63) {
     return {
       error:
         'Invalid subdomain. Use lowercase letters, numbers, and hyphens (max 63 chars).'
-    };
-  }
-
-  if (sanitizedSubdomain !== subdomain) {
-    return {
-      error: 'Subdomain can only contain lowercase letters, numbers, and hyphens.'
     };
   }
 
@@ -161,7 +143,7 @@ async function performRegistration(
     .setIssuer('multi-tenant-tenant')
     .setExpirationTime(`${SESSION_TTL}s`)
     .setJti(randomUUID())
-    .sign(await getSessionSecret());
+    .sign(await getTenantSessionSecret());
 
   const cookieStore = await cookies();
   cookieStore.set(SESSION_COOKIE, token, {

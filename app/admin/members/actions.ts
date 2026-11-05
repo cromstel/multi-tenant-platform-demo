@@ -2,6 +2,7 @@
 
 
 import { getMySQLPool } from '@/lib/db/mysql';
+import { assertLastOwner } from '@/lib/db/tenants';
 import { hashPassword } from '@/lib/password';
 import { sanitizeSubdomain } from '@/lib/subdomains';
 import { revalidateAdmin } from '@/lib/admin-path';
@@ -88,14 +89,7 @@ export async function changeMemberRoleAction(
 
   // The last owner cannot be demoted — a tenant with no owner is
   // unmanageable.
-  const [ownerRows] = await pool.execute(
-    `SELECT id FROM tenant_users
-     WHERE tenant_id = (SELECT id FROM tenants WHERE subdomain = ?) AND role = 'owner'`,
-    [sanitizeSubdomain(subdomain)]
-  );
-  const owners = ownerRows as Array<{ id: number }>;
-
-  if (owners.length === 1 && owners[0].id === Number(userId)) {
+  if (await assertLastOwner(pool, subdomain, Number(userId))) {
     return { error: 'A tenant must keep at least one owner.' };
   }
 
@@ -220,20 +214,10 @@ export async function setMemberActiveAction(
   const pool = await getMySQLPool();
   const shouldBeActive = active === 'true';
 
-  // The last active owner cannot be suspended, for the same reason they
-  // cannot be demoted.
-  if (!shouldBeActive) {
-    const [ownerRows] = await pool.execute(
-      `SELECT u.id FROM tenant_users u
-       JOIN tenants t ON t.id = u.tenant_id
-       WHERE t.subdomain = ? AND u.role = 'owner' AND u.is_active = TRUE`,
-      [sanitizeSubdomain(subdomain)]
-    );
-    const activeOwners = ownerRows as Array<{ id: number }>;
-
-    if (activeOwners.length === 1 && activeOwners[0].id === Number(userId)) {
-      return { error: 'A tenant must keep at least one active owner.' };
-    }
+  // The last owner cannot be suspended, for the same reason they cannot be
+  // demoted — a tenant must keep at least one owner.
+  if (!shouldBeActive && await assertLastOwner(pool, subdomain, Number(userId))) {
+    return { error: 'A tenant must keep at least one active owner.' };
   }
 
   const [result] = await pool.execute(
@@ -273,15 +257,7 @@ export async function removeMemberAction(
   const pool = await getMySQLPool();
 
   // The last owner cannot be removed — the tenant would be orphaned.
-  const [ownerRows] = await pool.execute(
-    `SELECT u.id FROM tenant_users u
-     JOIN tenants t ON t.id = u.tenant_id
-     WHERE t.subdomain = ? AND u.role = 'owner'`,
-    [sanitizeSubdomain(subdomain)]
-  );
-  const owners = ownerRows as Array<{ id: number }>;
-
-  if (owners.length === 1 && owners[0].id === Number(userId)) {
+  if (await assertLastOwner(pool, subdomain, Number(userId))) {
     return { error: 'A tenant must keep at least one owner.' };
   }
 

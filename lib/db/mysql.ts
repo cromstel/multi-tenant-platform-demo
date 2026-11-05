@@ -402,7 +402,7 @@ export async function getTenantDetails(subdomain: string): Promise<{
       emoji: tenant.emoji,
       createdAt: tenant.created_at,
       userCount: Number(tenant.userCount),
-      ownerEmail: null // Would need separate query
+      ownerEmail: null // TODO: requires a separate tenant-owner query; out of scope for now
     },
     users: (userRows as Array<{
       id: number;

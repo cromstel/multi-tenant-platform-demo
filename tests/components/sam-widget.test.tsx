@@ -51,7 +51,10 @@ describe('SAMWidget', () => {
   it('sends a message to /api/sam/chat and displays the bot reply', async () => {
     const user = userEvent.setup();
     fetchMock.mockResolvedValue(
-      new Response(JSON.stringify({ ok: true, data: { reply: 'Hello there!' } }), { status: 200 }),
+      new Response(
+        JSON.stringify({ ok: true, data: { response: { text: 'Hello there!' } } }),
+        { status: 200 },
+      ),
     );
 
     render(<SAMWidget />);

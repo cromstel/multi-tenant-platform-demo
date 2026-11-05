@@ -9,6 +9,7 @@ const EXCLUDED = [
   '/contact',
   '/faq',
   '/services',
+  '/s',
   '/api'
 ];
 

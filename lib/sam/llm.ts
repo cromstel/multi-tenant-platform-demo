@@ -44,6 +44,8 @@ async function callOpenRouter(
     throw new Error('OpenRouter API key is not configured.');
   }
 
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10000);
   const response = await fetch(OPENROUTER_BASE_URL, {
     method: 'POST',
     headers: {
@@ -51,7 +53,9 @@ async function callOpenRouter(
       Authorization: `Bearer ${openrouter}`,
     },
     body: JSON.stringify({ model, messages }),
+    signal: controller.signal,
   });
+  clearTimeout(timeoutId);
 
   if (!response.ok) {
     throw new Error(`OpenRouter request failed (HTTP ${response.status}).`);
@@ -69,6 +73,8 @@ async function callChatGPT(messages: unknown): Promise<SAMResponse> {
 
   const model = chatGptModel();
 
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10000);
   const response = await fetch(CHATGPT_BASE_URL, {
     method: 'POST',
     headers: {
@@ -76,7 +82,9 @@ async function callChatGPT(messages: unknown): Promise<SAMResponse> {
       Authorization: `Bearer ${chatgpt}`,
     },
     body: JSON.stringify({ model, messages }),
+    signal: controller.signal,
   });
+  clearTimeout(timeoutId);
 
   if (!response.ok) {
     throw new Error(`ChatGPT request failed (HTTP ${response.status}).`);

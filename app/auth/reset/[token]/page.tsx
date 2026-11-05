@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { redirect } from 'next/navigation';
 
 import { verifyResetTokenAction } from '../actions';
 
@@ -9,13 +8,12 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default async function VerifyResetPage({ params }: { params: { token: string } }) {
-  const { success, user } = await verifyResetTokenAction(params.token);
-
-  if (!success) {
-    redirect('/auth/login');
-  }
-
+export default async function VerifyResetPage({
+  params
+}: {
+  params: Promise<{ token: string }>;
+}) {
+  const { token } = await params;
   return (
     <div className="w-full max-w-md">
       <div className="max-h-[calc(100dvh-3rem)] overflow-y-auto rounded-none bg-white/[0.97] p-7 shadow-2xl shadow-black/30 backdrop-blur-xl sm:p-8">
@@ -26,9 +24,15 @@ export default async function VerifyResetPage({ params }: { params: { token: str
           </p>
         </div>
 
-        <form // @ts-expect-error server action return type
-          action={verifyResetTokenAction} method="post" className="space-y-4">
-          <input type="hidden" name="token" value={params.token} />
+        <form
+          action={async (formData: FormData) => {
+            'use server'
+            await verifyResetTokenAction(formData)
+          }}
+          method="post"
+          className="space-y-4"
+        >
+          <input type="hidden" name="token" value={token} />
           <div>
             <label htmlFor="new-password" className="block text-sm font-medium text-slate-700">New password</label>
             <input

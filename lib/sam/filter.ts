@@ -9,7 +9,12 @@ export function containsSecret(text: string): boolean {
     /OPENROUTER_API_KEY/i,
     /CHATGPT_API_KEY/i,
     /\.env\.local/i,
-    /password/i,
+    /password\s*=/i,
+    /api.?key\s*=/i,
+    /secret\s*=/i,
+    /token\s*=/i,
+    /sk-[A-Za-z0-9]{20,}/,
+    /AKIA[0-9A-Z]{16}/,
   ];
   return patterns.some((p) => p.test(text));
 }

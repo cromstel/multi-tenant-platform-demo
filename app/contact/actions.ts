@@ -1,7 +1,8 @@
 'use server';
 
 import { getMySQLPool } from '@/lib/db/mysql';
-import { consume } from '@/lib/rate-limit';
+import { isValidEmail } from '@/lib/db/tenants';
+import { CONTACT_LIMIT, consume } from '@/lib/rate-limit';
 import { revalidatePath } from 'next/cache';
 
 export type ContactCategory =
@@ -36,21 +37,11 @@ const VALID_CATEGORIES: ContactCategory[] = [
   'other',
 ];
 
-/** 5 enquiries per IP per hour — enough for a real conversation, not for spam. */
-const CONTACT_LIMIT = { max: 5, windowMs: 60 * 60 * 1000 };
-
 const MAX_NAME = 120;
 const MAX_EMAIL = 255;
 const MAX_COMPANY = 160;
 const MAX_SUBJECT = 200;
 const MAX_MESSAGE = 5000;
-
-function isValidEmail(value: string): boolean {
-  // Deliberately permissive: the only real test of an address is sending to
-  // it. A strict regex rejects valid addresses more often than it catches
-  // typos.
-  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value) && value.length <= MAX_EMAIL;
-}
 
 /** Trims and caps a field, returning an empty string when it is only whitespace. */
 function clean(value: FormDataEntryValue | null, max: number): string {

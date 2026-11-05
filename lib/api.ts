@@ -1,6 +1,5 @@
 import 'server-only';
 
-import { createHash } from 'node:crypto';
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 
@@ -65,20 +64,6 @@ export const apiErrors = {
   serverError: () =>
     fail('server_error', 'Something went wrong. Please try again.', 500),
 };
-
-/**
- * Best-effort client identifier for rate limiting, hashed the same way the
- * browser flow does it.
- */
-export async function apiClientIdentifier(): Promise<string> {
-  const headerList = await headers();
-  const forwarded = headerList.get('x-forwarded-for');
-  const raw = forwarded
-    ? forwarded.split(',')[0].trim()
-    : (headerList.get('x-real-ip') ?? 'unknown');
-
-  return createHash('sha256').update(raw, 'utf8').digest('hex').slice(0, 16);
-}
 
 /**
  * Applies a per-IP rate limit to an API route.
@@ -173,7 +158,8 @@ export async function readJsonBody<T>(request: Request): Promise<T | null> {
     const text = await request.text();
     if (!text) return null;
     return JSON.parse(text) as T;
-  } catch {
+  } catch (error) {
+    console.error('[api] Failed to parse JSON body:', error instanceof Error ? error.message : 'Unknown error');
     return null;
   }
 }

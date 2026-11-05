@@ -15,7 +15,10 @@ const mockConsume = vi.hoisted(() =>
   vi.fn(async () => ({ allowed: true, retryAfterSeconds: 60, attemptsLeft: 4 }))
 );
 
-vi.mock('@/lib/rate-limit', () => ({ consume: mockConsume }));
+vi.mock('@/lib/rate-limit', () => ({
+  consume: mockConsume,
+  CONTACT_LIMIT: { max: 5, windowMs: 60 * 60 * 1000 },
+}));
 vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }));
 
 const toClean: string[] = [];

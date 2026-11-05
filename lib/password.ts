@@ -12,11 +12,10 @@ const scryptAsync = promisify(scrypt);
  * own copy of the salt-and-compare logic. That made it easy for two of them
  * to drift, and impossible to upgrade the algorithm in one edit.
  *
- * The stored format is `salt:hash` — a 32-byte random salt, then SHA-256 over
+ * The stored format is `salt:hash` — a 32-byte random salt, then scrypt over
  * `password + salt`. Both are hex encoded.
  *
- * SHA-256 is salted and compared in constant time, but it is not
- * memory-hard, so it is weaker against offline cracking than a dedicated KDF.
+ * scrypt is memory-hard and compared in constant time.
  * `hashPassword` is the single seam where switching to scrypt or argon2
  * happens — see `SECURITY.md`.
  */

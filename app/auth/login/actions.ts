@@ -6,8 +6,7 @@ import { cookies } from 'next/headers';
 import { getMySQLPool } from '@/lib/db/mysql';
 import { verifyPassword } from '@/lib/password';
 import { LOGIN_LIMIT, check, consume, reset } from '@/lib/rate-limit';
-import { sanitizeSubdomain } from '@/lib/subdomains';
-import { protocol, rootDomain } from '@/lib/utils';
+import { protocol, rootDomain, getTenantSessionSecret, isRedirectError, minutesLabel, validateSubdomain } from '@/lib/utils';
 import { issueSession } from '@/lib/auth/jwt';
 
 export type LoginState = {
@@ -18,27 +17,6 @@ const SESSION_COOKIE = 'tenant_session';
 const AUTH_COOKIE = 'AUTH_COOKIE';
 const SESSION_TTL = 24 * 60 * 60; // 24 hours
 
-async function getSessionSecret(): Promise<Uint8Array> {
-  try {
-    const secret = process.env.TENANT_SESSION_SECRET || process.env.ADMIN_SESSION_SECRET;
-    if (!secret || secret.length < 32) {
-      throw new Error('TENANT_SESSION_SECRET or ADMIN_SESSION_SECRET must be set (32+ chars)');
-    }
-    return new TextEncoder().encode(secret);
-  } catch (error) {
-    console.error('[auth] Failed to get tenant session secret:', error instanceof Error ? error.message : 'Unknown error');
-    throw error;
-  }
-}
-
-function minutesLabel(seconds: number): string {
-  const minutes = Math.max(1, Math.ceil(seconds / 60));
-  return `${minutes} minute${minutes === 1 ? '' : 's'}`;
-}
-
-function isRedirectError(error: unknown): boolean {
-  return typeof error === 'object' && error !== null && 'digest' in error && typeof (error as { digest?: unknown }).digest === 'string' && (error as { digest: string }).digest.startsWith('NEXT_REDIRECT');
-}
 
 export async function loginAction(
   _prevState: LoginState,
@@ -54,11 +32,11 @@ export async function loginAction(
       return { error: 'Subdomain, email, and password are required' };
     }
 
-    // Sanitize subdomain
-    const sanitizedSubdomain = sanitizeSubdomain(subdomain);
-    if (!sanitizedSubdomain || sanitizedSubdomain !== subdomain) {
-      return { error: 'Invalid subdomain' };
+    const validation = validateSubdomain(subdomain);
+    if (!validation.ok) {
+      return { error: validation.error ?? 'Invalid subdomain' };
     }
+    const sanitizedSubdomain = validation.subdomain!;
 
     // Get tenant
     const [tenantRows] = (await pool.execute(
@@ -117,7 +95,7 @@ export async function loginAction(
       .setIssuer('multi-tenant-tenant')
       .setExpirationTime(`${SESSION_TTL}s`)
       .setJti(crypto.randomUUID())
-      .sign(await getSessionSecret());
+      .sign(await getTenantSessionSecret());
 
     const cookieStore = await cookies();
     cookieStore.set(SESSION_COOKIE, token, {
@@ -183,7 +161,7 @@ export async function getTenantSession(): Promise<{ userId: number; tenantId: nu
   if (!token) return null;
 
   try {
-    const { payload } = await jwtVerify(token, await getSessionSecret(), {
+    const { payload } = await jwtVerify(token, await getTenantSessionSecret(), {
       issuer: 'multi-tenant-tenant'
     });
     return { 

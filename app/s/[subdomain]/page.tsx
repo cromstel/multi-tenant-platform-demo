@@ -150,13 +150,13 @@ export default async function SubdomainPage({
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/auth/login"
+              href={`${protocol}://${rootDomain}/auth/login`}
               className="px-6 py-3 rounded-none bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors"
             >
               Tenant Sign In
             </Link>
             <Link
-              href="/dashboard"
+              href={`${protocol}://${rootDomain}/dashboard`}
               className="px-6 py-3 rounded-none bg-white text-gray-700 font-medium hover:bg-gray-50 border border-gray-300 transition-colors"
             >
               Open Dashboard
@@ -166,7 +166,7 @@ export default async function SubdomainPage({
       </main>
 
       <footer className="py-6 border-t border-gray-200">
-        <p className="text-center text-sm text-gray-500">
+        <p className="text-center text-sm text-gray-600">
           Powered by CITGROUP TENANCY SYSTEM
         </p>
       </footer>

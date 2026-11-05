@@ -4,8 +4,11 @@ import { z } from 'zod';
 
 import { getMySQLPool } from '@/lib/db/mysql';
 import { SAM_LIMIT, consume } from '@/lib/rate-limit';
-import { ok, fail, apiErrors, readJsonBody } from '@/lib/api';
+import { ok, apiErrors, readJsonBody } from '@/lib/api';
 import { callSAM } from '@/lib/sam/llm';
+import { sanitizePII, maskMessage } from '@/lib/sam/filter';
+import { detectEscalation, createEscalation } from '@/lib/sam/escalation';
+import { getDocsContext, getTenantContext } from '@/lib/sam/knowledge';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -39,9 +42,11 @@ const SamChatSchema = z.object({
  * Per AGENTS.md invariant 7, intentionally unauthenticated (documented).
  *
  * Accepts { messages, session?, subdomain? }. Creates or continues a SAM
- * conversation in MySQL, calls the SAM LLM, and writes back an anonymous
- * `sam_session` cookie when none was provided. Request bodies are never
- * logged.
+ * conversation in MySQL, redacts PII from user messages before storing,
+ * enriches the LLM prompt with docs/tenant context, masks the assistant
+ * response before storing/returning, detects escalation on the user's latest
+ * message, and writes back an anonymous `sam_session` cookie when none was
+ * provided. Request bodies are never logged.
  */
 export async function POST(request: NextRequest) {
   // Rate limit backed by kv_store via the shared consume/check pattern.
@@ -79,8 +84,18 @@ export async function POST(request: NextRequest) {
   // Never log the request body; only reference safe, non-secret fields.
   const conversationId = randomUUID();
 
+  // Redact PII from user message content before persisting to the DB.
+  const sanitizedMessages = messages.map((msg) => ({
+    ...msg,
+    content: typeof msg.content === 'string' ? sanitizePII(msg.content) : msg.content,
+  }));
+
   try {
     const pool = await getMySQLPool();
+
+    // Build knowledge context from the docs index and the tenant record.
+    const docs = await getDocsContext();
+    const tenant = subdomain ? await getTenantContext(subdomain) : null;
 
     // Insert the conversation row.
     await pool.execute(
@@ -88,8 +103,8 @@ export async function POST(request: NextRequest) {
       [conversationId, sessionId, subdomain]
     );
 
-    // Persist user messages.
-    for (const msg of messages) {
+    // Persist user messages (PII already redacted).
+    for (const msg of sanitizedMessages) {
       if (!msg || typeof msg !== 'object') continue;
       const msgObj = msg as Record<string, unknown>;
       const role = msgObj.role === 'assistant' ? 'assistant' : 'user';
@@ -100,22 +115,53 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Call SAM LLM via the assumed module.
-    const llmResponse = await callSAM(messages);
+    // Build a system message from the docs/tenant context and call SAM with
+    // the sanitized messages.
+    const contextLines: string[] = [];
+    for (const doc of docs) {
+      contextLines.push(`[${doc.role}] ${doc.title}: ${doc.body}`);
+    }
+    if (tenant) {
+      contextLines.push(
+        `Tenant: ${tenant.name} (subdomain: ${tenant.subdomain}, icon: ${tenant.icon})`
+      );
+    }
+    const systemContent = contextLines.length
+      ? `You are a support assistant.\nContext:\n${contextLines.join('\n')}`
+      : 'You are a support assistant.';
+
+    const llmResponse = await callSAM([
+      { role: 'system', content: systemContent },
+      ...sanitizedMessages,
+    ]);
+
+    // Mask any PII/secrets in the assistant response before storing/returning.
+    const maskedText = maskMessage(llmResponse.text);
 
     // Persist assistant message.
     await pool.execute(
       'INSERT INTO messages (id, conversation_id, role, content) VALUES (?, ?, ?, ?)',
-      [randomUUID(), conversationId, 'assistant', llmResponse.text]
+      [randomUUID(), conversationId, 'assistant', maskedText]
     );
+
+    // Detect escalation on the user's latest message.
+    const latestUserMessage = sanitizedMessages
+      .filter((m) => m.role === 'user')
+      .map((m) => m.content)
+      .pop() ?? '';
+    const escalated = detectEscalation(latestUserMessage);
+    if (escalated) {
+      await createEscalation(conversationId, 'User message matched escalation keywords');
+    }
 
     const response = ok({
       conversationId,
       session: sessionId,
       subdomain: subdomain,
       messages: messages.length,
+      escalated,
       response: {
-        text: llmResponse.text,
+        text: maskedText,
         model: llmResponse.model,
         source: llmResponse.source,
       },

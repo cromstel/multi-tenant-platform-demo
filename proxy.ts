@@ -1,5 +1,4 @@
 import { type NextRequest, NextResponse } from 'next/server';
-import { rootDomain } from '@/lib/utils';
 
 /**
  * Paths the admin area is mounted on internally.
@@ -52,7 +51,9 @@ function extractSubdomain(request: NextRequest): string | null {
   }
 
   // Production environment
-  const rootDomainFormatted = rootDomain.split(':')[0];
+  // proxy.ts runs at the edge and must not import shared modules, so it reads
+  // NEXT_PUBLIC_ROOT_DOMAIN directly instead of using the lib/utils helper.
+  const rootDomainFormatted = (process.env.NEXT_PUBLIC_ROOT_DOMAIN?.trim() || 'localhost').split(':')[0];
 
   // Handle preview deployment URLs (tenant---branch-name.vercel.app)
   if (hostname.includes('---') && hostname.endsWith('.vercel.app')) {

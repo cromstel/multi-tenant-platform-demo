@@ -1,8 +1,7 @@
 'use server';
-import { redirect } from 'next/navigation';
-import { randomBytes, createHash, timingSafeEqual } from 'node:crypto';
+import { randomBytes } from 'node:crypto';
 
-import { hashPassword, verifyPassword } from '@/lib/password';
+import { hashPassword } from '@/lib/password';
 import { getMySQLPool } from '@/lib/db/mysql';
 
 const TOKEN_BYTES = 32;
@@ -35,15 +34,15 @@ export async function resetRequestAction(prevState: unknown, formData: FormData)
       'INSERT INTO password_reset_tokens (token, user_id, expires_at, created_at) VALUES (?, ?, ?, CURRENT_TIMESTAMP)',
       [token, userId, expiresAt]
     );
-  } catch (e) {
+  } catch {
     return { error: 'Failed to create reset token' };
   }
 
   return { success: true, message: 'A reset token has been generated.' };
 }
 
-export async function verifyResetTokenAction(token: string | FormData): Promise<{ success: boolean; error?: string; message?: string; user?: number }> {
-  const tokenStr = typeof token === 'string' ? token : (token.get('token') as string) || '';
+export async function verifyResetTokenAction(formData: FormData): Promise<{ success: boolean; error?: string; message?: string; user?: number }> {
+  const tokenStr = (formData.get('token') as string) || '';
   if (!tokenStr) {
     return { success: false, error: 'Token is required' };
   }
@@ -68,8 +67,7 @@ export async function verifyResetTokenAction(token: string | FormData): Promise<
     return { success: false, error: 'Token has expired. Please request a new reset link.' };
   }
 
-  const formData = typeof token === 'object' ? token : null;
-  const newPassword = formData ? (formData.get('new-password') as string) : null;
+  const newPassword = (formData.get('new-password') as string) || null;
   if (newPassword) {
     if (newPassword.length < 8) {
       return { success: false, error: 'Password must be at least 8 characters' };

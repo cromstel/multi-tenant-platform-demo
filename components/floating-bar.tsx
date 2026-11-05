@@ -4,8 +4,8 @@ import { redis } from '@/lib/redis';
 const DEFAULTS = {
   whatsapp: 'https://wa.me/1234567890',
   email: 'mailto:hello@example.com',
-  linkedin: 'https://linkedin.com/company/example',
-  facebook: 'https://facebook.com/example',
+  linkedin: 'https://linkedin.com/company/citgroup',
+  facebook: 'https://facebook.com/citgroup',
 };
 
 export default async function FloatingBar() {

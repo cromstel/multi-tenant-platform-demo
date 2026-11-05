@@ -6,7 +6,6 @@ interface Message {
   id: number;
   sender: 'user' | 'bot';
   text: string;
-  escalated?: boolean;
 }
 
 export default function SAMWidget() {
@@ -15,7 +14,6 @@ export default function SAMWidget() {
     { id: 1, sender: 'bot', text: 'How can we help you today?' },
   ]);
   const [input, setInput] = useState('');
-  const [escalated, setEscalated] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -32,18 +30,16 @@ export default function SAMWidget() {
       const res = await fetch('/api/sam/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text }),
+        body: JSON.stringify({ messages: [{ role: 'user', content: text }] }),
       });
       const data = await res.json();
       if (data?.ok && data?.data) {
         const reply: Message = {
           id: Date.now() + 1,
           sender: 'bot',
-          text: data.data.reply || 'Received.',
-          escalated: data.data.escalated || false,
+          text: data.data.response?.text || 'Received.',
         };
         setMessages((prev) => [...prev, reply]);
-        if (data.data.escalated) setEscalated(true);
       } else {
         setMessages((prev) => [...prev, { id: Date.now() + 1, sender: 'bot', text: 'Something went wrong. Try again later.' }]);
       }
@@ -76,28 +72,11 @@ export default function SAMWidget() {
               <div key={m.id} className={`flex ${m.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-[75%] px-3 py-2 rounded-xl text-sm leading-relaxed shadow-sm ${m.sender === 'user' ? 'bg-[#005cb3] text-white rounded-br-md' : 'bg-white text-slate-800 border border-slate-200 rounded-bl-md'}`}>
                   {m.text}
-                  {m.escalated && (
-                    <span className="block text-xs text-amber-700 mt-1 font-medium">Escalated to a specialist.</span>
-                  )}
                 </div>
               </div>
             ))}
             <div ref={bottomRef} />
           </div>
-
-          {escalated && (
-            <div className="px-4 py-2 bg-amber-50 border-t border-amber-100 text-xs text-amber-800 font-medium flex items-center gap-2" role="status" aria-live="polite">
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-              This message has been escalated.
-              <button
-                onClick={() => setEscalated(false)}
-                aria-label="Dismiss escalation notice"
-                className="ml-auto text-amber-700 hover:text-amber-900 underline text-xs"
-              >
-                Dismiss
-              </button>
-            </div>
-          )}
 
           <div className="p-3 bg-white border-t border-slate-200 flex items-center gap-2">
             <input

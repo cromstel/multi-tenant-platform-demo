@@ -45,7 +45,7 @@ describe('containsSecret', () => {
     'OPENROUTER_API_KEY=sk-or-...',
     'CHATGPT_API_KEY=sk-...',
     'check .env.local for the value',
-    'the password is hunter2',
+    'password=hunter2',
   ])('detects the pattern in %s', (text) => {
     expect(containsSecret(text)).toBe(true);
   });

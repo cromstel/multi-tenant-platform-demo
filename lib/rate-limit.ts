@@ -54,6 +54,9 @@ export const SAM_LIMIT = { max: 20, windowMs: 15 * 60 * 1000 };
 /** 10 tenant creations per IP per hour. */
 export const CREATE_LIMIT = { max: 10, windowMs: 60 * 60 * 1000 };
 
+/** 5 contact enquiries per IP per hour. */
+export const CONTACT_LIMIT = { max: 5, windowMs: 60 * 60 * 1000 };
+
 type Window = {
   key: string;
   retryAfterSeconds: number;

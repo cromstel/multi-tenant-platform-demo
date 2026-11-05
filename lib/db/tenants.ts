@@ -2,6 +2,7 @@ import 'server-only';
 
 import { getMySQLPool } from '@/lib/db/mysql';
 import { isValidIcon, sanitizeSubdomain } from '@/lib/subdomains';
+import type { Pool as MySQLPool } from 'mysql2/promise';
 
 /**
  * Tenant operations shared by the JSON API and the Server Actions.
@@ -36,7 +37,7 @@ export type CreateTenantResult =
 /** Maximum length of a tenant subdomain. */
 export const MAX_SUBDOMAIN_LENGTH = 63;
 
-function isValidEmail(value: string): boolean {
+export function isValidEmail(value: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value) && value.length <= 255;
 }
 
@@ -280,6 +281,24 @@ export async function deleteTenant(subdomain: string): Promise<boolean> {
     await conn.execute('DELETE FROM tenant_users WHERE tenant_id = ?', [tenant.id]);
     await conn.execute('DELETE FROM tenant_sessions WHERE tenant_id = ?', [tenant.id]);
     await conn.execute('DELETE FROM tenants WHERE id = ?', [tenant.id]);
+    // Cascade SAM data: conversations are keyed by subdomain; messages and
+    // escalations reference conversation_id, so delete those first.
+    const [convRows] = await conn.execute(
+      'SELECT id FROM conversations WHERE subdomain = ?',
+      [sanitizeSubdomain(subdomain)]
+    );
+    const conversationIds = (convRows as Array<{ id: string }>).map((c) => c.id);
+    if (conversationIds.length > 0) {
+      await conn.execute('DELETE FROM messages WHERE conversation_id IN (?)', [
+        conversationIds,
+      ]);
+      await conn.execute('DELETE FROM escalations WHERE conversation_id IN (?)', [
+        conversationIds,
+      ]);
+    }
+    await conn.execute('DELETE FROM conversations WHERE subdomain = ?', [
+      sanitizeSubdomain(subdomain),
+    ]);
     await conn.execute('DELETE FROM kv_store WHERE `key` = ?', [
       `subdomain:${sanitizeSubdomain(subdomain)}`,
     ]);
@@ -321,6 +340,26 @@ export async function bulkDeleteTenants(subdomains: string[]): Promise<number> {
       await conn.execute('DELETE FROM tenant_users WHERE tenant_id = ?', [tenantId]);
       await conn.execute('DELETE FROM tenant_sessions WHERE tenant_id = ?', [tenantId]);
       await conn.execute('DELETE FROM tenants WHERE id = ?', [tenantId]);
+      // Cascade SAM data: conversations are keyed by subdomain; messages and
+      // escalations reference conversation_id, so delete those first.
+      const [convRows] = await conn.execute(
+        'SELECT id FROM conversations WHERE subdomain = ?',
+        [subdomain]
+      );
+      const conversationIds = (convRows as Array<{ id: string }>).map(
+        (c) => c.id
+      );
+      if (conversationIds.length > 0) {
+        await conn.execute('DELETE FROM messages WHERE conversation_id IN (?)', [
+          conversationIds,
+        ]);
+        await conn.execute('DELETE FROM escalations WHERE conversation_id IN (?)', [
+          conversationIds,
+        ]);
+      }
+      await conn.execute('DELETE FROM conversations WHERE subdomain = ?', [
+        subdomain,
+      ]);
       await conn.execute('DELETE FROM kv_store WHERE `key` = ?', [
         `subdomain:${subdomain}`,
       ]);
@@ -367,4 +406,27 @@ export async function listTenantUsers(subdomain: string) {
     createdAt: row.createdAt,
     lastLoginAt: row.lastLoginAt,
   }));
+}
+
+/**
+ * Returns `true` when `userId` is the only owner of `subdomain`, meaning an
+ * operation that would demote, deactivate, or remove them must be blocked — a
+ * tenant must always keep at least one owner.
+ *
+ * The subdomain is sanitised internally because tenants are stored under their
+ * sanitised form.
+ */
+export async function assertLastOwner(
+  pool: MySQLPool,
+  subdomain: string,
+  userId: number
+): Promise<boolean> {
+  const [rows] = await pool.execute(
+    `SELECT u.id FROM tenant_users u
+     JOIN tenants t ON t.id = u.tenant_id
+     WHERE t.subdomain = ? AND u.role = 'owner'`,
+    [sanitizeSubdomain(subdomain)]
+  );
+  const owners = rows as Array<{ id: number }>;
+  return owners.length === 1 && owners[0].id === userId;
 }

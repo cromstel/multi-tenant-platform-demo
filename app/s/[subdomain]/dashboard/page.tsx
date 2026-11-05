@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Metadata } from 'next';
-import { redirect } from 'next/navigation';
+import { redirect, notFound } from 'next/navigation';
 import { Users, Activity, Database } from 'lucide-react';
 import { getTenantSession, logoutAction } from '@/app/auth/login/actions';
 import { getMySQLPool } from '@/lib/db/mysql';
@@ -44,7 +44,7 @@ export default async function TenantDashboardPage({
 
   const subdomainData = await getSubdomainData(subdomain);
   if (!subdomainData) {
-    return <div>Not found</div>;
+    notFound();
   }
 
   return (

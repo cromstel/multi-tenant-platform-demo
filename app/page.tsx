@@ -5,6 +5,7 @@ import { SiteFooter } from '@/components/site-footer';
 import { ScrollProgress } from '@/components/scroll-progress';
 import { SubdomainForm } from './subdomain-form';
 import { rootDomain, protocol } from '@/lib/utils';
+import { createSubdomainAction } from './actions';
 import {
   structuredData,
   organizationSchema,
@@ -245,7 +246,7 @@ export default function HomePage() {
                   </div>
 
                   <div className="rounded-none bg-white p-5 shadow-lg">
-                    <SubdomainForm />
+                    <SubdomainForm action={createSubdomainAction} />
                   </div>
 
                   <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-blue-200/75">

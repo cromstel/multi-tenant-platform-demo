@@ -21,9 +21,8 @@ export function isValidIcon(str: string) {
     );
   }
 
-  // Fallback validation: Check if the string is within a reasonable length
-  // This is less secure but better than no validation
-  return str.length >= 1 && str.length <= 10;
+  // Fallback validation: not an emoji, reject
+  return false;
 }
 
 /** Normalises a subdomain to the characters allowed in a MySQL key segment. */

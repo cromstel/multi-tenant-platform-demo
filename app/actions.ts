@@ -7,7 +7,7 @@ import { deleteTenant, bulkDeleteTenants } from '@/lib/db/tenants';
 import { sanitizeSubdomain } from '@/lib/subdomains';
 import { getAdminSession } from '@/app/auth/admin/login/actions';
 import { CREATE_LIMIT, consume } from '@/lib/rate-limit';
-import { rootDomain, protocol } from '@/lib/utils';
+import { rootDomain, protocol, validateSubdomain } from '@/lib/utils';
 import { revalidateAdmin } from '@/lib/admin-path';
 
 export type CreateSubdomainState = {
@@ -64,27 +64,16 @@ export async function createSubdomainAction(
     return { success: false, error: 'Subdomain is required' };
   }
 
-  const sanitizedSubdomain = sanitizeSubdomain(subdomain);
-
-  if (!sanitizedSubdomain) {
+  const validation = validateSubdomain(subdomain);
+  if (!validation.ok) {
     return {
       subdomain,
       icon,
       success: false,
-      error:
-        'Subdomain can only have lowercase letters, numbers, and hyphens. Please try again.'
+      error: validation.error ?? 'Invalid subdomain'
     };
   }
-
-  if (sanitizedSubdomain !== subdomain) {
-    return {
-      subdomain,
-      icon,
-      success: false,
-      error:
-        'Subdomain can only have lowercase letters, numbers, and hyphens. Please try again.'
-    };
-  }
+  const sanitizedSubdomain = validation.subdomain!;
 
   const pool = await getMySQLPool();
 

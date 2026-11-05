@@ -46,7 +46,7 @@ describe('isValidIcon', () => {
     expect(isValidIcon('')).toBe(false);
   });
 
-  it('accepts exactly 10 characters', () => {
-    expect(isValidIcon('a'.repeat(10))).toBe(true);
+  it('rejects a non-emoji string of exactly 10 characters', () => {
+    expect(isValidIcon('a'.repeat(10))).toBe(false);
   });
 });

@@ -92,7 +92,7 @@ describe('verifyResetTokenAction', () => {
     const token = await tokenForUser(uid);
     expect(token).not.toBeNull();
 
-    const result = await verifyResetTokenAction(token!);
+    const result = await verifyResetTokenAction(formData([['token', token!]]));
 
     expect(result.success).toBe(true);
     expect(result.user).toBe(uid);
@@ -101,7 +101,7 @@ describe('verifyResetTokenAction', () => {
   });
 
   it('rejects a token that does not exist', async () => {
-    const result = await verifyResetTokenAction('does-not-exist-token');
+    const result = await verifyResetTokenAction(formData([['token', 'does-not-exist-token']]));
 
     expect(result.success).toBe(false);
     expect(result.error).toContain('Invalid or expired token');
@@ -114,7 +114,7 @@ describe('verifyResetTokenAction', () => {
       ['expired-reset-token', uid, Date.now() - 10000]
     );
 
-    const result = await verifyResetTokenAction('expired-reset-token');
+    const result = await verifyResetTokenAction(formData([['token', 'expired-reset-token']]));
 
     expect(result.success).toBe(false);
     expect(result.error).toContain('Token has expired');

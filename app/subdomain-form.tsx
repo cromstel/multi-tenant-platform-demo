@@ -5,7 +5,6 @@ import { useActionState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { createSubdomainAction } from '@/app/actions';
 import { rootDomain } from '@/lib/utils';
 
 type CreateState = {
@@ -14,6 +13,11 @@ type CreateState = {
   subdomain?: string;
   icon?: string;
 };
+
+type SubdomainAction = (
+  prevState: CreateState,
+  formData: FormData
+) => Promise<CreateState>;
 
 function SubdomainInput({ defaultValue }: { defaultValue?: string }) {
   return (
@@ -35,14 +39,18 @@ function SubdomainInput({ defaultValue }: { defaultValue?: string }) {
   );
 }
 
-export function SubdomainForm() {
-  const [state, action, isPending] = useActionState<CreateState, FormData>(
-    createSubdomainAction,
+export function SubdomainForm({
+  action,
+}: {
+  action: SubdomainAction;
+}) {
+  const [state, formAction, isPending] = useActionState<CreateState, FormData>(
+    action,
     {}
   );
 
   return (
-    <form action={action} className="space-y-4">
+    <form action={formAction} className="space-y-4">
       <div>
         <Label htmlFor="subdomain" className="mb-1.5 block text-sm font-medium text-slate-700">
           Subdomain

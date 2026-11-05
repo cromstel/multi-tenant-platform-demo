@@ -10,6 +10,7 @@ import { hashPassword, safeEqual, verifyPassword } from '@/lib/password';
 import { LOGIN_LIMIT, check, consume, reset } from '@/lib/rate-limit';
 import { adminUrl } from '@/lib/admin-path';
 import { issueSession } from '@/lib/auth/jwt';
+import { isRedirectError, minutesLabel } from '@/lib/utils';
 
 export type LoginState = {
   error?: string;
@@ -98,10 +99,6 @@ async function verifyAdminPassword(
   }
 }
 
-function minutesLabel(seconds: number): string {
-  const minutes = Math.max(1, Math.ceil(seconds / 60));
-  return minutes + " minute" + (minutes === 1 ? "" : "s");
-}
 
 export async function loginAction(
   _prevState: LoginState,
@@ -185,9 +182,6 @@ export async function loginAction(
   }
 }
 
-function isRedirectError(error: unknown): boolean {
-  return typeof error === 'object' && error !== null && 'digest' in error && typeof (error as { digest?: unknown }).digest === 'string' && (error as { digest: string }).digest.startsWith('NEXT_REDIRECT');
-}
 
 export async function logoutAction() {
   try {
