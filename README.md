@@ -22,6 +22,7 @@ single MySQL-backed data store.
 - ✅ Modern marketing landing page with global header nav, product dropdown and footer
 - ✅ Scroll progress bar and back-to-top control
 - ✅ Zero WCAG 2.0 A/AA violations in axe-core
+- ✅ **SAM chatbot** — AI support chat for tenants; OpenRouter first with ChatGPT fallback, rate-limited and fail-closed without LLM keys
 
 ## Tech Stack
 
@@ -167,6 +168,10 @@ file, and `.env.example` documents all of them:
 | `ADMIN_PASSWORD`                | yes             | Password for the administrator account, compared in constant time      |
 | `ADMIN_SESSION_SECRET`          | yes             | Random 32+ char string signing the session cookie (HS256)            |
 | `TENANT_SESSION_SECRET`         | no              | Separate secret for tenant sessions (falls back to `ADMIN_SESSION_SECRET`) |
+| `OPENROUTER_API_KEY`            | no              | LLM key for SAM chatbot — tried first (OpenRouter)                     |
+| `CHATGPT_API_KEY`               | no              | LLM key for SAM chatbot — fallback when OpenRouter fails               |
+| `SAM_MODEL`                     | no              | Model name for SAM chatbot (OpenRouter default or `gpt-4o-mini`)       |
+| `SAM_LIMIT`                     | no              | Rate limit for `POST /api/sam/chat` (default `20`)                     |
 
 `/auth/admin` **fails closed**: if either admin variable is missing, every
 request is denied rather than falling open. Rotating `ADMIN_SESSION_SECRET`
@@ -216,6 +221,40 @@ launcher warns at startup when the two values drift apart:
 In production, set `NEXT_PUBLIC_ROOT_DOMAIN` to your bare domain with no scheme
 and no port — the platform terminates TLS on 443.
 
+## SAM Chatbot
+
+SAM is an AI support chatbot embedded in tenant pages. It answers visitor
+questions using the platform documentation and tenant context, screens messages
+for PII and secrets, and flags conversations that need human attention for
+escalation.
+
+### How it works
+
+- `POST /api/sam/chat` is a **public** endpoint — no admin session or API key
+  is required. It accepts `{ messages, session?, subdomain? }`, persists the
+  conversation and messages to MySQL, calls the SAM LLM, writes back the
+  assistant reply, and sets an anonymous `sam_session` cookie when none was
+  provided. Request bodies are never logged.
+- The endpoint is rate limited with `consume('sam_chat', SAM_LIMIT)`. Exceeding
+  the limit returns `429`.
+- The LLM integration tries **OpenRouter first** and falls back to **ChatGPT**
+  on any error (including rate limits). It fails closed: if neither
+  `OPENROUTER_API_KEY` nor `CHATGPT_API_KEY` is configured, the request errors
+  instead of returning a canned answer. Keys are never logged or returned.
+- Incoming messages are masked for PII (emails, phone numbers) and secrets
+  (session secrets, API keys, `.env.local`, passwords); Bearer tokens and
+  `sk-` keys are redacted before being sent to the LLM.
+- Messages containing escalation keywords (urgent, escalate, manager, legal,
+  lawsuit, threat, refund now, etc.) are flagged and an escalation record is
+  created in MySQL.
+
+### Environment variables
+
+SAM reads `OPENROUTER_API_KEY`, `CHATGPT_API_KEY`, `SAM_MODEL` and
+`SAM_LIMIT` from the environment (see the table under
+[Configuration](#configuration)). At least one LLM key is required for SAM to
+answer; without either key it fails closed.
+
 ## Data Storage
 
 MySQL is the source of truth. `lib/db/mysql.ts` owns the connection pool and
@@ -239,15 +278,20 @@ instead of racing.
 
 ### Schema
 
-| Table               | Holds                                                     |
-| ------------------- | --------------------------------------------------------- |
-| `tenants`           | One row per tenant — `subdomain`, `emoji`, timestamps     |
-| `tenant_users`      | Members of a tenant, with `role` and `password_hash`     |
-| `tenant_sessions`   | Issued tenant sessions                                     |
-| `admin_users`       | Site administrator accounts, with `role`                   |
-| `admin_sessions`    | Issued administrator sessions                              |
-| `kv_store`          | Key/value rows backing the `KvClient` counters            |
-| `contact_enquiries` | Support and sales enquiries from the contact form         |
+| Table                     | Holds                                                     |
+| ------------------------- | --------------------------------------------------------- |
+| `tenants`                 | One row per tenant — `subdomain`, `emoji`, timestamps     |
+| `tenant_users`            | Members of a tenant, with `role` and `password_hash`     |
+| `tenant_sessions`         | Issued tenant sessions                                     |
+| `admin_users`             | Site administrator accounts, with `role`                   |
+| `admin_sessions`          | Issued administrator sessions                              |
+| `kv_store`                | Key/value rows backing the `KvClient` counters            |
+| `contact_enquiries`       | Support and sales enquiries from the contact form         |
+| `docs_sections`           | Help-document sections per role, with sort order           |
+| `password_reset_tokens`   | Tenant password-reset tokens, indexed by email and expiry  |
+| `conversations`           | SAM chatbot conversations, linked to a subdomain/session   |
+| `messages`                | SAM chatbot messages tied to a conversation                |
+| `escalations`             | SAM chatbot escalations tied to a conversation             |
 
 `tenants.subdomain` is `UNIQUE`, so two simultaneous signups cannot claim
 the same name — the database rejects the loser.
@@ -620,6 +664,7 @@ path still works.
 | `DELETE` | `/api/v1/tenants/{subdomain}` | Delete a tenant and everything under it |
 | `GET` | `/api/v1/tenants/{subdomain}/users` | List a tenant members |
 | `GET` | `/api/v1/stats` | Platform metrics |
+| `POST` | `/api/sam/chat` | SAM support chat — public, rate-limited, fail-closed without LLM keys |
 
 ```bash
 # Health check — no auth needed

@@ -26,15 +26,15 @@ Generated from `docs/Project Auditor.md` audit (sections 1–6). All task IDs, p
 | TEST-001 | Add API route tests (all 8 documented endpoints + `/api/sam/chat`) | P1 | Completed | `tests/api/api.test.ts` | SEC-004 | 25 route-level tests pass against test DB; 146 total tests pass |
 | TEST-002 | Add auth tests (JWT verify/issue, role-check, admin login actions) | P1 | Completed | `tests/auth/jwt.test.ts`, `tests/auth/role-check.test.ts`, `tests/auth/admin-login.test.ts` | SEC-001 | 20 auth tests pass; no secret values in fixtures |
 | TEST-003 | Add SAM tests (lib/sam/* + chat route) | P2 | Completed | `tests/sam/filter.test.ts`, `tests/sam/escalation.test.ts`, `tests/sam/llm.test.ts`, `tests/sam/chat.test.ts` | DEV-001 | 36 SAM tests pass; fetch mocked (no network) |
-| TEST-004 | Add component tests (jsdom configured but unused) | P2 | In Progress | `tests/components/` | None | At least one component test suite passes |
-| TEST-005 | Add Server Action tests (`app/actions.ts`, reset, contact) | P2 | Not Started | `tests/actions/` | DEV-002 | Actions tested with DB |
-| DOC-001 | Create `IMPLEMENTATION_STATUS.md` (current implementation status) | P2 | Not Started | `IMPLEMENTATION_STATUS.md` | Audit complete | Status report exists, consistent with codebase |
+| TEST-004 | Add component tests (jsdom configured but unused) | P2 | Completed | `tests/components/scroll-to-top.test.tsx`, `tests/components/sam-widget.test.tsx`, `tests/components/floating-bar.test.tsx` | None | 12 component tests pass; 182 total tests pass |
+| TEST-005 | Add Server Action tests (`app/actions.ts`, reset, contact) | P2 | Completed | `tests/actions/tenant-actions.test.ts`, `tests/actions/contact-actions.test.ts`, `tests/actions/reset-actions.test.ts` | DEV-002 | 24 action tests pass against real MySQL |
+| DOC-001 | Create `IMPLEMENTATION_STATUS.md` (current implementation status) | P2 | Completed | `IMPLEMENTATION_STATUS.md` | Audit complete | 221 lines, 9 sections, all counts documented |
 | DOC-002 | Create `IMPLEMENTATION_PLAN.md` (this file — TODO plan) | P1 | Completed | `IMPLEMENTATION_PLAN.md` | None | This file exists; updated as tasks progress |
-| DOC-003 | Create `SECURITY_AUDIT.md` (findings + remediation, secrets redacted) | P1 | Not Started | `SECURITY_AUDIT.md` | SEC-001..SEC-004 | Security report exists; no secret values exposed |
-| DOC-004 | Create `ARCHITECTURE.md` (architecture overview, currently missing) | P2 | Not Started | `ARCHITECTURE.md` | Architecture agent findings | Architecture doc exists |
-| DOC-005 | Create `CHANGELOG.md` | P3 | Not Started | `CHANGELOG.md` | None | Changelog exists |
-| DOC-006 | Document SAM chatbot in README (env vars, public endpoint) | P2 | Not Started | `README.md` | DEV-001 | SAM documented |
-| DOC-007 | Update README schema table (6 tables omitted) | P3 | Not Started | `README.md` | None | All 12 tables listed |
+| DOC-003 | Create `SECURITY_AUDIT.md` (findings + remediation, secrets redacted) | P1 | Completed | `SECURITY_AUDIT.md` | SEC-001..SEC-004 | 204 lines, 4 vulnerabilities fixed, no secrets exposed |
+| DOC-004 | Create `ARCHITECTURE.md` (architecture overview, currently missing) | P2 | Completed | `ARCHITECTURE.md` | Architecture agent findings | 380 lines, 10 sections |
+| DOC-005 | Create `CHANGELOG.md` | P3 | Completed | `CHANGELOG.md` | None | 37 lines, Keep a Changelog format, 28 entries |
+| DOC-006 | Document SAM chatbot in README (env vars, public endpoint) | P2 | Completed | `README.md` | DEV-001 | SAM section, 4 env vars, POST /api/sam/chat endpoint |
+| DOC-007 | Update README schema table (6 tables omitted) | P3 | Completed | `README.md` | None | All 12 tables now documented |
 
 ## Verification Rules
 
