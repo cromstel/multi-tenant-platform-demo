@@ -294,6 +294,50 @@ export async function deleteTenant(subdomain: string): Promise<boolean> {
   }
 }
 
+/** Deletes many tenants in one transaction, returning the count removed. */
+export async function bulkDeleteTenants(subdomains: string[]): Promise<number> {
+  if (subdomains.length === 0) return 0;
+
+  const pool = await getMySQLPool();
+  const conn = await pool.getConnection();
+
+  try {
+    await conn.beginTransaction();
+
+    let deletedCount = 0;
+
+    for (const raw of subdomains) {
+      const subdomain = sanitizeSubdomain(raw);
+      const [tenantRows] = await conn.execute(
+        'SELECT id FROM tenants WHERE subdomain = ?',
+        [subdomain]
+      );
+      const tenant = (tenantRows as Array<{ id: number }>)[0];
+
+      if (!tenant) continue;
+
+      const tenantId = tenant.id;
+
+      await conn.execute('DELETE FROM tenant_users WHERE tenant_id = ?', [tenantId]);
+      await conn.execute('DELETE FROM tenant_sessions WHERE tenant_id = ?', [tenantId]);
+      await conn.execute('DELETE FROM tenants WHERE id = ?', [tenantId]);
+      await conn.execute('DELETE FROM kv_store WHERE `key` = ?', [
+        `subdomain:${subdomain}`,
+      ]);
+
+      deletedCount++;
+    }
+
+    await conn.commit();
+    return deletedCount;
+  } catch (error) {
+    await conn.rollback();
+    throw error;
+  } finally {
+    conn.release();
+  }
+}
+
 /** Lists the members of a tenant. */
 export async function listTenantUsers(subdomain: string) {
   const pool = await getMySQLPool();

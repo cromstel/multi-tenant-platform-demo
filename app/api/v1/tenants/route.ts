@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server';
-import { createTenant, listTenants, validateTenantInput } from '@/lib/db/tenants';
+import { z } from 'zod';
+
+import { createTenant, listTenants } from '@/lib/db/tenants';
+import { isValidIcon } from '@/lib/subdomains';
 import {
   apiErrors,
   enforceRateLimit,
@@ -9,6 +12,39 @@ import {
 } from '@/lib/api';
 
 export const dynamic = 'force-dynamic';
+
+/**
+ * Validation schema for `POST /api/v1/tenants`.
+ *
+ * Mirrors the rules enforced by `validateTenantInput` in `lib/db/tenants.ts`
+ * so a malformed body is rejected with a 400 before any database work.
+ */
+const CreateTenantSchema = z.object({
+  subdomain: z
+    .string()
+    .min(1, 'A subdomain is required.')
+    .max(63, 'A subdomain may be at most 63 characters.')
+    .regex(
+      /^[a-z0-9-]+$/,
+      'A subdomain may only contain lowercase letters, numbers and hyphens.'
+    ),
+  emoji: z
+    .string()
+    .min(1, 'An icon is required.')
+    .refine((value) => isValidIcon(value), {
+      message: 'The icon must be an emoji of at most 10 characters.',
+    }),
+  email: z
+    .string()
+    .min(1, 'An email address is required.')
+    .max(255, 'That does not look like an email address.')
+    .email('That does not look like an email address.'),
+  password: z
+    .string()
+    .min(1, 'A password is required.')
+    .min(8, 'A password must be at least 8 characters.')
+    .max(200, 'A password may be at most 200 characters.'),
+});
 
 /**
  * `GET /api/v1/tenants` — list tenants.
@@ -47,27 +83,30 @@ export async function POST(request: Request) {
   const limited = await enforceRateLimit('api:tenant_create', 10, 60 * 60 * 1000);
   if (limited) return limited;
 
-  const body = await readJsonBody<{
-    subdomain?: unknown;
-    emoji?: unknown;
-    email?: unknown;
-    password?: unknown;
-  }>(request);
+  const rawBody = await readJsonBody<Record<string, unknown>>(request);
 
-  if (!body) {
+  if (!rawBody) {
     return apiErrors.badRequest('A JSON body is required.');
   }
 
-  const errors = validateTenantInput(body);
-  if (errors) {
-    return apiErrors.badRequest('The tenant could not be created.', errors);
+  const parsed = CreateTenantSchema.safeParse(rawBody);
+  if (!parsed.success) {
+    const details: Record<string, string> = {};
+    for (const issue of parsed.error.issues) {
+      const path =
+        issue.path.length > 0 ? issue.path.join('.') : 'body';
+      details[path] = issue.message;
+    }
+    return apiErrors.badRequest('The tenant could not be created.', details);
   }
 
+  const { subdomain, emoji, email, password } = parsed.data;
+
   const result = await createTenant({
-    subdomain: body.subdomain as string,
-    emoji: body.emoji as string,
-    email: body.email as string,
-    password: body.password as string,
+    subdomain,
+    emoji,
+    email,
+    password,
   });
 
   if (!result.ok) {

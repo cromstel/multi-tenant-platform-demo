@@ -1,10 +1,11 @@
 import 'server-only';
 
-import { createHash, timingSafeEqual } from 'node:crypto';
+import { createHash } from 'node:crypto';
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 
 import { getAdminSession } from '@/app/auth/admin/login/actions';
+import { safeEqual } from '@/lib/password';
 import { consume } from '@/lib/rate-limit';
 
 /**
@@ -107,15 +108,6 @@ export async function requireAdminCookie() {
   const session = await getAdminSession();
   if (!session) return null;
   return session;
-}
-
-/**
- * Compares two secrets without leaking their contents through timing.
- */
-function safeEqual(a: string, b: string): boolean {
-  const hashA = createHash('sha256').update(a, 'utf8').digest();
-  const hashB = createHash('sha256').update(b, 'utf8').digest();
-  return timingSafeEqual(hashA, hashB);
 }
 
 /**

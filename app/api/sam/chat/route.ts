@@ -1,13 +1,35 @@
 import { randomBytes, randomUUID } from 'node:crypto';
 import { NextResponse, NextRequest } from 'next/server';
+import { z } from 'zod';
 
 import { getMySQLPool } from '@/lib/db/mysql';
 import { SAM_LIMIT, consume } from '@/lib/rate-limit';
-import { ok, fail, apiErrors } from '@/lib/api';
-import { generateSAMResponse } from '@/lib/sam/llm';
+import { ok, fail, apiErrors, readJsonBody } from '@/lib/api';
+import { callSAM } from '@/lib/sam/llm';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
+
+/**
+ * Validation schema for `POST /api/sam/chat`.
+ *
+ * `messages` is optional and defaults to `[]`; `session` and `subdomain` are
+ * optional overrides. A malformed body is rejected with a 400 before any
+ * database or LLM work.
+ */
+const SamChatSchema = z.object({
+  messages: z
+    .array(
+      z.object({
+        role: z.enum(['user', 'assistant']),
+        content: z.string(),
+      })
+    )
+    .optional()
+    .default([]),
+  session: z.string().optional(),
+  subdomain: z.string().optional(),
+});
 
 /**
  * POST /api/sam/chat
@@ -32,24 +54,27 @@ export async function POST(request: NextRequest) {
   const existingCookie = request.cookies.get('sam_session')?.value;
   const sessionCookieValue = existingCookie || randomBytes(16).toString('hex');
 
-  let parsedBody: unknown;
-  try {
-    parsedBody = await request.json();
-  } catch {
+  const rawBody = await readJsonBody<Record<string, unknown>>(request);
+
+  if (!rawBody) {
     return apiErrors.badRequest('Request body must be valid JSON.');
   }
 
-  if (!parsedBody || typeof parsedBody !== 'object') {
-    return apiErrors.badRequest('Request body must be an object.');
+  const parsed = SamChatSchema.safeParse(rawBody);
+  if (!parsed.success) {
+    const details: Record<string, string> = {};
+    for (const issue of parsed.error.issues) {
+      const path =
+        issue.path.length > 0 ? issue.path.join('.') : 'body';
+      details[path] = issue.message;
+    }
+    return apiErrors.badRequest('Invalid request body.', details);
   }
 
-  const body = parsedBody as Record<string, unknown>;
-  const messages = Array.isArray(body.messages) ? body.messages : [];
-  const subdomain = typeof body.subdomain === 'string' ? body.subdomain : null;
-  const providedSession = typeof body.session === 'string' ? body.session : null;
+  const { messages = [], session = null, subdomain = null } = parsed.data;
 
   // Use the cookie session (anonymous) unless the caller provides an override.
-  const sessionId = providedSession || sessionCookieValue;
+  const sessionId = session || sessionCookieValue;
 
   // Never log the request body; only reference safe, non-secret fields.
   const conversationId = randomUUID();
@@ -76,12 +101,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Call SAM LLM via the assumed module.
-    const llmResponse = await generateSAMResponse(messages, sessionId, subdomain);
+    const llmResponse = await callSAM(messages);
 
     // Persist assistant message.
     await pool.execute(
       'INSERT INTO messages (id, conversation_id, role, content) VALUES (?, ?, ?, ?)',
-      [randomUUID(), conversationId, 'assistant', typeof llmResponse === 'string' ? llmResponse : String(llmResponse)]
+      [randomUUID(), conversationId, 'assistant', llmResponse.text]
     );
 
     const response = ok({
@@ -89,7 +114,11 @@ export async function POST(request: NextRequest) {
       session: sessionId,
       subdomain: subdomain,
       messages: messages.length,
-      response: llmResponse,
+      response: {
+        text: llmResponse.text,
+        model: llmResponse.model,
+        source: llmResponse.source,
+      },
     });
 
     // Write anonymous session cookie via NextResponse (only when missing).

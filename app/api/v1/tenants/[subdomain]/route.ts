@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 import {
   deleteTenant,
   getTenantBySubdomain,
@@ -12,6 +14,21 @@ import {
 } from '@/lib/api';
 
 export const dynamic = 'force-dynamic';
+
+/**
+ * Validation schema for `PATCH /api/v1/tenants/{subdomain}`.
+ *
+ * Only the icon can change; the subdomain is immutable. A malformed body is
+ * rejected with a 400 before any database work.
+ */
+const UpdateTenantSchema = z.object({
+  emoji: z
+    .string()
+    .min(1, 'An icon is required.')
+    .refine((value) => isValidIcon(value), {
+      message: 'The icon must be an emoji of at most 10 characters.',
+    }),
+});
 
 type RouteContext = { params: Promise<{ subdomain: string }> };
 
@@ -45,23 +62,26 @@ export async function PATCH(request: Request, context: RouteContext) {
   if (!auth) return apiErrors.unauthorized();
 
   const { subdomain } = await context.params;
-  const body = await readJsonBody<{ emoji?: unknown }>(request);
+  const rawBody = await readJsonBody<Record<string, unknown>>(request);
 
-  if (!body) {
+  if (!rawBody) {
     return apiErrors.badRequest('A JSON body is required.');
   }
 
-  if (body.emoji === undefined) {
-    return apiErrors.badRequest('Nothing to update. Supply an `emoji`.');
+  const parsed = UpdateTenantSchema.safeParse(rawBody);
+  if (!parsed.success) {
+    const details: Record<string, string> = {};
+    for (const issue of parsed.error.issues) {
+      const path =
+        issue.path.length > 0 ? issue.path.join('.') : 'body';
+      details[path] = issue.message;
+    }
+    return apiErrors.badRequest('Invalid update body.', details);
   }
 
-  if (typeof body.emoji !== 'string' || !isValidIcon(body.emoji)) {
-    return apiErrors.badRequest('The icon must be an emoji of at most 10 characters.', {
-      emoji: 'Invalid icon.',
-    });
-  }
+  const { emoji } = parsed.data;
 
-  const tenant = await updateTenant(subdomain, { emoji: body.emoji });
+  const tenant = await updateTenant(subdomain, { emoji });
 
   if (!tenant) return apiErrors.notFound('Tenant');
 

@@ -2,7 +2,8 @@
 
 import { redirect } from 'next/navigation';
 
-import { getMySQLPool, deleteTenant } from '@/lib/db/mysql';
+import { getMySQLPool } from '@/lib/db/mysql';
+import { deleteTenant, bulkDeleteTenants } from '@/lib/db/tenants';
 import { sanitizeSubdomain } from '@/lib/subdomains';
 import { getAdminSession } from '@/app/auth/admin/login/actions';
 import { CREATE_LIMIT, consume } from '@/lib/rate-limit';
@@ -27,6 +28,19 @@ export type BulkDeleteState = {
   count?: number;
 };
 
+/**
+ * Public landing-page entry point: creates the tenant row only (no owner).
+ *
+ * It intentionally does NOT delegate to `lib/db/tenants.ts:createTenant`,
+ * which is the canonical tenant + owner path — that function requires an
+ * email and a password, but this entry point's form (subdomain-form.tsx)
+ * collects only the subdomain and icon, and this action is not permitted to
+ * alter that form. Owner provisioning is a separate concern owned by
+ * `registerAction` (app/auth/register/actions.ts), which creates the tenant
+ * and its owner in one transaction. This action is therefore tenant-only by
+ * design: it claims the subdomain on the landing page, and the owner account
+ * is established through registration.
+ */
 export async function createSubdomainAction(
   _prevState: CreateSubdomainState,
   formData: FormData
@@ -151,39 +165,13 @@ export async function bulkDeleteSubdomainsAction(
     return { error: 'Select at least one tenant to delete.' };
   }
 
-  const pool = await getMySQLPool();
-  const conn = await pool.getConnection();
-
   let deleted = 0;
-
   try {
-    await conn.beginTransaction();
-
-    for (const subdomain of subdomains) {
-      const [rows] = await conn.execute(
-        'SELECT id FROM tenants WHERE subdomain = ?',
-        [subdomain]
-      );
-      const tenant = (rows as Array<{ id: number }>)[0];
-      if (!tenant) continue;
-
-      // Children first — the foreign keys cascade, but deleting explicitly
-      // keeps the intent obvious and works on engines with FK checks off.
-      await conn.execute('DELETE FROM tenant_users WHERE tenant_id = ?', [tenant.id]);
-      await conn.execute('DELETE FROM tenant_sessions WHERE tenant_id = ?', [tenant.id]);
-      await conn.execute('DELETE FROM tenants WHERE id = ?', [tenant.id]);
-
-      deleted++;
-    }
-
-    await conn.commit();
+    deleted = await bulkDeleteTenants(subdomains);
   } catch {
-    await conn.rollback();
     return {
       error: 'The delete could not be completed. No tenants were removed.'
     };
-  } finally {
-    conn.release();
   }
 
   revalidateAdmin();

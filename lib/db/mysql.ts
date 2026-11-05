@@ -170,10 +170,6 @@ export async function initializeMySQL(): Promise<void> {
     `);
 
     await conn.query(`
-      CREATE INDEX IF NOT EXISTS idx_docs_sections_role_sort ON docs_sections(role, sort_order)
-    `);
-
-    await conn.query(`
       CREATE TABLE IF NOT EXISTS password_reset_tokens (
         token VARCHAR(64) PRIMARY KEY,
         email VARCHAR(255) NOT NULL,
@@ -357,83 +353,6 @@ export async function getAdminStats(): Promise<AdminStats> {
     activeTenants: Number((activeTenantsResult as Array<{ total: number }>)[0]?.total) || 0,
     recentTenants: Number((recentTenantsResult as Array<{ total: number }>)[0]?.total) || 0
   };
-}
-
-export async function deleteTenant(subdomain: string): Promise<boolean> {
-  const pool = await getMySQLPool();
-  const conn = await pool.getConnection();
-  
-  try {
-    await conn.beginTransaction();
-    
-    // Get tenant ID first
-    const [tenantRows] = await conn.execute('SELECT id FROM tenants WHERE subdomain = ?', [subdomain]);
-    const tenant = (tenantRows as Array<{ id: number }>)[0];
-    
-    if (!tenant) {
-      await conn.rollback();
-      return false;
-    }
-    
-    const tenantId = tenant.id;
-    
-    // Delete tenant_users first (FK constraint)
-    await conn.execute('DELETE FROM tenant_users WHERE tenant_id = ?', [tenantId]);
-    
-    // Delete tenant_sessions
-    await conn.execute('DELETE FROM tenant_sessions WHERE tenant_id = ?', [tenantId]);
-    
-    // Delete tenant
-    await conn.execute('DELETE FROM tenants WHERE id = ?', [tenantId]);
-    
-    // Also delete from kv_store for backwards compatibility
-    await conn.execute('DELETE FROM kv_store WHERE `key` = ?', [`subdomain:${subdomain}`]);
-    
-    await conn.commit();
-    return true;
-  } catch (e) {
-    await conn.rollback();
-    throw e;
-  } finally {
-    conn.release();
-  }
-}
-
-export async function bulkDeleteTenants(subdomains: string[]): Promise<number> {
-  if (subdomains.length === 0) return 0;
-  
-  const pool = await getMySQLPool();
-  const conn = await pool.getConnection();
-  
-  try {
-    await conn.beginTransaction();
-    
-    let deletedCount = 0;
-    
-    for (const subdomain of subdomains) {
-      const [tenantRows] = await conn.execute('SELECT id FROM tenants WHERE subdomain = ?', [subdomain]);
-      const tenant = (tenantRows as Array<{ id: number }>)[0];
-      
-      if (!tenant) continue;
-      
-      const tenantId = tenant.id;
-      
-      await conn.execute('DELETE FROM tenant_users WHERE tenant_id = ?', [tenantId]);
-      await conn.execute('DELETE FROM tenant_sessions WHERE tenant_id = ?', [tenantId]);
-      await conn.execute('DELETE FROM tenants WHERE id = ?', [tenantId]);
-      await conn.execute('DELETE FROM kv_store WHERE `key` = ?', [`subdomain:${subdomain}`]);
-      
-      deletedCount++;
-    }
-    
-    await conn.commit();
-    return deletedCount;
-  } catch (e) {
-    await conn.rollback();
-    throw e;
-  } finally {
-    conn.release();
-  }
 }
 
 export async function getTenantDetails(subdomain: string): Promise<{
