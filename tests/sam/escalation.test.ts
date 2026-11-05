@@ -63,7 +63,7 @@ describe('createEscalation', () => {
       'SELECT id, reason, resolved FROM escalations WHERE conversation_id = ?',
       [CONVERSATION_ID]
     );
-    const found = (rows as Array<{ reason: string; resolved: number }>)[0];
+    const found = (rows as Array<{ id: string; reason: string; resolved: number }>)[0];
 
     expect(found).toBeDefined();
     expect(found.reason).toBe(REASON);
