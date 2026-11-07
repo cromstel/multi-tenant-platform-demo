@@ -1,6 +1,8 @@
 'use server';
 import { randomBytes } from 'node:crypto';
 
+import { protocol, rootDomain } from '@/lib/utils';
+import { sendPasswordResetEmail } from '@/lib/email';
 import { hashPassword } from '@/lib/password';
 import { getMySQLPool } from '@/lib/db/mysql';
 
@@ -34,6 +36,19 @@ export async function resetRequestAction(prevState: unknown, formData: FormData)
       'INSERT INTO password_reset_tokens (token, user_id, expires_at, created_at) VALUES (?, ?, ?, CURRENT_TIMESTAMP)',
       [token, userId, expiresAt]
     );
+
+    // Send the password reset email. An email failure must not block the token
+    // or surface as an error to the user — the token is valid regardless of
+    // whether the email arrived.
+    try {
+      const resetUrl = `${protocol}://${rootDomain}/auth/reset/${token}`;
+      await sendPasswordResetEmail(email, resetUrl);
+    } catch (emailError) {
+      console.error(
+        '[auth] Password reset email failed:',
+        emailError instanceof Error ? emailError.message : 'Unknown error'
+      );
+    }
   } catch {
     return { error: 'Failed to create reset token' };
   }

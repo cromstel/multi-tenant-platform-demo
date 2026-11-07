@@ -10,7 +10,7 @@ import { FieldHint, TooltipProvider } from '@/components/ui/tooltip';
 import { loginAction, type LoginState } from './actions';
 
 const fieldClass =
-  'h-10 bg-slate-50 border-slate-200 focus:border-[#0078E2] focus:ring-2 focus:ring-[#0078E2]/20 text-base';
+  'h-12 bg-slate-50 border-slate-200 focus:border-[#0078E2] focus:ring-2 focus:ring-[#0078E2]/20 text-base';
 
 export function TenantLoginForm() {
   const [state, action, isPending] = useActionState<LoginState, FormData>(

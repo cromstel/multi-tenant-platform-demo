@@ -20,6 +20,7 @@ export default async function FloatingBar() {
   }
   const p = pathname.split('?')[0];
   if (p.startsWith('/auth') || p.startsWith('/admin')) return null;
+  if (p.startsWith('/ops-')) return null;
 
   const links = (await redis.get<Record<string, string>>('social_links')) || {};
   const wa = links.whatsapp || DEFAULTS.whatsapp;

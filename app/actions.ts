@@ -7,7 +7,7 @@ import { getMySQLPool } from '@/lib/db/mysql';
 import { deleteTenant, bulkDeleteTenants } from '@/lib/db/tenants';
 import { sanitizeSubdomain } from '@/lib/utils';
 import { getAdminSession } from '@/app/auth/admin/login/actions';
-import { CREATE_LIMIT, consume } from '@/lib/rate-limit';
+import { CREATE_LIMIT, DELETE_LIMIT, consume } from '@/lib/rate-limit';
 import { rootDomain, protocol, validateSubdomain } from '@/lib/utils';
 import { revalidateAdmin } from '@/lib/admin-path';
 
@@ -119,6 +119,13 @@ export async function deleteSubdomainAction(
     return { error: 'Your session has expired. Sign in again to continue.' };
   }
 
+  const limit = await consume('delete', DELETE_LIMIT);
+  if (!limit.allowed) {
+    return {
+      error: `Too many delete requests from your network. Try again in about ${Math.max(1, Math.ceil(limit.retryAfterSeconds / 60))} minutes.`
+    };
+  }
+
   const rawSubdomain = formData.get('subdomain');
 
   if (typeof rawSubdomain !== 'string' || !rawSubdomain) {
@@ -143,6 +150,13 @@ export async function bulkDeleteSubdomainsAction(
   const session = await getAdminSession();
   if (!session) {
     return { error: 'Your session has expired. Sign in again to continue.' };
+  }
+
+  const limit = await consume('delete', DELETE_LIMIT);
+  if (!limit.allowed) {
+    return {
+      error: `Too many delete requests from your network. Try again in about ${Math.max(1, Math.ceil(limit.retryAfterSeconds / 60))} minutes.`
+    };
   }
 
   const raw = formData.getAll('subdomains');

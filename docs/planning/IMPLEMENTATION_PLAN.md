@@ -1,6 +1,6 @@
 # IMPLEMENTATION_PLAN.md — CITGROUP Tenancy System
 
-Generated from `docs/Project Auditor.md` audit (sections 1–6). All task IDs, priorities, and acceptance criteria are evidence-based (verified via parallel discovery subagents).
+Generated from `docs/audit/Project-Auditor.md` audit (sections 1–6). All task IDs, priorities, and acceptance criteria are evidence-based (verified via parallel discovery subagents).
 
 ## Categories
 

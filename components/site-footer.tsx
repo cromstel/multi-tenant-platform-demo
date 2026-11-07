@@ -5,7 +5,7 @@ const FOOTER_SECTIONS = [
     title: 'Platform',
     links: [
       { label: 'Overview', href: '/#platform' },
-      { label: 'Features', href: '/#features' },
+      { label: 'Features', href: '/#platform' },
       { label: 'Architecture', href: '/#architecture' },
       { label: 'Security', href: '/#security' },
     ],
@@ -24,8 +24,8 @@ const FOOTER_SECTIONS = [
     title: 'Resources',
     links: [
       { label: 'Documentation', href: '/faq' },
-      { label: 'API Reference', href: '/#platform' },
-      { label: 'Status', href: '/#platform' },
+      { label: 'API Reference', href: '/faq' },
+      { label: 'Status', href: '/contact' },
       { label: 'Contact Us', href: '/contact' },
     ],
   },

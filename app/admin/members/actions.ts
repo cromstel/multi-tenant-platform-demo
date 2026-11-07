@@ -4,10 +4,11 @@
 import { getMySQLPool } from '@/lib/db/mysql';
 import { assertLastOwner } from '@/lib/db/tenants';
 import { hashPassword } from '@/lib/password';
-import { sanitizeSubdomain } from '@/lib/utils';
+import { protocol, rootDomain, sanitizeSubdomain } from '@/lib/utils';
 import { revalidateAdmin } from '@/lib/admin-path';
 import { getAdminSession } from '@/app/auth/admin/login/actions';
 import { CREATE_LIMIT, consume } from '@/lib/rate-limit';
+import { sendInvitationEmail } from '@/lib/email';
 
 /**
  * Admin member management.
@@ -182,6 +183,19 @@ export async function inviteMemberAction(
       return { error: 'That person is already a member of this tenant.' };
     }
     throw error;
+  }
+
+  // Send the invitation email. An email failure must not block member
+  // creation; the temporary password is still returned to the admin as a
+  // fallback.
+  try {
+    const inviteUrl = `${protocol}://${rootDomain}/auth/login`;
+    await sendInvitationEmail(normalizedEmail, subdomain, temporaryPassword, inviteUrl);
+  } catch (emailError) {
+    console.error(
+      '[admin] Invitation email failed:',
+      emailError instanceof Error ? emailError.message : 'Unknown error'
+    );
   }
 
   revalidateAdmin();

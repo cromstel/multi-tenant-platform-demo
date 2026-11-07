@@ -81,7 +81,7 @@ export async function loginAction(
       };
     }
 
-    await reset(`tenant_login:${tenantId}`);
+    await reset(`tenant_login:${tenantId}`, LOGIN_LIMIT);
 
     // Create session
     const token = await new SignJWT({ 

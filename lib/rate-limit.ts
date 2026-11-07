@@ -54,6 +54,9 @@ export const SAM_LIMIT = { max: 20, windowMs: 15 * 60 * 1000 };
 /** 10 tenant creations per IP per hour. */
 export const CREATE_LIMIT = { max: 10, windowMs: 60 * 60 * 1000 };
 
+/** 20 admin subdomain deletes per IP per 15 minutes. */
+export const DELETE_LIMIT = { max: 20, windowMs: 15 * 60 * 1000 };
+
 /** 5 contact enquiries per IP per hour. */
 export const CONTACT_LIMIT = { max: 5, windowMs: 60 * 60 * 1000 };
 
@@ -125,9 +128,11 @@ export async function check(
 }
 
 /** Clears the counter after a successful login. */
-export async function reset(prefix: string): Promise<void> {
+export async function reset(
+  prefix: string,
+  limit: { max: number; windowMs: number }
+): Promise<void> {
   const identifier = await getClientIdentifier();
-  const windowMs = prefix === 'login' ? LOGIN_LIMIT.windowMs : CREATE_LIMIT.windowMs;
-  const { key } = currentWindow(prefix, identifier, windowMs);
+  const { key } = currentWindow(prefix, identifier, limit.windowMs);
   await redis.del(key);
 }

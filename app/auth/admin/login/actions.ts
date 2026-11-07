@@ -136,7 +136,7 @@ export async function loginAction(
       return { error: "Too many failed attempts. Try again in about " + minutesLabel(verdict.retryAfterSeconds) + "." };
     }
 
-    await reset("admin_login");
+    await reset("admin_login", LOGIN_LIMIT);
 
     const token = await new SignJWT({ userId: user.id, email: user.email, role: user.role })
       .setProtectedHeader({ alg: "HS256" })

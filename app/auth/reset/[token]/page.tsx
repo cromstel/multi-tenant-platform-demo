@@ -1,6 +1,11 @@
 import type { Metadata } from 'next';
 
+import { Input } from '@/components/ui/input';
+
 import { verifyResetTokenAction } from '../actions';
+
+const fieldClass =
+  'h-12 bg-slate-50 border-slate-200 focus:border-[#0078E2] focus:ring-2 focus:ring-[#0078E2]/20 text-base';
 
 export const metadata: Metadata = {
   title: 'Verify Reset Token',
@@ -35,14 +40,14 @@ export default async function VerifyResetPage({
           <input type="hidden" name="token" value={token} />
           <div>
             <label htmlFor="new-password" className="block text-sm font-medium text-slate-700">New password</label>
-            <input
+            <Input
               id="new-password"
               name="new-password"
               type="password"
               required
               minLength={8}
               placeholder="Enter a new password"
-              className="mt-1 block w-full rounded-none border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#005cb3] focus:outline-none focus:ring-1 focus:ring-[#005cb3]"
+              className={fieldClass}
             />
           </div>
           <button

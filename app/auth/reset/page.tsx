@@ -1,7 +1,12 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
+import { Input } from '@/components/ui/input';
+
 import { resetRequestAction } from './actions';
+
+const fieldClass =
+  'h-12 bg-slate-50 border-slate-200 focus:border-[#0078E2] focus:ring-2 focus:ring-[#0078E2]/20 text-base';
 
 export const metadata: Metadata = {
   title: 'Password Reset',
@@ -38,14 +43,14 @@ export default async function PasswordResetPage() {
           className="space-y-4"
         >
           <div>
-            <label htmlFor="email" className="sr-only">Email address</label>
-            <input
+            <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-slate-700">Email address</label>
+            <Input
               id="email"
               name="email"
               type="email"
               required
               placeholder="you@example.com"
-              className="mt-1 block w-full rounded-none border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#005cb3] focus:outline-none focus:ring-1 focus:ring-[#005cb3]"
+              className={fieldClass}
             />
           </div>
 

@@ -44,6 +44,7 @@ vi.mock('next/navigation', () => ({ redirect: mockRedirect }));
 vi.mock('@/lib/rate-limit', () => ({
   consume: mockConsume,
   CREATE_LIMIT: { max: 10, windowMs: 60 * 60 * 1000 },
+  DELETE_LIMIT: { max: 20, windowMs: 15 * 60 * 1000 },
   LOGIN_LIMIT: { max: 5, windowMs: 15 * 60 * 1000 },
 }));
 vi.mock('@/app/auth/admin/login/actions', () => ({ getAdminSession: mockGetAdminSession }));
