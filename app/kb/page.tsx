@@ -32,7 +32,12 @@ export default async function KnowledgeBasePage() {
       <ScrollProgress />
 
       <main className="flex-1">
-        <SearchableSectionList sections={sections} />
+        {/* Max-width container keeps line length readable; the client
+            component owns the internal two-column layout (TOC sidebar +
+            content) and all interactivity. */}
+        <div className="mx-auto px-4 py-8 xl:px-12 max-w-7xl">
+          <SearchableSectionList sections={sections} />
+        </div>
       </main>
 
       <SiteFooter />
