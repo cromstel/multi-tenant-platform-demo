@@ -3,7 +3,8 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Calendar, Link as LuLink, Sparkles } from 'lucide-react';
 import { getSubdomainData } from '@/lib/subdomains';
-import { protocol, rootDomain } from '@/lib/utils';
+import { getMySQLPool } from '@/lib/db/mysql';
+import { protocol, rootDomain, sanitizeSubdomain } from '@/lib/utils';
 import { pageMetadata, structuredData, siteUrl } from '@/lib/seo';
 import { SiteHeader } from '@/components/site-header';
 import { SiteFooter } from '@/components/site-footer';
@@ -46,6 +47,35 @@ export default async function SubdomainPage({
   if (!subdomainData) {
     notFound();
   }
+
+  // Resolve the tenant id from the subdomain, then count its members.
+  // `session.tenantId` is not available on the public page, so we look it up
+  // directly from the `tenants` table using the sanitized subdomain.
+  let memberCount = 0;
+  try {
+    const pool = await getMySQLPool();
+    const [tenantRows] = await pool.execute(
+      'SELECT id FROM tenants WHERE subdomain = ?',
+      [sanitizeSubdomain(subdomain)]
+    );
+    const tenant = (tenantRows as Array<{ id: number }>)[0];
+    if (tenant) {
+      const [countRows] = await pool.execute(
+        'SELECT COUNT(*) as count FROM tenant_users WHERE tenant_id = ?',
+        [tenant.id]
+      );
+      memberCount = Number((countRows as Array<{ count: number }>)[0]?.count) || 0;
+    }
+  } catch {
+    // Database unavailable — badges degrade gracefully to a zero count.
+    memberCount = 0;
+  }
+
+  const memberSince = new Date(subdomainData.createdAt).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
 
   // Structured data describing the tenant as an organisation of its own,
   // parented by the platform. Both `@id`s are absolute so a crawler can tell
@@ -109,10 +139,18 @@ export default async function SubdomainPage({
         <div className="w-full text-center">
           <div className="text-9xl mb-6">{subdomainData.emoji}</div>
 
-          <div className="mb-4">
+          <div className="mb-4 flex flex-wrap justify-center gap-2">
             <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#0078E2]/10 text-[#005cb3] text-sm font-medium">
               <span className="w-2 h-2 rounded-full bg-[#005cb3]" aria-hidden="true"></span>
               Active
+            </span>
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#0078E2]/10 text-[#005cb3] text-sm font-medium">
+              <span className="w-2 h-2 rounded-full bg-[#005cb3]" aria-hidden="true"></span>
+              {memberCount} members
+            </span>
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#0078E2]/10 text-[#005cb3] text-sm font-medium">
+              <span className="w-2 h-2 rounded-full bg-[#005cb3]" aria-hidden="true"></span>
+              Member since {memberSince}
             </span>
           </div>
 

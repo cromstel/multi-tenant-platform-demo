@@ -174,7 +174,7 @@ export default function HomePage() {
         <section className="relative overflow-hidden bg-[#0c2238]">
           <div className="pointer-events-none absolute inset-0" aria-hidden="true">
             <div className="absolute -top-40 left-1/4 h-[560px] w-[560px] rounded-full bg-[#0078E2]/25 blur-[100px]" />
-            <div className="absolute -right-32 top-40 h-[420px] w-[420px] rounded-full bg-blue-400/15 blur-[90px]" />
+            <div className="absolute -right-32 top-40 h-[420px] w-[420px] rounded-full bg-[#0078E2]/15 blur-[90px]" />
             <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:56px_56px]" />
           </div>
 
@@ -185,7 +185,7 @@ export default function HomePage() {
                 <h1 className="mt-6 text-4xl font-extrabold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-6xl">
                   One platform.
                   <br />
-                  <span className="bg-gradient-to-r from-[#4A9DFF] to-[#7DD3FC] bg-clip-text text-transparent">
+                  <span className="bg-gradient-to-r from-[#0078E2] to-[#4da6ff] bg-clip-text text-transparent">
                     Every tenant isolated.
                   </span>
                 </h1>

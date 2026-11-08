@@ -16,12 +16,13 @@ export type ContactCategory =
 export type ContactState = {
   error?: string;
   success?: string;
-  fieldErrors?: Partial<Record<'name' | 'email' | 'subject' | 'message', string>>;
+  fieldErrors?: Partial<Record<'name' | 'email' | 'phone' | 'subject' | 'message', string>>;
   /** Echoed back so the form can keep what the user typed. */
   values?: {
     name?: string;
     email?: string;
     company?: string;
+    phone?: string;
     category?: string;
     subject?: string;
     message?: string;
@@ -40,8 +41,12 @@ const VALID_CATEGORIES: ContactCategory[] = [
 const MAX_NAME = 120;
 const MAX_EMAIL = 255;
 const MAX_COMPANY = 160;
+const MAX_PHONE = 32;
 const MAX_SUBJECT = 200;
 const MAX_MESSAGE = 5000;
+
+/** Optional phone: digits, spaces, dashes, plus signs, parentheses only. */
+const PHONE_PATTERN = /^[\d\s\-\+\(\)]+$/;
 
 /** Trims and caps a field, returning an empty string when it is only whitespace. */
 function clean(value: FormDataEntryValue | null, max: number): string {
@@ -68,6 +73,7 @@ export async function submitContactAction(
   const name = clean(formData.get('name'), MAX_NAME);
   const email = clean(formData.get('email'), MAX_EMAIL);
   const company = clean(formData.get('company'), MAX_COMPANY);
+  const phone = clean(formData.get('phone'), MAX_PHONE);
   const subject = clean(formData.get('subject'), MAX_SUBJECT);
   const message = clean(formData.get('message'), MAX_MESSAGE);
   const rawCategory = clean(formData.get('category'), 32);
@@ -93,26 +99,29 @@ export async function submitContactAction(
   else if (message.length < 20) {
     fieldErrors.message = 'Please add a little more detail (at least 20 characters).';
   }
+  if (phone && !PHONE_PATTERN.test(phone)) {
+    fieldErrors.phone = 'Enter a valid phone number.';
+  }
 
   if (Object.keys(fieldErrors).length > 0) {
     return {
       error: 'Please correct the highlighted fields.',
       fieldErrors,
-      values: { name, email, company, category, subject, message },
+      values: { name, email, company, phone, category, subject, message },
     };
   }
 
   try {
     const pool = await getMySQLPool();
     await pool.execute(
-      `INSERT INTO contact_enquiries (name, email, company, category, subject, message)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [name, email, company || null, category, subject, message]
+      `INSERT INTO contact_enquiries (name, email, company, phone, category, subject, message)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [name, email, company || null, phone || null, category, subject, message]
     );
   } catch {
     return {
       error: 'Your message could not be sent right now. Please try again shortly.',
-      values: { name, email, company, category, subject, message },
+      values: { name, email, company, phone, category, subject, message },
     };
   }
 

@@ -154,6 +154,11 @@ export async function initializeMySQL(): Promise<void> {
       )
     `);
 
+    const [phoneCol] = await conn.query(`SELECT 1 FROM information_schema.COLUMNS WHERE table_name = 'contact_enquiries' AND column_name = 'phone'`);
+    if ((phoneCol as Array<{1: number}>).length === 0) {
+      await conn.query(`ALTER TABLE contact_enquiries ADD COLUMN phone VARCHAR(32) NULL`);
+    }
+
     await conn.query(`
       CREATE TABLE IF NOT EXISTS docs_sections (
         id INT AUTO_INCREMENT PRIMARY KEY,

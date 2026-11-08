@@ -1,5 +1,7 @@
 import 'server-only';
 
+import { createTransport, type SendMailOptions, type Transporter } from 'nodemailer';
+
 export type EmailSendResult = { ok: true } | { ok: false; error: string };
 
 export interface SendEmailOptions {
@@ -10,7 +12,8 @@ export interface SendEmailOptions {
 }
 
 const isDevelopment = process.env.NODE_ENV === 'development';
-const nodemailerPkg = 'nodemailer';
+
+let smtpTransporter: Transporter | null = null;
 
 function escapeHtml(value: string): string {
   return value
@@ -21,14 +24,38 @@ function escapeHtml(value: string): string {
     .replace(/'/g, '&#039;');
 }
 
+/** Lazily creates and caches the SMTP transporter. */
+function getSmtpTransporter(): Transporter | null {
+  if (smtpTransporter) return smtpTransporter;
+
+  const host = process.env.SMTP_HOST;
+  const port = Number(process.env.SMTP_PORT || 587);
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASS;
+
+  if (!host || !user || !pass) {
+    return null;
+  }
+
+  smtpTransporter = createTransport({
+    host,
+    port,
+    secure: port === 465,
+    auth: { user, pass },
+  });
+
+  return smtpTransporter;
+}
+
 /** Logs the email content to stdout so developers can preview it in development. */
 function logEmail(opts: SendEmailOptions): void {
-  console.log('[email] Development mode — email would be sent:');
+  console.log('[email] Development mode — email preview:');
   console.log(`  To: ${opts.to}`);
-  console.log(`  From: ${process.env.RESEND_FROM_EMAIL || process.env.SMTP_FROM || 'noreply@citgroup.example'}`);
+  console.log(
+    `  From: ${process.env.RESEND_FROM_EMAIL || process.env.SMTP_FROM || 'noreply@citgroup.example'}`
+  );
   console.log(`  Subject: ${opts.subject}`);
   console.log(`  Text: ${opts.text}`);
-  console.log(`  HTML: ${opts.html}`);
 }
 
 /** Primary transport: Resend HTTP API. */
@@ -67,49 +94,26 @@ async function sendViaResend(opts: SendEmailOptions): Promise<EmailSendResult> {
   }
 }
 
-/** Fallback transport: SMTP via nodemailer (only when the package is installed). */
+/** Fallback transport: SMTP via nodemailer. */
 async function sendViaSmtp(opts: SendEmailOptions): Promise<EmailSendResult> {
-  const host = process.env.SMTP_HOST;
-  const port = Number(process.env.SMTP_PORT || 587);
-  const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
   const fromEmail = process.env.SMTP_FROM;
   const fromName = process.env.SMTP_FROM_NAME;
 
-  if (!host || !user || !pass || !fromEmail) {
-    return { ok: false, error: 'SMTP is not fully configured' };
+  const transporter = getSmtpTransporter();
+  if (!transporter) {
+    return { ok: false, error: 'SMTP is not fully configured (SMTP_HOST, SMTP_USER, SMTP_PASS)' };
   }
 
-  let transport: { sendMail: (mail: unknown) => Promise<unknown> } | null = null;
-  try {
-    // The specifier is a variable so TypeScript does not require the module to
-    // resolve and bundlers do not statically resolve it. When nodemailer is not
-    // installed the dynamic import throws at runtime and we fall back below.
-    const nm = (await import(nodemailerPkg)) as {
-      createTransport: (options: unknown) => { sendMail: (mail: unknown) => Promise<unknown> };
-    };
-    transport = nm.createTransport({
-      host,
-      port,
-      secure: port === 465,
-      auth: { user, pass },
-    });
-  } catch {
-    return { ok: false, error: 'nodemailer is not installed' };
-  }
-
-  if (!transport) {
-    return { ok: false, error: 'nodemailer is not installed' };
-  }
+  const mailOptions: SendMailOptions = {
+    from: fromName ? { name: fromName, address: fromEmail } : fromEmail,
+    to: opts.to,
+    subject: opts.subject,
+    text: opts.text,
+    html: opts.html,
+  };
 
   try {
-    await transport.sendMail({
-      from: fromName ? { name: fromName, address: fromEmail } : fromEmail,
-      to: opts.to,
-      subject: opts.subject,
-      text: opts.text,
-      html: opts.html,
-    });
+    await transporter.sendMail(mailOptions);
     return { ok: true };
   } catch (error) {
     return {
@@ -122,20 +126,28 @@ async function sendViaSmtp(opts: SendEmailOptions): Promise<EmailSendResult> {
 /**
  * Sends an email through the best available transport.
  *
- * Resend is tried first, then SMTP (nodemailer). When neither transport is
- * configured or available the content is logged to the console. In
- * development the content is always logged instead of being sent, so
- * developers can preview emails without a real transport.
+ * In development, the email content is always logged to the console so the
+ * developer can preview reset links and invitation codes. If SMTP is
+ * configured, the email is also sent for real.
  *
- * Failures are reported in the result and never thrown — callers decide
- * whether an email failure is fatal.
+ * In production, Resend is tried first, then SMTP. Failures are reported in
+ * the result and never thrown — callers decide whether an email failure is
+ * fatal.
  */
 export async function sendEmail(opts: SendEmailOptions): Promise<EmailSendResult> {
+  // Always log in development so developers can preview email content.
   if (isDevelopment) {
     logEmail(opts);
-    return { ok: true };
+
+    // Attempt real delivery if SMTP is configured.
+    const smtp = await sendViaSmtp(opts);
+    if (smtp.ok) {
+      return smtp;
+    }
+    return { ok: true }; // logged successfully, even if SMTP not configured
   }
 
+  // Production: Resend first, then SMTP fallback.
   const resend = await sendViaResend(opts);
   if (resend.ok) return resend;
 

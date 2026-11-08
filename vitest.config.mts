@@ -23,6 +23,7 @@ export default defineConfig({
     globals: true,
     setupFiles: ['./tests/setup.ts'],
     include: ['tests/**/*.test.ts', 'tests/**/*.test.tsx'],
+    exclude: ['tests/e2e/**'],
     // The integration tests share one database, so they must not run
     // concurrently — they would race on the same rows.
     fileParallelism: false,

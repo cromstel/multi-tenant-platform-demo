@@ -124,23 +124,45 @@ export function ContactForm() {
         </div>
 
         <div>
-          <label htmlFor="category" className="mb-1.5 block text-sm font-medium text-slate-700">
-            Topic <span className="text-red-600">*</span>
+          <label htmlFor="phone" className="mb-1.5 block text-sm font-medium text-slate-700">
+            Phone
           </label>
-          <select
-            id="category"
-            name="category"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className={`${fieldClass} w-full border border-slate-200 text-slate-700 focus:border-[#0078E2] focus:outline-none focus:ring-2 focus:ring-[#0078E2]/20`}
-          >
-            {CATEGORIES.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+          <Input
+            id="phone"
+            name="phone"
+            type="tel"
+            autoComplete="tel"
+            placeholder="+1 (555) 000-0000"
+            defaultValue={state.values?.phone}
+            aria-invalid={Boolean(errors.phone)}
+            aria-describedby={errors.phone ? 'phone-error' : undefined}
+            className={`${fieldClass} ${errors.phone ? 'border-red-400 focus:border-red-500 focus:ring-red-500/20' : ''}`}
+          />
+          {errors.phone && (
+            <p id="phone-error" className="mt-1.5 text-xs text-red-600">
+              {errors.phone}
+            </p>
+          )}
         </div>
+      </div>
+
+      <div>
+        <label htmlFor="category" className="mb-1.5 block text-sm font-medium text-slate-700">
+          Topic <span className="text-red-600">*</span>
+        </label>
+        <select
+          id="category"
+          name="category"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          className={`${fieldClass} w-full border border-slate-200 text-slate-700 focus:border-[#0078E2] focus:outline-none focus:ring-2 focus:ring-[#0078E2]/20`}
+        >
+          {CATEGORIES.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div>

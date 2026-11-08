@@ -3,6 +3,9 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+vi.mock('next/navigation', () => ({
+  usePathname: vi.fn().mockReturnValue('/'),
+}));
 vi.mock('next/headers', () => ({
   headers: () => new Headers(),
 }));
