@@ -24,7 +24,7 @@ const FOOTER_SECTIONS = [
     links: [
       { label: 'Documentation', href: '/faq' },
       { label: 'API Reference', href: '/faq' },
-      { label: 'Services', href: '/services' },
+      { label: 'Knowledge Base', href: '/kb' },
       { label: 'Contact Us', href: '/contact' },
     ],
   },
