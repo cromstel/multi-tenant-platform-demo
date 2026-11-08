@@ -70,7 +70,7 @@ export function SubdomainForm({
       <Button
         type="submit"
         disabled={isPending}
-        className="h-12 w-full rounded-none bg-[#005cb3] text-base font-semibold text-white shadow-lg shadow-blue-600/25 transition-all hover:bg-[#004A94] active:scale-[0.99]"
+        className="h-12 w-full rounded-none bg-[#005cb3] text-base font-semibold text-white transition-all hover:bg-[#004A94] active:scale-[0.99]"
       >
         {isPending ? 'Creating…' : 'Create Subdomain'}
       </Button>

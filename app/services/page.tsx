@@ -186,7 +186,7 @@ export default function ServicesPage() {
                 <div className="flex flex-col items-center gap-6 sm:flex-row">
                   <Link
                     href="/auth/register"
-                    className="inline-flex items-center justify-center gap-2 rounded-none bg-[#005cb3] px-6 py-3.5 text-sm font-bold text-white shadow-xl shadow-blue-600/30 transition-all hover:bg-[#004A94] hover:shadow-blue-600/45 active:scale-[0.98]"
+                    className="inline-flex items-center justify-center gap-2 rounded-none bg-[#005cb3] px-6 py-3.5 text-sm font-bold text-white transition-all hover:bg-[#004A94] active:scale-[0.98]"
                   >
                     Start your free trial
                     <ArrowRight className="h-4 w-4" aria-hidden="true" />

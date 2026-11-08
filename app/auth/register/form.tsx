@@ -120,7 +120,7 @@ export function TenantRegisterForm({
         <Button
           type="submit"
           disabled={isPending || !complete}
-          className={`h-12 w-full rounded-none bg-[#005cb3] text-base font-semibold text-white shadow-lg shadow-blue-600/25 transition-all hover:bg-[#004A94] active:scale-[0.99] ${!complete ? 'opacity-40' : ''}`}
+          className={`h-12 w-full rounded-none bg-[#005cb3] text-base font-semibold text-white transition-all hover:bg-[#004A94] active:scale-[0.99] ${!complete ? 'opacity-40' : ''}`}
         >
           {isPending ? 'Creating…' : 'Create Tenant'}
         </Button>

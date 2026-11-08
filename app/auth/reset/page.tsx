@@ -56,7 +56,7 @@ export default async function PasswordResetPage() {
 
           <button
             type="submit"
-            className="w-full rounded-none bg-[#005cb3] px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-blue-600/25 transition-all hover:bg-[#004A94] active:scale-[0.98]"
+            className="w-full rounded-none bg-[#005cb3] px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-[#004A94] active:scale-[0.98]"
           >
             Send reset link
           </button>

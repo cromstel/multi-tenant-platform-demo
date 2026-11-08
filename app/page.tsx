@@ -199,7 +199,7 @@ export default function HomePage() {
                 <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                   <Link
                     href="/auth/register"
-                    className="inline-flex items-center justify-center gap-2 rounded-none bg-[#005cb3] px-6 py-3.5 text-sm font-bold text-white shadow-xl shadow-blue-600/30 transition-all hover:bg-[#004A94] hover:shadow-blue-600/45 active:scale-[0.98]"
+                    className="inline-flex items-center justify-center gap-2 rounded-none bg-[#005cb3] px-6 py-3.5 text-sm font-bold text-white transition-all hover:bg-[#004A94] active:scale-[0.98]"
                   >
                     Create your tenant
                     <ArrowRight className="h-4 w-4" aria-hidden="true" />
@@ -401,7 +401,7 @@ const rows = await db.query(
 
                 <Link
                   href="/auth/register"
-                  className="mt-8 inline-flex items-center gap-2 rounded-none bg-[#005cb3] px-5 py-3 text-sm font-bold text-white shadow-lg shadow-blue-600/25 transition-all hover:bg-[#004A94] active:scale-[0.98]"
+                  className="mt-8 inline-flex items-center gap-2 rounded-none bg-[#005cb3] px-5 py-3 text-sm font-bold text-white transition-all hover:bg-[#004A94] active:scale-[0.98]"
                 >
                   Create a tenant workspace
                   <ArrowRight className="h-4 w-4" aria-hidden="true" />
@@ -495,7 +495,7 @@ const rows = await db.query(
             <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
               <Link
                 href="/auth/register"
-                className="inline-flex items-center justify-center gap-2 rounded-none bg-[#005cb3] px-6 py-3.5 text-sm font-bold text-white shadow-xl shadow-blue-600/30 transition-all hover:bg-[#004A94] active:scale-[0.98]"
+                className="inline-flex items-center justify-center gap-2 rounded-none bg-[#005cb3] px-6 py-3.5 text-sm font-bold text-white transition-all hover:bg-[#004A94] active:scale-[0.98]"
               >
                 Create your tenant
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />

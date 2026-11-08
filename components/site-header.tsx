@@ -98,7 +98,7 @@ export function SiteHeader() {
           </Link>
           <Link
             href="/auth/register"
-            className="inline-flex items-center gap-1.5 rounded-none bg-[#005cb3] px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-blue-600/25 transition-all hover:bg-[#004A94] hover:shadow-blue-600/35 active:scale-[0.98]"
+            className="inline-flex items-center gap-1.5 rounded-none bg-[#005cb3] px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-[#004A94] active:scale-[0.98]"
           >
             Get Started
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
@@ -153,7 +153,7 @@ export function SiteHeader() {
               <Link
                 href="/auth/register"
                 onClick={() => setMobileOpen(false)}
-                className="rounded-none bg-[#005cb3] px-4 py-2.5 text-center text-sm font-semibold text-white shadow-lg shadow-blue-600/25 transition-colors hover:bg-[#004A94]"
+                className="rounded-none bg-[#005cb3] px-4 py-2.5 text-center text-sm font-semibold text-white transition-colors hover:bg-[#004A94]"
               >
                 Get Started
               </Link>

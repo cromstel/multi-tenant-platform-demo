@@ -42,7 +42,7 @@ export function ContactForm() {
         </p>
         <Link
           href="/"
-          className="mt-6 inline-flex items-center gap-2 rounded-none bg-[#005cb3] px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-blue-600/25 transition-all hover:bg-[#004A94] active:scale-[0.98]"
+          className="mt-6 inline-flex items-center gap-2 rounded-none bg-[#005cb3] px-5 py-2.5 text-sm font-bold text-white transition-all hover:bg-[#004A94] active:scale-[0.98]"
         >
           Back to the platform
         </Link>
@@ -221,7 +221,7 @@ export function ContactForm() {
       <Button
         type="submit"
         disabled={isPending}
-        className="h-12 w-full rounded-none bg-[#005cb3] text-base font-bold text-white shadow-lg shadow-blue-600/25 transition-all hover:bg-[#004A94] active:scale-[0.99] disabled:opacity-60"
+        className="h-12 w-full rounded-none bg-[#005cb3] text-base font-bold text-white transition-all hover:bg-[#004A94] active:scale-[0.99] disabled:opacity-60"
       >
         {isPending ? 'Sending…' : 'Send message'}
       </Button>
