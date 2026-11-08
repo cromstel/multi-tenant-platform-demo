@@ -15,6 +15,9 @@
  *   node --experimental-strip-types scripts/seed-docs.ts
  */
 
+import dotenv from 'dotenv';
+dotenv.config({ path: '.env.local' });
+
 import { getMySQLPool } from '@/lib/db/mysql';
 
 type Role = 'owner' | 'admin' | 'member';

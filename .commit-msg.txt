@@ -1,0 +1,36 @@
+Enhance knowledge base with rich documentation content
+
+Expand scripts/seed-docs.ts with rich, HTML-formatted documentation for all
+roles (owner, admin, member):
+
+Owner (5 sections):
+- Getting Started — workspace overview, first steps, key concepts table
+- Tenant Isolation — subdomain routing, data scoping, session binding
+- Billing & Usage — metrics table, invoices, payment methods, quotas
+- Member Management — roles table, invite flow, role changes, suspension
+- Branding & Customization — emoji, subdomain rules, where branding appears
+
+Admin (6 sections):
+- Security & Sessions — session architecture, revocation, brute-force
+- API Reference — auth methods, endpoint table, response envelope, rate limits
+- Content Moderation — enquiry categories, moderation workflow, retention
+- User Management — creating users, role changes, suspension, removal
+- Rate Limiting — how limits work, endpoint table, exceeded responses
+- Tenant Management — creating, listing, deleting tenants
+
+Member (5 sections):
+- Getting Started — dashboard, capabilities, sign-in
+- Profile Settings — editable fields, password change, requirements
+- Support Requests — what to include, categories, response times
+- Tenant Overview — what is a tenant, subdomain, workspace boundaries
+- Password & Security — requirements, change flow, forgotten password,
+  security best practices, platform security features
+
+Each section uses semantic HTML (h2, h3, lists, code blocks, callout
+boxes, tables) for rich rendering in the knowledge base UI.
+
+Verification:
+- pnpm check: clean
+- pnpm test: 198/198 passed
+- pnpm build: clean, all 26 routes including /kb
+- npx playwright test: 8/8 passed
