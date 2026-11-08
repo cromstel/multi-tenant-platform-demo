@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Menu, X, ChevronDown, ArrowRight } from 'lucide-react';
+import { Menu, X, ArrowRight } from 'lucide-react';
 
 const NAV_LINKS = [
   { label: 'Home', href: '/' },
@@ -12,15 +12,8 @@ const NAV_LINKS = [
   { label: 'Contact', href: '/contact' },
 ];
 
-const PRODUCT_LINKS = [
-  { label: 'Create Tenant', href: '/auth/register' },
-  { label: 'Tenant Sign In', href: '/auth/login' },
-  { label: 'Documentation', href: '/faq' },
-];
-
 export function SiteHeader() {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [productsOpen, setProductsOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200/70 bg-white/85 backdrop-blur-xl">
@@ -55,37 +48,7 @@ export function SiteHeader() {
             </a>
           ))}
 
-          <div
-            className="relative"
-            onMouseEnter={() => setProductsOpen(true)}
-            onMouseLeave={() => setProductsOpen(false)}
-          >
-            <button
-              type="button"
-              className="flex items-center gap-1 rounded-none px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
-              aria-expanded={productsOpen}
-              aria-haspopup="true"
-              onClick={() => setProductsOpen((v) => !v)}
-            >
-              Product
-              <ChevronDown className={`h-4 w-4 transition-transform ${productsOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
-            </button>
-            {productsOpen && (
-              <div className="absolute left-0 top-full w-60 pt-2">
-                <div className="overflow-hidden rounded-none border border-slate-200 bg-white p-2 shadow-xl shadow-slate-900/5">
-                  {PRODUCT_LINKS.map((link) => (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      className="block rounded-none px-3 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 hover:text-[#005cb3]"
-                    >
-                      {link.label}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
+
         </nav>
 
         {/* Actions */}
@@ -132,16 +95,6 @@ export function SiteHeader() {
               </a>
             ))}
             <div className="my-3 h-px bg-slate-200" />
-            {PRODUCT_LINKS.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setMobileOpen(false)}
-                className="block rounded-none px-3 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 hover:text-[#005cb3]"
-              >
-                {link.label}
-              </Link>
-            ))}
             <div className="mt-4 flex flex-col gap-2">
               <Link
                 href="/auth/login"
