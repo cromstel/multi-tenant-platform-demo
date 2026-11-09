@@ -169,7 +169,7 @@ export default function ServicesPage() {
                     </ul>
                     <Link
                       href={service.href}
-                      className="mt-5 inline-flex items-center gap-2 rounded-none bg-[#005cb3] px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-blue-600/25 transition-all hover:bg-[#004A94] active:scale-[0.98]"
+                      className="mt-5 inline-flex items-center gap-2 rounded-6 bg-[#005cb3] px-4 py-2 text-sm font-bold text-white shadow-lg shadow-blue-600/25 transition-all hover:bg-[#004A94] active:scale-[0.98]"
                     >
                       Read more
                       <ArrowRight className="h-4 w-4" aria-hidden="true" />
