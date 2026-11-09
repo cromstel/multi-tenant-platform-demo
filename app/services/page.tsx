@@ -148,7 +148,7 @@ export default function ServicesPage() {
                 {SERVICES.map((service) => (
                   <div
                     key={service.title}
-                    className="rounded-none border border-slate-200 bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
+                    className="rounded-none border border-slate-200 bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg flex flex-col h-full"
                   >
                     <div className="flex h-11 w-11 items-center justify-center rounded-none bg-gradient-to-br from-[#0078E2] to-[#5B9CF5] text-white shadow-lg transition-transform duration-300 group-hover:scale-105">
                       <service.icon className="h-6 w-6" aria-hidden="true" />
@@ -159,7 +159,7 @@ export default function ServicesPage() {
                     <p className="mt-2 text-sm leading-relaxed text-slate-600">
                       {service.description}
                     </p>
-                    <ul className="mt-5 space-y-2.5">
+                    <ul className="mt-5 space-y-2.5 flex-1">
                       {service.points.map((point) => (
                         <li key={point} className="flex items-start gap-2.5">
                           <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" aria-hidden="true" />
