@@ -184,10 +184,10 @@ export default function ServicesPage() {
             <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
               <div className="text-center">
                 <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
-                  Why choose our services
+                  Built for Multi-Tenant Success
                 </h2>
                 <p className="mt-4 text-base leading-relaxed text-slate-600 sm:text-lg">
-                  We build more than just a platform - we provide the complete service ecosystem for multi-tenant success. Our services are designed to work seamlessly together, with consistent security, reliability, and performance across all tenant boundaries.
+                  CITGROUP TENANCY SYSTEM provides comprehensive services that power every aspect of your multi-tenant platform. From instant provisioning to ongoing management, we handle the infrastructure so you can focus on your customers.
                 </p>
               </div>
             </div>
@@ -212,7 +212,7 @@ export default function ServicesPage() {
                     <ArrowRight className="h-4 w-4" aria-hidden="true" />
                   </Link>
                 </div>
-                <p className="mt-8 text-xs text-slate-600">
+                <p className="mt-10 text-sm text-slate-700">
                   Serving from {rootDomain} · Built and operated by CITGROUP
                 </p>
               </div>
