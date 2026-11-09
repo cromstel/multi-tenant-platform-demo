@@ -39,6 +39,7 @@ const SERVICES = [
     icon: Server,
     title: 'Provisioning API',
     description: 'RESTful API for programmatic tenant creation and management through a single endpoint.',
+    href: '/services/provisioning',
     points: [
       'Instant subdomain creation',
       'Automatic storage allocation',
@@ -50,6 +51,7 @@ const SERVICES = [
     icon: ShieldCheck,
     title: 'Tenant Management',
     description: 'Comprehensive dashboard for monitoring and controlling all tenant environments.',
+    href: '/services/tenant-management',
     points: [
       'Real-time usage analytics',
       'Resource monitoring',
@@ -61,6 +63,7 @@ const SERVICES = [
     icon: Database,
     title: 'Data Isolation',
     description: 'Guaranteed data boundaries with MySQL-backed relational storage and strict tenant scoping.',
+    href: '/services/data-isolation',
     points: [
       'Foreign key enforced boundaries',
       'Automatic tenant scoping',
@@ -72,6 +75,7 @@ const SERVICES = [
     icon: Gauge,
     title: 'Monitoring & Alerts',
     description: 'Real-time system health monitoring with customizable alert thresholds.',
+    href: '/services/monitoring',
     points: [
       'Dashboard for all tenants',
       'Performance metrics',
@@ -83,6 +87,7 @@ const SERVICES = [
     icon: Users,
     title: 'User Management',
     description: 'Role-based access control for tenant administrators and end users.',
+    href: '/services/user-management',
     points: [
       'Granular permission sets',
       'Session management',
@@ -94,6 +99,7 @@ const SERVICES = [
     icon: Workflow,
     title: 'Automation & Integrations',
     description: 'Webhooks and event-driven workflows for custom tenant experiences.',
+    href: '/services/automation',
     points: [
       'Event-driven notifications',
       'Custom workflow triggers',
@@ -161,6 +167,13 @@ export default function ServicesPage() {
                         </li>
                       ))}
                     </ul>
+                    <Link
+                      href={service.href}
+                      className="mt-5 inline-flex items-center gap-2 rounded-none bg-[#005cb3] px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-blue-600/25 transition-all hover:bg-[#004A94] active:scale-[0.98]"
+                    >
+                      Read more
+                      <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                    </Link>
                   </div>
                 ))}
               </div>
