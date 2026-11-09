@@ -212,7 +212,7 @@ export default function ServicesPage() {
                     <ArrowRight className="h-4 w-4" aria-hidden="true" />
                   </Link>
                 </div>
-                <p className="mt-8 text-xs text-blue-200/75">
+                <p className="mt-8 text-xs text-slate-600">
                   Serving from {rootDomain} · Built and operated by CITGROUP
                 </p>
               </div>
