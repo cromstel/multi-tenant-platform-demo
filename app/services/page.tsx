@@ -196,7 +196,7 @@ export default function ServicesPage() {
           <section className="py-20 sm:py-24">
             <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
               <div className="text-center">
-                <div className="flex flex-col items-center gap-6 sm:flex-row">
+                <div className="flex flex-col items-center sm:justify-center gap-6 sm:flex-row">
                   <Link
                     href="/auth/register"
                     className="inline-flex items-center justify-center gap-2 rounded-none bg-[#005cb3] px-6 py-3.5 text-sm font-bold text-white transition-all hover:bg-[#004A94] active:scale-[0.98]"
