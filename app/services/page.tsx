@@ -189,6 +189,13 @@ export default function ServicesPage() {
                 <p className="mt-4 text-base leading-relaxed text-slate-600 sm:text-lg">
                   CITGROUP TENANCY SYSTEM provides comprehensive services that power every aspect of your multi-tenant platform. From instant provisioning to ongoing management, we handle the infrastructure so you can focus on your customers.
                 </p>
+                <Link
+                  href="/auth/register"
+                  className="mt-5 inline-flex items-center justify-center gap-2 rounded-none bg-[#005cb3] px-6 py-3.5 text-sm font-bold text-white shadow-xl shadow-blue-600/25 transition-all hover:bg-[#004A94] active:scale-[0.98]"
+                >
+                  Start for free
+                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                </Link>
               </div>
             </div>
           </section>
