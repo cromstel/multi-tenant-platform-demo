@@ -13,7 +13,6 @@ import {
 import { SiteHeader } from '@/components/site-header';
 import { SiteFooter } from '@/components/site-footer';
 import { ScrollProgress } from '@/components/scroll-progress';
-import { rootDomain } from '@/lib/utils';
 import {
   pageMetadata,
   structuredData,
@@ -196,32 +195,6 @@ export default function ServicesPage() {
                   Start for free
                   <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </Link>
-              </div>
-            </div>
-          </section>
-
-          <section className="py-20 sm:py-24">
-            <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
-              <div className="text-center">
-                <div className="flex flex-col items-center sm:justify-center gap-6 sm:flex-row">
-                  <Link
-                    href="/auth/register"
-                    className="inline-flex items-center justify-center gap-2 rounded-none bg-[#005cb3] px-6 py-3.5 text-sm font-bold text-white transition-all hover:bg-[#004A94] active:scale-[0.98]"
-                  >
-                    Start your free trial
-                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                  </Link>
-                  <Link
-                    href="/contact"
-                    className="inline-flex items-center justify-center border border-white/20 bg-white/5 px-6 py-3.5 text-sm font-bold text-white backdrop-blur-sm transition-all hover:border-white/35 hover:bg-white/10"
-                  >
-                    Talk to sales
-                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                  </Link>
-                </div>
-                <p className="mt-10 text-sm text-slate-700">
-                  Serving from {rootDomain} · Built and operated by CITGROUP
-                </p>
               </div>
             </div>
           </section>
