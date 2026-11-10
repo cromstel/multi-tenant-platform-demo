@@ -45,12 +45,6 @@ export default async function AdminLoginPage() {
           Protected by two independent authorization checks
         </p>
       </div>
-
-      <p className="mt-4 text-center">
-        <Link href="/" className="text-sm font-medium text-blue-200/75 transition-colors hover:text-white">
-          ← Back to System
-        </Link>
-      </p>
     </div>
   );
 }
