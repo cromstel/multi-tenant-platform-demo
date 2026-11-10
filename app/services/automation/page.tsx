@@ -1,10 +1,8 @@
-import Link from 'next/link';
 import type { Metadata } from 'next';
-import { ArrowRight, Workflow, Server, ShieldCheck, Mail } from 'lucide-react';
+import { Workflow, Server, ShieldCheck, Mail } from 'lucide-react';
 import { SiteHeader } from '@/components/site-header';
 import { SiteFooter } from '@/components/site-footer';
 import { ScrollProgress } from '@/components/scroll-progress';
-import { rootDomain } from '@/lib/utils';
 import { pageMetadata, structuredData, organizationSchema, softwareApplicationSchema } from '@/lib/seo';
 
 export const metadata: Metadata = pageMetadata({
@@ -156,32 +154,6 @@ export default function AutomationPage() {
                   </tr>
                 </tbody>
               </table>
-            </div>
-          </div>
-        </section>
-
-        <section className="py-20 sm:py-24">
-          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
-            <div className="text-center">
-              <div className="flex flex-col items-center gap-6 sm:flex-row">
-                <Link
-                  href="/auth/register"
-                  className="inline-flex items-center justify-center gap-2 rounded-none bg-[#005cb3] px-6 py-3.5 text-sm font-bold text-white shadow-xl shadow-blue-600/30 transition-all hover:bg-[#004A94] active:scale-[0.98]"
-                >
-                  Start your free trial
-                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                </Link>
-                <Link
-                  href="/contact"
-                  className="inline-flex items-center justify-center border border-white/20 bg-white/5 px-6 py-3.5 text-sm font-bold text-white backdrop-blur-sm transition-all hover:border-white/35 hover:bg-white/10"
-                >
-                  Talk to sales
-                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                </Link>
-              </div>
-              <p className="mt-8 text-xs text-blue-200/75">
-                Serving from {rootDomain} · Built and operated by CITGROUP
-              </p>
             </div>
           </div>
         </section>
