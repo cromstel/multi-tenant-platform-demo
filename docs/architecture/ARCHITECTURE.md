@@ -288,6 +288,12 @@ internal paths only).
 `Referrer-Policy: strict-origin-when-cross-origin`, and a restrictive
 `Permissions-Policy`. `poweredByHeader` is disabled.
 
+The policy allowlists no third-party script origin, so the app loads no
+third-party scripts at all. Vercel Speed Insights was removed from the root
+layout for exactly this reason — its script origin was blocked by
+`script-src`. Any future analytics integration must add its origins to
+`script-src`, `connect-src` and `img-src` in the same change that mounts it.
+
 **Cookies.** Session cookies are `httpOnly`, `SameSite=lax`, and `secure` in
 production, with `path: "/"` and an explicit `maxAge`.
 

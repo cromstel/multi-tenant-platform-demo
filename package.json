@@ -20,7 +20,6 @@
     "@radix-ui/react-tooltip": "^1.4.1",
     "@upstash/redis": "^1.39.0",
     "@vercel/analytics": "^2.0.1",
-    "@vercel/speed-insights": "^2.0.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dotenv": "^18.0.9",
@@ -60,7 +59,6 @@
   "pnpm": {
     "onlyBuiltDependencies": [
       "@tailwindcss/oxide",
-      "@vercel/speed-insights",
       "sharp",
       "unrs-resolver"
     ],

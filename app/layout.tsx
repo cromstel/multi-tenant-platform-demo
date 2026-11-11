@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from 'next';
 
-import { SpeedInsights } from '@vercel/speed-insights/next';
 import './globals.css';
 import { siteUrl, SITE_NAME, SITE_DESCRIPTION, BRAND_COLOR } from '@/lib/seo';
 import FloatingBar from '@/components/floating-bar';
@@ -92,7 +91,6 @@ export default function RootLayout({
         {children}
         <FloatingBar />
         <SAMWidget />
-        <SpeedInsights />
       </body>
     </html>
   );

@@ -216,6 +216,7 @@ Additional security posture (per `SECURITY.md`):
 - Tenant isolation via schema: `tenants.subdomain` UNIQUE, FKs with `ON DELETE CASCADE`.
 - Production fails fast without durable store (`lib/redis.ts`, build-exempt).
 - Strict CSP, HSTS, `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy`, `Permissions-Policy` in `next.config.ts`.
+- No third-party scripts are loaded; the CSP allowlists no external script origin, so Speed Insights was removed rather than allowlisted.
 - `pnpm audit`: 0 critical, 1 high (`braces`, no published fix; lint-time devDependency only).
 
 **Known open limitations (unchecked in `SECURITY.md` hardening checklist):**

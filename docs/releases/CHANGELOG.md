@@ -41,4 +41,5 @@ All notable changes to this project will be documented in this file.
 - Zod validation, unified delete/bulk-delete/safeEqual/index, SAM LLM hardening (SEC-004 + DEV-001 to DEV-005) (f34b05b)
 
 ### Removed
-- None.
+- Vercel Speed Insights (`<SpeedInsights />`) from the root layout — its script origin (`va.vercel-scripts.com`) was blocked by the strict CSP's default-deny `script-src`
+- "Back to System" link from the admin dashboard header, matching the login pages

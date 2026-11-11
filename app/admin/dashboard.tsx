@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useActionState } from 'react';
-import Link from 'next/link';
 import {
   Trash2,
   Loader2,
@@ -135,12 +134,6 @@ function DashboardHeader({ stats }: { stats: Stats }) {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Link
-            href="/"
-            className="rounded-none px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
-          >
-            Back to System
-          </Link>
           <form action={logoutAction}>
             <Button type="submit" variant="outline" size="sm">
               Sign out
