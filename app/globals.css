@@ -138,6 +138,42 @@
   background-color: hsl(var(--muted-foreground) / 0.5);
 }
 
+/*
+ * Knowledge-base article bodies.
+ *
+ * The body is admin-authored HTML stored in `docs_sections.body` and rendered
+ * with `dangerouslySetInnerHTML`, so its width is not known at build time. A
+ * long code line or a wide table therefore used to widen the whole page: the
+ * grid track inherited the content's min-content width and pushed the
+ * document past the viewport.
+ *
+ * `overflow-wrap: anywhere` (rather than `break-word`) is deliberate — it is
+ * the only value that also lowers the element's intrinsic min-content width,
+ * so the grid track can shrink no matter what an admin pastes in. The
+ * alternative, a horizontally scrollable block, would need `tabindex="0"` to
+ * stay keyboard-accessible (WCAG 2.1.1), which the injected markup cannot
+ * carry.
+ */
+.kb-prose {
+  overflow-wrap: anywhere;
+}
+
+.kb-prose pre {
+  max-width: 100%;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.kb-prose table {
+  max-width: 100%;
+  table-layout: auto;
+}
+
+.kb-prose table td,
+.kb-prose table th {
+  overflow-wrap: anywhere;
+}
+
 .emoji-picker-container .epr-category-nav {
   padding: 8px 0;
 }

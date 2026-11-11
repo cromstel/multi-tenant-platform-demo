@@ -359,7 +359,11 @@ export function SearchableSectionList({
       <button
         className="lg:hidden mb-6 inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 transition-colors"
         onClick={() => setMobileDrawerOpen(true)}
-        aria-label="Open navigation"
+        // The accessible name has to contain the visible "Sections" text
+        // (WCAG 2.5.3 Label in Name), so it extends the label rather than
+        // replacing it.
+        aria-label="Open Sections navigation"
+        aria-expanded={mobileDrawerOpen}
       >
         <LayoutDashboard className="h-4 w-4" aria-hidden="true" />
         Sections
@@ -380,8 +384,10 @@ export function SearchableSectionList({
           </div>
         </aside>
 
-        {/* Section cards (content area). */}
-        <div className="xl:col-span-8">
+        {/* Section cards (content area). `min-w-0` lets the grid track shrink
+            below the content's intrinsic width — without it the track is
+            sized by the widest article and the page overflows sideways. */}
+        <div className="xl:col-span-8 min-w-0">
           {grouped.map(([role, roleSections]) => (
             <section
               key={role}
@@ -431,7 +437,7 @@ export function SearchableSectionList({
                         {section.title}
                       </h3>
                       <div
-                        className="prose prose-sm prose-slate max-w-none text-slate-700 leading-relaxed mb-4"
+                        className="kb-prose prose prose-sm prose-slate max-w-none text-slate-700 leading-relaxed mb-4"
                         dangerouslySetInnerHTML={{ __html: section.body }}
                       />
                       <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
