@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { SiteHeader } from '@/components/site-header';
 import { SiteFooter } from '@/components/site-footer';
 import { ScrollProgress } from '@/components/scroll-progress';
+import { HeroBanner } from '@/components/hero-banner';
 import { SubdomainForm } from './subdomain-form';
 import { rootDomain, protocol } from '@/lib/utils';
 import { createSubdomainAction } from './actions';
@@ -171,99 +172,91 @@ export default function HomePage() {
 
       <main className="flex-1">
         {/* ───────────── Hero ───────────── */}
-        <section className="relative overflow-hidden bg-[#0c2238]">
-          <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-            <div className="absolute -top-40 left-1/4 h-[560px] w-[560px] rounded-full bg-[#0078E2]/25 blur-[100px]" />
-            <div className="absolute -right-32 top-40 h-[420px] w-[420px] rounded-full bg-[#0078E2]/15 blur-[90px]" />
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:56px_56px]" />
-          </div>
+        <HeroBanner>
+          <div className="grid items-center gap-14 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]">
+            {/* Copy */}
+            <div>
+              <h1 className="mt-6 text-4xl font-extrabold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-6xl">
+                One platform.
+                <br />
+                <span className="bg-gradient-to-r from-[#0078E2] to-[#4da6ff] bg-clip-text text-transparent">
+                  Every tenant isolated.
+                </span>
+              </h1>
 
-          <div className="relative w-full px-4 py-20 sm:px-6 sm:py-28 lg:px-8 xl:px-12">
-            <div className="grid items-center gap-14 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]">
-              {/* Copy */}
-              <div>
-                <h1 className="mt-6 text-4xl font-extrabold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-6xl">
-                  One platform.
-                  <br />
-                  <span className="bg-gradient-to-r from-[#0078E2] to-[#4da6ff] bg-clip-text text-transparent">
-                    Every tenant isolated.
-                  </span>
-                </h1>
+              <p className="mt-6 max-w-xl text-base leading-relaxed text-blue-100/70 sm:text-lg">
+                CITGROUP TENANCY SYSTEM gives every customer a dedicated subdomain, isolated data,
+                and an independent workspace — all from a single deployment. Provision in seconds,
+                scale without surprises.
+              </p>
 
-                <p className="mt-6 max-w-xl text-base leading-relaxed text-blue-100/70 sm:text-lg">
-                  CITGROUP TENANCY SYSTEM gives every customer a dedicated subdomain, isolated data,
-                  and an independent workspace — all from a single deployment. Provision in seconds,
-                  scale without surprises.
-                </p>
-
-                <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                  <Link
-                    href="/auth/register"
-                    className="inline-flex items-center justify-center gap-2 rounded-none bg-[#005cb3] px-6 py-3.5 text-sm font-bold text-white transition-all hover:bg-[#004A94] active:scale-[0.98]"
-                  >
-                    Create your tenant
-                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                  </Link>
-                  <Link
-                    href="/auth/login"
-                    className="inline-flex items-center justify-center gap-2 rounded-none border border-white/30 bg-white/10 px-6 py-3.5 text-sm font-bold text-white backdrop-blur-sm transition-all hover:border-white/40 hover:bg-white/20"
-                  >
-                    Sign in to your tenant
-                  </Link>
-                </div>
-
-                <dl className="mt-12 grid grid-cols-2 gap-x-6 gap-y-6 sm:grid-cols-4">
-                  {STATS.map((stat) => (
-                    <div key={stat.label}>
-                      <dt className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
-                        {stat.value}
-                      </dt>
-                      <dd className="mt-1 text-xs font-medium uppercase tracking-wide text-blue-200/75">
-                        {stat.label}
-                      </dd>
-                    </div>
-                  ))}
-                </dl>
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                <Link
+                  href="/auth/register"
+                  className="inline-flex items-center justify-center gap-2 rounded-none bg-[#005cb3] px-6 py-3.5 text-sm font-bold text-white transition-all hover:bg-[#004A94] active:scale-[0.98]"
+                >
+                  Create your tenant
+                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                </Link>
+                <Link
+                  href="/auth/login"
+                  className="inline-flex items-center justify-center gap-2 rounded-none border border-white/30 bg-white/10 px-6 py-3.5 text-sm font-bold text-white backdrop-blur-sm transition-all hover:border-white/40 hover:bg-white/20"
+                >
+                  Sign in to your tenant
+                </Link>
               </div>
 
-              {/* Provisioning card */}
-              <div className="relative">
-                <div
-                  className="pointer-events-none absolute -inset-4 rounded-none bg-gradient-to-tr from-[#0078E2]/25 to-transparent blur-2xl"
-                  aria-hidden="true"
-                />
-                <div className="relative rounded-none border border-white/12 bg-white/[0.07] p-6 shadow-2xl shadow-black/30 backdrop-blur-xl sm:p-8">
-                  <div className="mb-5 flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-bold text-white">Provision a tenant</p>
-                      <p className="mt-0.5 text-xs text-blue-200/75">
-                        Live in under ten seconds
-                      </p>
-                    </div>
-                    <span className="rounded-none border border-white/15 bg-white/5 px-2.5 py-1 font-mono text-[10px] font-semibold text-blue-200/70">
-                      POST /tenants
-                    </span>
+              <dl className="mt-12 grid grid-cols-2 gap-x-6 gap-y-6 sm:grid-cols-4">
+                {STATS.map((stat) => (
+                  <div key={stat.label}>
+                    <dt className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
+                      {stat.value}
+                    </dt>
+                    <dd className="mt-1 text-xs font-medium uppercase tracking-wide text-blue-200/75">
+                      {stat.label}
+                    </dd>
                   </div>
+                ))}
+              </dl>
+            </div>
 
-                  <div className="rounded-none bg-white p-5 shadow-lg">
-                    <SubdomainForm action={createSubdomainAction} />
+            {/* Provisioning card */}
+            <div className="relative">
+              <div
+                className="pointer-events-none absolute -inset-4 rounded-none bg-gradient-to-tr from-[#0078E2]/25 to-transparent blur-2xl"
+                aria-hidden="true"
+              />
+              <div className="relative rounded-none border border-white/12 bg-white/[0.07] p-6 shadow-2xl shadow-black/30 backdrop-blur-xl sm:p-8">
+                <div className="mb-5 flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-bold text-white">Provision a tenant</p>
+                    <p className="mt-0.5 text-xs text-blue-200/75">
+                      Live in under ten seconds
+                    </p>
                   </div>
+                  <span className="rounded-none border border-white/15 bg-white/5 px-2.5 py-1 font-mono text-[10px] font-semibold text-blue-200/70">
+                    POST /tenants
+                  </span>
+                </div>
 
-                  <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-blue-200/75">
-                    <span className="inline-flex items-center gap-1.5">
-                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" aria-hidden="true" />
-                      Auto-provisioned storage
-                    </span>
-                    <span className="inline-flex items-center gap-1.5">
-                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" aria-hidden="true" />
-                      Isolated by default
-                    </span>
-                  </div>
+                <div className="rounded-none bg-white p-5 shadow-lg">
+                  <SubdomainForm action={createSubdomainAction} />
+                </div>
+
+                <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-blue-200/75">
+                  <span className="inline-flex items-center gap-1.5">
+                    <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" aria-hidden="true" />
+                    Auto-provisioned storage
+                  </span>
+                  <span className="inline-flex items-center gap-1.5">
+                    <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" aria-hidden="true" />
+                    Isolated by default
+                  </span>
                 </div>
               </div>
             </div>
           </div>
-        </section>
+        </HeroBanner>
 
         {/* ───────────── Platform ───────────── */}
         <section id="platform" className="scroll-mt-20 bg-white py-20 sm:py-24">

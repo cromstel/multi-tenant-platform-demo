@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Users, ShieldCheck, Mail, Clock } from 'lucide-react';
+import { HeroBanner } from '@/components/hero-banner';
 import { SiteHeader } from '@/components/site-header';
 import { SiteFooter } from '@/components/site-footer';
 import { ScrollProgress } from '@/components/scroll-progress';
@@ -63,22 +64,20 @@ export default function UserManagementPage() {
       <ScrollProgress />
 
       <main className="flex-1">
-        <section className="py-20 sm:py-24">
-          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
-            <div className="text-center">
-              <span className="inline-block text-xs font-bold uppercase tracking-[0.15em] text-[#005cb3]">
-                User Management
-              </span>
-              <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
-                Role-Based Access Control
-              </h2>
-              <p className="mt-6 text-base leading-relaxed text-slate-600 sm:text-lg">
-                Manage tenant administrators and end users with granular permission sets. Control
-                exactly what each user can see and do within your workspace.
-              </p>
-            </div>
+        <HeroBanner>
+          <div className="mx-auto max-w-3xl text-center">
+            <span className="inline-block text-xs font-bold uppercase tracking-[0.15em] text-blue-200">
+              User Management
+            </span>
+            <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+              Role-Based Access Control
+            </h2>
+            <p className="mt-6 text-base leading-relaxed text-blue-100/80 sm:text-lg">
+              Manage tenant administrators and end users with granular permission sets. Control
+              exactly what each user can see and do within your workspace.
+            </p>
           </div>
-        </section>
+        </HeroBanner>
 
         <section className="py-20 sm:py-24">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">

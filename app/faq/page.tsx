@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowRight, BookOpen, ShieldCheck, Server, Users, LifeBuoy } from 'lucide-react';
 
+import { HeroBanner } from '@/components/hero-banner';
 import { SiteHeader } from '@/components/site-header';
 import { SiteFooter } from '@/components/site-footer';
 import { ScrollProgress } from '@/components/scroll-progress';
@@ -176,60 +177,52 @@ export default function FaqPage() {
 
       <main className="flex-1">
         {/* Hero banner */}
-        <section className="relative overflow-hidden bg-[#0c2238]">
-          <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-            <div className="absolute -top-40 left-1/4 h-[560px] w-[560px] rounded-full bg-[#0078E2]/25 blur-[100px]" />
-            <div className="absolute -right-32 top-24 h-[420px] w-[420px] rounded-full bg-blue-400/15 blur-[90px]" />
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:56px_56px]" />
-          </div>
+        <HeroBanner>
+          <h1 className="mt-0 max-w-4xl text-4xl font-extrabold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-6xl">
+            Frequently asked{' '}
+            <span className="bg-gradient-to-r from-[#4A9DFF] to-[#7DD3FC] bg-clip-text text-transparent">
+              questions
+            </span>
+          </h1>
 
-          <div className="relative w-full px-4 py-16 sm:px-6 sm:py-24 lg:px-8 xl:px-12">
-            <h1 className="mt-0 max-w-4xl text-4xl font-extrabold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-6xl">
-                Frequently asked{' '}
-                <span className="bg-gradient-to-r from-[#4A9DFF] to-[#7DD3FC] bg-clip-text text-transparent">
-                  questions
-                </span>
-              </h1>
+          <p className="mt-6 max-w-2xl text-base leading-relaxed text-blue-100/70 sm:text-lg">
+            How tenants are created, how their data stays separate, how sign-in is protected and
+            what the platform runs on. If something is still unclear, the contact form reaches a
+            person.
+          </p>
 
-              <p className="mt-6 max-w-2xl text-base leading-relaxed text-blue-100/70 sm:text-lg">
-                How tenants are created, how their data stays separate, how sign-in is protected and
-                what the platform runs on. If something is still unclear, the contact form reaches a
-                person.
-              </p>
+          {/* Jump links */}
+          <ul className="mt-9 flex flex-wrap gap-2">
+            {GROUPS.map((group) => (
+              <li key={group.id}>
+                <a
+                  href={`#${group.id}`}
+                  className="inline-flex items-center gap-1.5 border border-white/20 bg-white/5 px-3.5 py-2 text-xs font-semibold text-blue-100 backdrop-blur-sm transition-colors hover:border-white/40 hover:bg-white/10 hover:text-white"
+                >
+                  <group.icon className="h-3.5 w-3.5" aria-hidden="true" />
+                  {group.title}
+                </a>
+              </li>
+            ))}
+          </ul>
 
-              {/* Jump links */}
-              <ul className="mt-9 flex flex-wrap gap-2">
-                {GROUPS.map((group) => (
-                  <li key={group.id}>
-                    <a
-                      href={`#${group.id}`}
-                      className="inline-flex items-center gap-1.5 border border-white/20 bg-white/5 px-3.5 py-2 text-xs font-semibold text-blue-100 backdrop-blur-sm transition-colors hover:border-white/40 hover:bg-white/10 hover:text-white"
-                    >
-                      <group.icon className="h-3.5 w-3.5" aria-hidden="true" />
-                      {group.title}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-
-              <dl className="mt-12 grid grid-cols-2 gap-x-6 gap-y-6 sm:grid-cols-3">
-                {[
-                  { value: `${ALL_FAQS.length}`, label: 'Answered questions' },
-                  { value: `${GROUPS.length}`, label: 'Topic areas' },
-                  { value: '24/7', label: 'Tenant availability' },
-                ].map((stat) => (
-                  <div key={stat.label}>
-                    <dt className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
-                      {stat.value}
-                    </dt>
-                    <dd className="mt-1 text-xs font-medium uppercase tracking-wide text-blue-200/75">
-                      {stat.label}
-                    </dd>
-                  </div>
-                ))}
-              </dl>
-          </div>
-        </section>
+          <dl className="mt-12 grid grid-cols-2 gap-x-6 gap-y-6 sm:grid-cols-3">
+            {[
+              { value: `${ALL_FAQS.length}`, label: 'Answered questions' },
+              { value: `${GROUPS.length}`, label: 'Topic areas' },
+              { value: '24/7', label: 'Tenant availability' },
+            ].map((stat) => (
+              <div key={stat.label}>
+                <dt className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
+                  {stat.value}
+                </dt>
+                <dd className="mt-1 text-xs font-medium uppercase tracking-wide text-blue-200/75">
+                  {stat.label}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </HeroBanner>
 
         {/* Groups */}
         <div className="grid w-full items-start gap-10 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-2 lg:gap-12 lg:px-8 xl:px-12">

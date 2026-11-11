@@ -10,6 +10,7 @@ import {
   Users,
   Workflow,
 } from 'lucide-react';
+import { HeroBanner } from '@/components/hero-banner';
 import { SiteHeader } from '@/components/site-header';
 import { SiteFooter } from '@/components/site-footer';
 import { ScrollProgress } from '@/components/scroll-progress';
@@ -125,21 +126,19 @@ export default function ServicesPage() {
       <ScrollProgress />
 
       <main className="flex-1">
-        <section className="py-20 sm:py-24">
-          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
-            <div className="text-center">
-              <span className="inline-block text-xs font-bold uppercase tracking-[0.15em] text-[#005cb3]">
-                Services
-              </span>
-              <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
-                Platform services for multi-tenant success
-              </h2>
-              <p className="mt-6 text-base leading-relaxed text-slate-600 sm:text-lg">
-                CITGROUP TENANCY SYSTEM provides comprehensive services that power every aspect of your multi-tenant SaaS platform. From initial provisioning to ongoing management, we handle the infrastructure so you can focus on your customers.
-              </p>
-            </div>
+        <HeroBanner>
+          <div className="mx-auto max-w-3xl text-center">
+            <span className="inline-block text-xs font-bold uppercase tracking-[0.15em] text-blue-200">
+              Services
+            </span>
+            <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+              Platform services for multi-tenant success
+            </h2>
+            <p className="mt-6 text-base leading-relaxed text-blue-100/80 sm:text-lg">
+              CITGROUP TENANCY SYSTEM provides comprehensive services that power every aspect of your multi-tenant SaaS platform. From initial provisioning to ongoing management, we handle the infrastructure so you can focus on your customers.
+            </p>
           </div>
-        </section>
+        </HeroBanner>
 
           <section className="py-20 sm:py-24">
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">

@@ -17,6 +17,7 @@ import {
 import { SiteHeader } from '@/components/site-header';
 import { SiteFooter } from '@/components/site-footer';
 import { ScrollProgress } from '@/components/scroll-progress';
+import { HeroBanner } from '@/components/hero-banner';
 import { rootDomain } from '@/lib/utils';
 import {
   aboutPageSchema,
@@ -163,70 +164,61 @@ export default function AboutPage() {
 
       <main className="flex-1">
         {/* ───────────── Hero banner ───────────── */}
-        <section className="relative overflow-hidden bg-[#0c2238] text-white">
-          <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-            <div className="absolute -top-28 left-1/2 h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-[#0078E2]/10 blur-[110px] motion-safe:animate-pulse" />
-            <div className="absolute -right-24 top-32 h-80 w-80 rounded-full bg-[#5B9CF5]/10 blur-[90px]" />
-            <div className="absolute -left-24 bottom-0 h-72 w-72 rounded-full bg-indigo-400/10 blur-[90px]" />
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(0,92,179,0.055)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,92,179,0.055)_1px,transparent_1px)] bg-[size:56px_56px] [mask-image:radial-gradient(ellipse_at_center,black,transparent_72%)]" />
-          </div>
+        <HeroBanner>
+          <div className="mx-auto max-w-3xl text-center">
+            <h1 className="mt-6 text-4xl font-extrabold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-6xl animate-in fade-in slide-in-from-bottom-6 duration-700 delay-100 fill-mode-both motion-reduce:animate-none">
+              About{' '}
+              {/* Gradient text is painted by `background-clip`, which axe
+                  reports as "incomplete" rather than checking it. Every stop
+                  therefore stays inside the brand scale — the light
+                  `#5B9CF5` used for decorative glows measures 2.6:1 here and
+                  would fail AA for large text. */}
+              <span className="inline-block bg-gradient-to-r from-[#004A94] via-[#005cb3] to-[#0078E2] bg-clip-text text-transparent">
+                CITGROUP
+              </span>
+            </h1>
 
-          <div className="relative w-full px-4 pb-20 pt-16 sm:px-6 sm:pb-24 sm:pt-24 lg:px-8 xl:px-12">
-            <div className="mx-auto max-w-3xl text-center">
-              <h1 className="mt-6 text-4xl font-extrabold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-6xl animate-in fade-in slide-in-from-bottom-6 duration-700 delay-100 fill-mode-both motion-reduce:animate-none">
-                About{' '}
-                {/* Gradient text is painted by `background-clip`, which axe
-                    reports as "incomplete" rather than checking it. Every stop
-                    therefore stays inside the brand scale — the light
-                    `#5B9CF5` used for decorative glows measures 2.6:1 here and
-                    would fail AA for large text. */}
-                <span className="inline-block bg-gradient-to-r from-[#004A94] via-[#005cb3] to-[#0078E2] bg-clip-text text-transparent">
-                  CITGROUP
-                </span>
-              </h1>
+            <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-blue-100/80 sm:text-lg animate-in fade-in slide-in-from-bottom-6 duration-700 delay-200 fill-mode-both motion-reduce:animate-none">
+              We build multi-tenant infrastructure for teams who refuse to
+              trade isolation for convenience. One deployment, a dedicated
+              subdomain for every customer, and data boundaries that are
+              enforced by the platform — not by a promise in a policy
+              document.
+            </p>
 
-              <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-blue-100/80 sm:text-lg animate-in fade-in slide-in-from-bottom-6 duration-700 delay-200 fill-mode-both motion-reduce:animate-none">
-                We build multi-tenant infrastructure for teams who refuse to
-                trade isolation for convenience. One deployment, a dedicated
-                subdomain for every customer, and data boundaries that are
-                enforced by the platform — not by a promise in a policy
-                document.
-              </p>
-
-              <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row animate-in fade-in slide-in-from-bottom-6 duration-700 delay-300 fill-mode-both motion-reduce:animate-none">
-                <Link
-                  href="/auth/register"
-                  className="inline-flex items-center justify-center gap-2 bg-[#005cb3] px-6 py-3.5 text-sm font-bold text-white transition-all hover:bg-[#004A94] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0078E2] focus-visible:ring-offset-2 motion-reduce:transition-none"
-                >
-                  Create your tenant
-                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                </Link>
-                <Link
-                  href="/contact"
-                  className="inline-flex items-center justify-center border border-slate-300 bg-white/70 px-6 py-3.5 text-sm font-bold text-slate-700 backdrop-blur-sm transition-all hover:border-[#0078E2]/40 hover:bg-white hover:text-[#005cb3] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0078E2] focus-visible:ring-offset-2 motion-reduce:transition-none"
-                >
-                  Talk to our team
-                </Link>
-              </div>
+            <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row animate-in fade-in slide-in-from-bottom-6 duration-700 delay-300 fill-mode-both motion-reduce:animate-none">
+              <Link
+                href="/auth/register"
+                className="inline-flex items-center justify-center gap-2 bg-[#005cb3] px-6 py-3.5 text-sm font-bold text-white transition-all hover:bg-[#004A94] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0078E2] focus-visible:ring-offset-2 motion-reduce:transition-none"
+              >
+                Create your tenant
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
+              <Link
+                href="/contact"
+                className="inline-flex items-center justify-center border border-slate-300 bg-white/70 px-6 py-3.5 text-sm font-bold text-slate-700 backdrop-blur-sm transition-all hover:border-[#0078E2]/40 hover:bg-white hover:text-[#005cb3] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0078E2] focus-visible:ring-offset-2 motion-reduce:transition-none"
+              >
+                Talk to our team
+              </Link>
             </div>
-
-            <dl className="mx-auto mt-14 grid max-w-4xl grid-cols-2 gap-px overflow-hidden border border-white/10 bg-white/5 shadow-xl shadow-black/10 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-500 fill-mode-both motion-reduce:animate-none sm:grid-cols-4">
-              {STATS.map((stat) => (
-                <div
-                  key={stat.label}
-                  className="flex flex-col-reverse bg-[#0c2238]/70 px-4 py-5 text-center backdrop-blur-sm ring-1 ring-white/10"
-                >
-                  <dt className="mt-1 text-[11px] font-semibold uppercase tracking-wide text-blue-200/70">
-                    {stat.label}
-                  </dt>
-                  <dd className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
-                    {stat.value}
-                  </dd>
-                </div>
-              ))}
-            </dl>
           </div>
-        </section>
+
+          <dl className="mx-auto mt-14 grid max-w-4xl grid-cols-2 gap-px overflow-hidden border border-white/10 bg-white/5 shadow-xl shadow-black/10 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-500 fill-mode-both motion-reduce:animate-none sm:grid-cols-4">
+            {STATS.map((stat) => (
+              <div
+                key={stat.label}
+                className="flex flex-col-reverse bg-[#0c2238]/70 px-4 py-5 text-center backdrop-blur-sm ring-1 ring-white/10"
+              >
+                <dt className="mt-1 text-[11px] font-semibold uppercase tracking-wide text-blue-200/70">
+                  {stat.label}
+                </dt>
+                <dd className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
+                  {stat.value}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </HeroBanner>
 
         {/* ───────────── Mission ───────────── */}
         <section className="bg-white py-20 sm:py-24" aria-labelledby="mission-heading">

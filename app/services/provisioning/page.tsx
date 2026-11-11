@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Server, ShieldCheck, Database, Gauge } from 'lucide-react';
+import { HeroBanner } from '@/components/hero-banner';
 import { SiteHeader } from '@/components/site-header';
 import { SiteFooter } from '@/components/site-footer';
 import { ScrollProgress } from '@/components/scroll-progress';
@@ -63,22 +64,20 @@ export default function ProvisioningPage() {
       <ScrollProgress />
 
       <main className="flex-1">
-        <section className="py-20 sm:py-24">
-          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
-            <div className="text-center">
-              <span className="inline-block text-xs font-bold uppercase tracking-[0.15em] text-[#005cb3]">
-                Provisioning API
-              </span>
-              <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
-                Programmatic Tenant Provisioning
-              </h2>
-              <p className="mt-6 text-base leading-relaxed text-slate-600 sm:text-lg">
-                Create tenants and manage their lifecycle through a single RESTful API endpoint.
-                Automate tenant creation, storage allocation, and branded workspace setup.
-              </p>
-            </div>
+        <HeroBanner>
+          <div className="mx-auto max-w-3xl text-center">
+            <span className="inline-block text-xs font-bold uppercase tracking-[0.15em] text-blue-200">
+              Provisioning API
+            </span>
+            <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+              Programmatic Tenant Provisioning
+            </h2>
+            <p className="mt-6 text-base leading-relaxed text-blue-100/80 sm:text-lg">
+              Create tenants and manage their lifecycle through a single RESTful API endpoint.
+              Automate tenant creation, storage allocation, and branded workspace setup.
+            </p>
           </div>
-        </section>
+        </HeroBanner>
 
         <section className="py-20 sm:py-24">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">

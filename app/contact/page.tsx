@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 
 import { ContactForm } from './form';
+import { HeroBanner } from '@/components/hero-banner';
 import { SiteHeader } from '@/components/site-header';
 import { SiteFooter } from '@/components/site-footer';
 import { ScrollProgress } from '@/components/scroll-progress';
@@ -130,75 +131,67 @@ export default function ContactPage() {
       <ScrollProgress />
 
       {/* ───────────── Hero ───────────── */}
-      <section className="relative overflow-hidden bg-[#0c2238]">
-        <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-          <div className="absolute -top-40 left-1/4 h-[560px] w-[560px] rounded-full bg-[#0078E2]/25 blur-[100px]" />
-          <div className="absolute -right-32 top-40 h-[420px] w-[420px] rounded-full bg-blue-400/15 blur-[100px]" />
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.035)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.035)_1px,transparent_1px)] bg-[size:56px_56px]" />
-        </div>
-
-        <div className="relative w-full px-4 py-20 sm:px-6 sm:py-24 lg:px-8 xl:px-12">
-          <div className="mx-auto max-w-3xl text-center">
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3.5 py-1.5 text-xs font-semibold text-blue-200 backdrop-blur-sm">
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
-              </span>
-              Support team online
+      <HeroBanner>
+        <div className="mx-auto max-w-3xl text-center">
+          <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3.5 py-1.5 text-xs font-semibold text-blue-200 backdrop-blur-sm">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
             </span>
+            Support team online
+          </span>
 
-            <h1 className="mt-6 text-4xl font-extrabold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-6xl">
-              Talk to a human.
-              <br />
-              <span className="bg-gradient-to-r from-[#4A9DFF] to-[#7DD3FC] bg-clip-text text-transparent">
-                We&rsquo;ll sort it out.
-              </span>
-            </h1>
+          <h1 className="mt-6 text-4xl font-extrabold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-6xl">
+            Talk to a human.
+            <br />
+            <span className="bg-gradient-to-r from-[#4A9DFF] to-[#7DD3FC] bg-clip-text text-transparent">
+              We&rsquo;ll sort it out.
+            </span>
+          </h1>
 
-            <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-blue-100/70 sm:text-lg">
-              Support, sales, billing or partnership — every enquiry lands with a
-              named person who can actually resolve it. No ticket ping-pong, no
-              chatbots.
-            </p>
+          <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-blue-100/70 sm:text-lg">
+            Support, sales, billing or partnership — every enquiry lands with a
+            named person who can actually resolve it. No ticket ping-pong, no
+            chatbots.
+          </p>
 
-            <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
-              <a
-                href="#enquiry"
-                className="inline-flex items-center justify-center gap-2 rounded-none bg-[#005cb3] px-6 py-3.5 text-sm font-bold text-white transition-all hover:bg-[#004A94] active:scale-[0.98]"
-              >
-                Send an enquiry
-                <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              </a>
-              <a
-                href="#channels"
-                className="inline-flex items-center justify-center rounded-none border border-white/20 bg-white/5 px-6 py-3.5 text-sm font-bold text-white backdrop-blur-sm transition-all hover:border-white/35 hover:bg-white/10"
-              >
-                Browse support channels
-              </a>
-            </div>
-
-            <dl className="mx-auto mt-12 grid max-w-2xl grid-cols-1 gap-4 sm:grid-cols-3">
-              {[
-                { value: '< 1 day', label: 'First response' },
-                { value: '24/7', label: 'Critical incidents' },
-                { value: '99.99%', label: 'Platform uptime' },
-              ].map((stat) => (
-                <div
-                  key={stat.label}
-                  className="rounded-none border border-white/10 bg-white/5 px-4 py-4 backdrop-blur-sm"
-                >
-                  <dt className="text-2xl font-extrabold tracking-tight text-white">
-                    {stat.value}
-                  </dt>
-                  <dd className="mt-1 text-xs font-medium uppercase tracking-wide text-blue-200/75">
-                    {stat.label}
-                  </dd>
-                </div>
-              ))}
-            </dl>
+          <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
+            <a
+              href="#enquiry"
+              className="inline-flex items-center justify-center gap-2 rounded-none bg-[#005cb3] px-6 py-3.5 text-sm font-bold text-white transition-all hover:bg-[#004A94] active:scale-[0.98]"
+            >
+              Send an enquiry
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </a>
+            <a
+              href="#channels"
+              className="inline-flex items-center justify-center rounded-none border border-white/20 bg-white/5 px-6 py-3.5 text-sm font-bold text-white backdrop-blur-sm transition-all hover:border-white/35 hover:bg-white/10"
+            >
+              Browse support channels
+            </a>
           </div>
+
+          <dl className="mx-auto mt-12 grid max-w-2xl grid-cols-1 gap-4 sm:grid-cols-3">
+            {[
+              { value: '< 1 day', label: 'First response' },
+              { value: '24/7', label: 'Critical incidents' },
+              { value: '99.99%', label: 'Platform uptime' },
+            ].map((stat) => (
+              <div
+                key={stat.label}
+                className="rounded-none border border-white/10 bg-white/5 px-4 py-4 backdrop-blur-sm"
+              >
+                <dt className="text-2xl font-extrabold tracking-tight text-white">
+                  {stat.value}
+                </dt>
+                <dd className="mt-1 text-xs font-medium uppercase tracking-wide text-blue-200/75">
+                  {stat.label}
+                </dd>
+              </div>
+            ))}
+          </dl>
         </div>
-      </section>
+      </HeroBanner>
 
       {/* ───────────── Channels ───────────── */}
       <section id="channels" className="scroll-mt-20 bg-white py-20 sm:py-24">
