@@ -27,6 +27,7 @@ All notable changes to this project will be documented in this file.
 - /faq aligned to single max-w-3xl layout (c3105e8)
 - /faq dark hero banner added; breadcrumb list dropped (dcf2d6a)
 - Footer replaced status/domain with 'Powered By CITGROUP' link; removed remaining rounded edges (16e86b8)
+- /services and its 6 sub-pages: hero heading h2 to h1, card titles h3 to h2 (these 7 pages had no h1); CTA drop-shadows and the dead rounded-6 class removed
 
 ### Fixed
 - Pre-existing type error in tests/sam/escalation.test.ts (e71307d)

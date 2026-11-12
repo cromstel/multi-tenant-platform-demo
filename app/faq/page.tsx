@@ -268,7 +268,7 @@ export default function FaqPage() {
             <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
               <Link
                 href="/contact"
-                className="inline-flex items-center justify-center gap-2 bg-[#005cb3] px-6 py-3 text-sm font-bold text-white shadow-lg shadow-blue-600/25 transition-all hover:bg-[#004A94] active:scale-[0.98]"
+                className="inline-flex items-center justify-center gap-2 bg-[#005cb3] px-6 py-3 text-sm font-bold text-white transition-all hover:bg-[#004A94] active:scale-[0.98]"
               >
                 Contact us
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />

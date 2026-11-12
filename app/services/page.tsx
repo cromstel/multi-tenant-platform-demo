@@ -131,9 +131,9 @@ export default function ServicesPage() {
             <span className="inline-block text-xs font-bold uppercase tracking-[0.15em] text-blue-200">
               Services
             </span>
-            <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+            <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
               Platform services for multi-tenant success
-            </h2>
+            </h1>
             <p className="mt-6 text-base leading-relaxed text-blue-100/80 sm:text-lg">
               CITGROUP TENANCY SYSTEM provides comprehensive services that power every aspect of your multi-tenant SaaS platform. From initial provisioning to ongoing management, we handle the infrastructure so you can focus on your customers.
             </p>
@@ -151,9 +151,9 @@ export default function ServicesPage() {
                     <div className="flex h-11 w-11 items-center justify-center rounded-none bg-gradient-to-br from-[#0078E2] to-[#5B9CF5] text-white shadow-lg transition-transform duration-300 group-hover:scale-105">
                       <service.icon className="h-6 w-6" aria-hidden="true" />
                     </div>
-                    <h3 className="mt-5 text-lg font-bold text-slate-900">
+                    <h2 className="mt-5 text-lg font-bold text-slate-900">
                       {service.title}
-                    </h3>
+                    </h2>
                     <p className="mt-2 text-sm leading-relaxed text-slate-600">
                       {service.description}
                     </p>
@@ -167,7 +167,7 @@ export default function ServicesPage() {
                     </ul>
                     <Link
                       href={service.href}
-                      className="mt-5 inline-flex items-center gap-2 rounded-6 bg-[#005cb3] px-3 py-1.5 text-sm font-bold text-white shadow-lg shadow-blue-600/25 transition-all hover:bg-[#004A94] active:scale-[0.98]"
+                      className="mt-5 inline-flex items-center gap-2 rounded-none bg-[#005cb3] px-3 py-1.5 text-sm font-bold text-white transition-all hover:bg-[#004A94] active:scale-[0.98]"
                     >
                       Read more
                       <ArrowRight className="h-4 w-4" aria-hidden="true" />
@@ -189,7 +189,7 @@ export default function ServicesPage() {
                 </p>
                 <Link
                   href="/auth/register"
-                  className="mt-5 inline-flex items-center justify-center gap-2 rounded-none bg-[#005cb3] px-6 py-3.5 text-sm font-bold text-white shadow-xl shadow-blue-600/25 transition-all hover:bg-[#004A94] active:scale-[0.98]"
+                  className="mt-5 inline-flex items-center justify-center gap-2 rounded-none bg-[#005cb3] px-6 py-3.5 text-sm font-bold text-white transition-all hover:bg-[#004A94] active:scale-[0.98]"
                 >
                   Start for free
                   <ArrowRight className="h-4 w-4" aria-hidden="true" />

@@ -69,9 +69,9 @@ export default function UserManagementPage() {
             <span className="inline-block text-xs font-bold uppercase tracking-[0.15em] text-blue-200">
               User Management
             </span>
-            <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+            <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
               Role-Based Access Control
-            </h2>
+            </h1>
             <p className="mt-6 text-base leading-relaxed text-blue-100/80 sm:text-lg">
               Manage tenant administrators and end users with granular permission sets. Control
               exactly what each user can see and do within your workspace.
@@ -90,9 +90,9 @@ export default function UserManagementPage() {
                   <div className="flex h-11 w-11 items-center justify-center rounded-none bg-gradient-to-br from-[#0078E2] to-[#5B9CF5] text-white shadow-lg transition-transform duration-300 group-hover:scale-105">
                     <feature.icon className="h-6 w-6" aria-hidden="true" />
                   </div>
-                  <h3 className="mt-5 text-lg font-bold text-slate-900">
+                  <h2 className="mt-5 text-lg font-bold text-slate-900">
                     {feature.title}
-                  </h3>
+                  </h2>
                   <p className="mt-2 text-sm leading-relaxed text-slate-600">
                     {feature.description}
                   </p>

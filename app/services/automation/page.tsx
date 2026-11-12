@@ -70,9 +70,9 @@ export default function AutomationPage() {
             <span className="inline-block text-xs font-bold uppercase tracking-[0.15em] text-blue-200">
               Automation & Integrations
             </span>
-            <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+            <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
               Event-Driven Workflows
-            </h2>
+            </h1>
             <p className="mt-6 text-base leading-relaxed text-blue-100/80 sm:text-lg">
               Webhooks and event-driven workflows for custom tenant experiences. Receive real-time
               notifications, trigger custom actions, and integrate with third-party services.
@@ -91,9 +91,9 @@ export default function AutomationPage() {
                   <div className="flex h-11 w-11 items-center justify-center rounded-none bg-gradient-to-br from-[#0078E2] to-[#5B9CF5] text-white shadow-lg transition-transform duration-300 group-hover:scale-105">
                     <feature.icon className="h-6 w-6" aria-hidden="true" />
                   </div>
-                  <h3 className="mt-5 text-lg font-bold text-slate-900">
+                  <h2 className="mt-5 text-lg font-bold text-slate-900">
                     {feature.title}
-                  </h3>
+                  </h2>
                   <p className="mt-2 text-sm leading-relaxed text-slate-600">
                     {feature.description}
                   </p>
