@@ -28,6 +28,9 @@ All notable changes to this project will be documented in this file.
 - /faq dark hero banner added; breadcrumb list dropped (dcf2d6a)
 - Footer replaced status/domain with 'Powered By CITGROUP' link; removed remaining rounded edges (16e86b8)
 - /services and its 6 sub-pages: hero heading h2 to h1, card titles h3 to h2 (these 7 pages had no h1); CTA drop-shadows and the dead rounded-6 class removed
+- Registered `@tailwindcss/typography` so the prose/prose-sm/prose-slate classes on /kb article bodies are live instead of no-ops
+- Removed `shadow-xs` from the Button primitive variants, applying the no-drop-shadow rule to admin, contact, /kb and SAM CTAs
+- Normalised `rounded-none` on the remaining about and /faq CTA class lists
 
 ### Fixed
 - Pre-existing type error in tests/sam/escalation.test.ts (e71307d)
@@ -44,3 +47,4 @@ All notable changes to this project will be documented in this file.
 ### Removed
 - Vercel Speed Insights (`<SpeedInsights />`) from the root layout — its script origin (`va.vercel-scripts.com`) was blocked by the strict CSP's default-deny `script-src`
 - "Back to System" link from the admin dashboard header, matching the login pages
+- Unused `@vercel/analytics` dependency (declared, never imported) and the stray tracked `review-diff.patch`
