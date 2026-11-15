@@ -166,9 +166,9 @@ export async function inviteMemberAction(
     return { error: 'That person is already a member of this tenant.' };
   }
 
-  // The invitee gets a random temporary password. There is no mail
-  // transport wired up, so the password is returned once to the admin
-  // rather than silently discarded.
+  // The invitee gets a random temporary password. It is emailed to them;
+  // the value is also returned once to the admin as a fallback for when
+  // the email cannot be delivered.
   const temporaryPassword = `cit-${Math.random().toString(36).slice(2, 10)}-${Math.random().toString(36).slice(2, 10)}`;
   const passwordHash = await hashPassword(temporaryPassword);
 

@@ -35,6 +35,7 @@ All notable changes to this project will be documented in this file.
 - Added `scripts/check-ui-rules.mjs`, which enforces the UI rules from tracked code: a static scan that no interactive control carries a drop shadow, and a browser pass that checks every page for exactly one `h1` and a heading outline that never skips a level. CI runs both, because the test suite is untracked
 
 ### Fixed
+- The admin dashboard's tenant detail modal always showed `—` for the owner: `getTenantDetails()` hardcoded `ownerEmail: null` instead of running the owner aggregate, so the Owner field could never populate. It now returns the active owner's email, the same way `getAdminTenants()` and `getTenantBySubdomain()` already did
 - CI failed on every push: the test suite is untracked, so a checkout left Vitest with no files to run and `pnpm test` exited 1. Vitest now passes with no tests present, and the setup file and `server-only` alias are only wired up when the suite exists
 - /kb lost its `h1` whenever the search matched nothing, or no sections had been published — the empty state rendered from an early return, so the page had no `h1` and its outline started at an `h3`
 - Pre-existing type error in tests/sam/escalation.test.ts (e71307d)

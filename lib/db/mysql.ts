@@ -375,20 +375,22 @@ export async function getTenantDetails(subdomain: string): Promise<{
   const pool = await getMySQLPool();
   
   const [tenantRows] = await pool.execute(
-    `SELECT t.*, COUNT(u.id) as userCount 
-     FROM tenants t 
+    `SELECT t.*, COUNT(u.id) as userCount,
+            MAX(CASE WHEN u.role = 'owner' THEN u.email END) as ownerEmail
+     FROM tenants t
      LEFT JOIN tenant_users u ON u.tenant_id = t.id AND u.is_active = TRUE
      WHERE t.subdomain = ?
      GROUP BY t.id`,
     [subdomain]
   );
-  
+
   const tenant = (tenantRows as Array<{
     id: number;
     subdomain: string;
     emoji: string;
     created_at: Date;
     userCount: number;
+    ownerEmail: string | null;
   }>)[0];
   if (!tenant) return null;
   
@@ -408,7 +410,9 @@ export async function getTenantDetails(subdomain: string): Promise<{
       emoji: tenant.emoji,
       createdAt: tenant.created_at,
       userCount: Number(tenant.userCount),
-      ownerEmail: null // TODO: requires a separate tenant-owner query; out of scope for now
+      // Same aggregate as getAdminTenants: the active owner's email, or null
+      // when the tenant has no active owner.
+      ownerEmail: tenant.ownerEmail
     },
     users: (userRows as Array<{
       id: number;
