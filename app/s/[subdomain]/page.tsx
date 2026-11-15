@@ -129,7 +129,7 @@ export default async function SubdomainPage({
       <header className="fixed top-4 right-4 z-10">
         <Link
           href={`${protocol}://${rootDomain}`}
-          className="px-3 py-1.5 text-sm text-slate-600 hover:text-slate-900 transition-colors bg-white/80 backdrop-blur-sm rounded-none shadow-sm border border-slate-200"
+          className="px-3 py-1.5 text-sm text-slate-600 hover:text-slate-900 transition-colors bg-white/80 backdrop-blur-sm rounded-none border border-slate-200"
         >
           CITGROUP TENANCY SYSTEM
         </Link>

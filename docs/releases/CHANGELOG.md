@@ -31,6 +31,7 @@ All notable changes to this project will be documented in this file.
 - Registered `@tailwindcss/typography` so the prose/prose-sm/prose-slate classes on /kb article bodies are live instead of no-ops
 - Removed `shadow-xs` from the Button primitive variants, applying the no-drop-shadow rule to admin, contact, /kb and SAM CTAs
 - Normalised `rounded-none` on the remaining about and /faq CTA class lists
+- Extended the no-drop-shadow rule from CTA buttons to every interactive control — floating bar icons, SAM widget buttons, the scroll-to-top button, the /kb mobile Sections button, the tenant chip link and the `Input` primitive
 
 ### Fixed
 - Pre-existing type error in tests/sam/escalation.test.ts (e71307d)

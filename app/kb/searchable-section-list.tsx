@@ -357,7 +357,7 @@ export function SearchableSectionList({
 
       {/* Mobile nav trigger opens the collapsible drawer containing the TOC. */}
       <button
-        className="lg:hidden mb-6 inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 transition-colors"
+        className="lg:hidden mb-6 inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
         onClick={() => setMobileDrawerOpen(true)}
         // The accessible name has to contain the visible "Sections" text
         // (WCAG 2.5.3 Label in Name), so it extends the label rather than

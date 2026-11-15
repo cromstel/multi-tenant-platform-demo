@@ -92,7 +92,7 @@ export default function SAMWidget() {
             <button
               onClick={send}
               aria-label="Send message"
-              className="bg-[#005cb3] hover:bg-[#004A94] text-white p-2 rounded-full shadow-md transition-colors"
+              className="bg-[#005cb3] hover:bg-[#004A94] text-white p-2 rounded-full transition-colors"
               title="Send"
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" /></svg>
@@ -104,7 +104,7 @@ export default function SAMWidget() {
       <button
         onClick={() => setOpen(!open)}
         aria-label={open ? 'Close support widget' : 'Open support widget'}
-        className="w-12 h-12 rounded-full bg-[#005cb3] text-white shadow-xl hover:bg-[#004A94] transition-all flex items-center justify-center relative"
+        className="w-12 h-12 rounded-full bg-[#005cb3] text-white hover:bg-[#004A94] transition-all flex items-center justify-center relative"
         aria-expanded={open}
       >
         {open ? (
