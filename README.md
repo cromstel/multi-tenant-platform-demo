@@ -506,7 +506,9 @@ launcher and the proxy both depend on a single source of truth, and
 | `pnpm start`        | Serve the production build on `PORT`                      |
 | `pnpm typecheck`    | `tsc --noEmit`                                            |
 | `pnpm lint`         | ESLint (`next/core-web-vitals` + `next/typescript`)       |
-| `pnpm check`        | `typecheck` then `lint` — run before pushing               |
+| `pnpm check`        | `typecheck`, then `lint`, then the UI rule scan           |
+| `pnpm check:ui:source`  | Static scan: no interactive control may carry a shadow    |
+| `pnpm check:ui:runtime` | Browser check against a running server (heading outline, shadows) |
 | `pnpm test`         | Vitest — run once                                         |
 | `pnpm test:watch`   | Vitest in watch mode                                      |
 | `pnpm test:coverage`| Vitest with a coverage report                             |
@@ -524,9 +526,15 @@ pnpm build
 - **Types** — strict TypeScript; `tsc --noEmit` must be clean
 - **Lint** — `next/core-web-vitals` plus TypeScript rules; no `any`, no
   `setState` inside effects, no unescaped entities
-- **Tests** — 64 tests over the password helper, subdomain sanitisation, the
-  SEO builder, the rate limiter and the tenant lifecycle against the real
-  database
+- **UI rules** — `pnpm check` ends with a scan that fails when an
+  interactive control carries a drop shadow. Cards, panels, overlays, toasts
+  and decorative badges keep their elevation; controls do not. The same rules
+  run in CI, and `pnpm check:ui:runtime` re-checks them in a real browser
+  against a running server (one `<h1>` per page, a heading outline that never
+  skips a level, no shadow on any control).
+- **Tests** — 198 tests over 24 files, covering the password helper, the
+  auth and API surfaces, the SAM chatbot, the component layer and the tenant
+  lifecycle against the real database
 - **Accessibility** — every route reports **0 axe-core violations** for
   `wcag2a` / `wcag2aa` / `wcag21a` / `wcag21aa`. Four constraints worth
   preserving when restyling:
@@ -705,6 +713,21 @@ thing.
 
 > `server-only` throws by design outside a React Server Component, so Vitest
 > aliases it to a stub. The guard still does its job in the app.
+
+> **The test suite is not tracked.** `.gitignore` excludes `tests/`, so a fresh
+> clone has no suite to run and `pnpm test` reports "no test files" and exits
+> cleanly. That is deliberate — CI therefore cannot rely on it, and the rules
+> that must hold in CI are enforced by tracked code instead:
+>
+> | Check | Runs in CI | Command |
+> | ----- | ---------- | ------- |
+> | UI rules, static scan | yes | `pnpm check:ui:source` |
+> | UI rules, browser check | yes | `pnpm check:ui:runtime` |
+> | Type check and lint | yes | `pnpm typecheck`, `pnpm lint` |
+>
+> The browser check needs a running server: start it with `pnpm dev` (or
+> `pnpm start`) and run `pnpm check:ui:runtime`. It reads the base URL from
+> the environment file, so the port stays in one place.
 
 ## Deployment
 

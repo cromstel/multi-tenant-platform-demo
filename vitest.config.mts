@@ -1,9 +1,22 @@
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
+import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const rootDir = path.dirname(fileURLToPath(import.meta.url));
+
+/**
+ * The test suite is deliberately untracked (see `.gitignore` — "do not track
+ * test code"), so a fresh checkout has no `tests/` directory at all. Vitest
+ * must not treat that as a failure: `pnpm test` runs in CI on every push, and
+ * a missing suite is a normal state for this repository, not a broken one.
+ *
+ * When the suite is present these all behave exactly as before.
+ */
+const setupFile = path.resolve(rootDir, 'tests/setup.ts');
+const serverOnlyStub = path.resolve(rootDir, 'tests/stubs/server-only.ts');
+const hasTests = fs.existsSync(path.resolve(rootDir, 'tests'));
 
 /**
  * Vitest configuration.
@@ -21,9 +34,12 @@ export default defineConfig({
   test: {
     environment: 'node',
     globals: true,
-    setupFiles: ['./tests/setup.ts'],
+    setupFiles: hasTests && fs.existsSync(setupFile) ? [setupFile] : [],
     include: ['tests/**/*.test.ts', 'tests/**/*.test.tsx'],
     exclude: ['tests/e2e/**'],
+    // The suite is untracked, so a checkout without it has nothing to run.
+    // That is not a failure — see the note above.
+    passWithNoTests: true,
     // The integration tests share one database, so they must not run
     // concurrently — they would race on the same rows.
     fileParallelism: false,
@@ -52,7 +68,7 @@ export default defineConfig({
       // `server-only` throws by design when it is imported outside a React
       // Server Component. In a test there is no such context, so it is
       // aliased to an empty module. The guard still does its job in the app.
-      'server-only': path.resolve(rootDir, './tests/stubs/server-only.ts'),
+      ...(fs.existsSync(serverOnlyStub) ? { 'server-only': serverOnlyStub } : {}),
     },
   },
 });

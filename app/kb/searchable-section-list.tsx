@@ -225,34 +225,6 @@ export function SearchableSectionList({
     </div>
   );
 
-  if (!hasResults) {
-    return (
-      <section className="rounded-xl border border-[#0078E2]/20 bg-[#0078E2]/5 p-16 text-center">
-        <BookOpen
-          className="mx-auto h-12 w-12 text-[#0078E2]/30 mb-4"
-          aria-hidden="true"
-        />
-        <h3 className="text-lg font-semibold text-[#005cb3] mb-2">
-          {debouncedQuery ? `No results for "${debouncedQuery}"` : 'No documentation sections available yet.'}
-        </h3>
-        <p className="text-sm text-slate-600 max-w-xs mx-auto">
-          {debouncedQuery
-            ? 'Try a different search term, or broaden your query.'
-            : 'Documentation sections will appear here once they are published.'}
-        </p>
-        {debouncedQuery && (
-          <button
-            onClick={() => setQuery('')}
-            className="mt-6 inline-flex items-center gap-2 rounded-full bg-[#005cb3] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#004A94] active:scale-[0.98]"
-          >
-            Clear search
-            <X className="h-4 w-4" aria-hidden="true" />
-          </button>
-        )}
-      </section>
-    );
-  }
-
   return (
     <section className="w-full">
       {/* Skip link for keyboard users. */}
@@ -355,39 +327,81 @@ export function SearchableSectionList({
         </div>
       </div>
 
-      {/* Mobile nav trigger opens the collapsible drawer containing the TOC. */}
-      <button
-        className="lg:hidden mb-6 inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
-        onClick={() => setMobileDrawerOpen(true)}
-        // The accessible name has to contain the visible "Sections" text
-        // (WCAG 2.5.3 Label in Name), so it extends the label rather than
-        // replacing it.
-        aria-label="Open Sections navigation"
-        aria-expanded={mobileDrawerOpen}
-      >
-        <LayoutDashboard className="h-4 w-4" aria-hidden="true" />
-        Sections
-      </button>
+      {/* Mobile nav trigger opens the collapsible drawer containing the TOC.
+          Hidden when there is nothing to list. */}
+      {hasResults && (
+        <button
+          className="lg:hidden mb-6 inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+          onClick={() => setMobileDrawerOpen(true)}
+          // The accessible name has to contain the visible "Sections" text
+          // (WCAG 2.5.3 Label in Name), so it extends the label rather than
+          // replacing it.
+          aria-label="Open Sections navigation"
+          aria-expanded={mobileDrawerOpen}
+        >
+          <LayoutDashboard className="h-4 w-4" aria-hidden="true" />
+          Sections
+        </button>
+      )}
 
       <div id="kb-content" className="xl:grid xl:grid-cols-12 xl:gap-12">
-        {/* Desktop sticky TOC sidebar. */}
-        <aside className="hidden xl:block xl:col-span-4">
-          <div className="sticky top-24">
-            <h2 className="font-semibold text-[#005cb3] mb-4 tracking-tight">
-              Contents
-            </h2>
-            <nav aria-label="Table of contents">
-              {grouped.map(([role, roleSections]) =>
-                tocGroup(role, roleSections, false)
-              )}
-            </nav>
-          </div>
-        </aside>
+        {/* Desktop sticky TOC sidebar. Hidden when there is nothing to list,
+            so the content column can take the full width instead. */}
+        {hasResults && (
+          <aside className="hidden xl:block xl:col-span-4">
+            <div className="sticky top-24">
+              <h2 className="font-semibold text-[#005cb3] mb-4 tracking-tight">
+                Contents
+              </h2>
+              <nav aria-label="Table of contents">
+                {grouped.map(([role, roleSections]) =>
+                  tocGroup(role, roleSections, false)
+                )}
+              </nav>
+            </div>
+          </aside>
+        )}
 
         {/* Section cards (content area). `min-w-0` lets the grid track shrink
             below the content's intrinsic width — without it the track is
-            sized by the widest article and the page overflows sideways. */}
-        <div className="xl:col-span-8 min-w-0">
+            sized by the widest article and the page overflows sideways.
+            With no sections the column takes the full width. */}
+        <div
+          className={
+            hasResults ? 'xl:col-span-8 min-w-0' : 'xl:col-span-12 min-w-0'
+          }
+        >
+          {/* The empty state lives inside the main branch, not in an early
+              return: an early return dropped the page <h1> entirely, so
+              the page had no h1 and started at an h3 whenever the search
+              matched nothing. */}
+          {!hasResults && (
+            <section className="rounded-xl border border-[#0078E2]/20 bg-[#0078E2]/5 p-16 text-center">
+              <BookOpen
+                className="mx-auto h-12 w-12 text-[#0078E2]/30 mb-4"
+                aria-hidden="true"
+              />
+              <h2 className="text-lg font-semibold text-[#005cb3] mb-2">
+                {debouncedQuery
+                  ? `No results for "${debouncedQuery}"`
+                  : 'No documentation sections available yet.'}
+              </h2>
+              <p className="text-sm text-slate-600 max-w-xs mx-auto">
+                {debouncedQuery
+                  ? 'Try a different search term, or broaden your query.'
+                  : 'Documentation sections will appear here once they are published.'}
+              </p>
+              {debouncedQuery && (
+                <button
+                  onClick={() => setQuery('')}
+                  className="mt-6 inline-flex items-center gap-2 rounded-full bg-[#005cb3] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#004A94] active:scale-[0.98]"
+                >
+                  Clear search
+                  <X className="h-4 w-4" aria-hidden="true" />
+                </button>
+              )}
+            </section>
+          )}
           {grouped.map(([role, roleSections]) => (
             <section
               key={role}

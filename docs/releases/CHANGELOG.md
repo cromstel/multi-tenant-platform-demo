@@ -32,8 +32,11 @@ All notable changes to this project will be documented in this file.
 - Removed `shadow-xs` from the Button primitive variants, applying the no-drop-shadow rule to admin, contact, /kb and SAM CTAs
 - Normalised `rounded-none` on the remaining about and /faq CTA class lists
 - Extended the no-drop-shadow rule from CTA buttons to every interactive control — floating bar icons, SAM widget buttons, the scroll-to-top button, the /kb mobile Sections button, the tenant chip link and the `Input` primitive
+- Added `scripts/check-ui-rules.mjs`, which enforces the UI rules from tracked code: a static scan that no interactive control carries a drop shadow, and a browser pass that checks every page for exactly one `h1` and a heading outline that never skips a level. CI runs both, because the test suite is untracked
 
 ### Fixed
+- CI failed on every push: the test suite is untracked, so a checkout left Vitest with no files to run and `pnpm test` exited 1. Vitest now passes with no tests present, and the setup file and `server-only` alias are only wired up when the suite exists
+- /kb lost its `h1` whenever the search matched nothing, or no sections had been published — the empty state rendered from an early return, so the page had no `h1` and its outline started at an `h3`
 - Pre-existing type error in tests/sam/escalation.test.ts (e71307d)
 - Hydration mismatch from Turbopack geist variable on body className (e1aef00)
 - no-html-link errors: replaced anchor with Link on admin login (4e64db5)

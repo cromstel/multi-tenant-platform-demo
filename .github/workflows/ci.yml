@@ -75,6 +75,11 @@ jobs:
       - name: Lint (eslint)
         run: pnpm lint
 
+      # The test suite is deliberately untracked, so CI cannot rely on it.
+      # These rules are enforced by a tracked script instead.
+      - name: UI rules (source scan)
+        run: pnpm run check:ui:source
+
       - name: Test suite against MySQL
         env:
           MYSQL_HOST: ${{ env.MYSQL_HOST }}
@@ -95,6 +100,26 @@ jobs:
         env:
           NEXT_PUBLIC_ROOT_DOMAIN: ${{ env.NEXT_PUBLIC_ROOT_DOMAIN }}
         run: pnpm build
+
+      # Runtime UI rules: one <h1> per page, a heading outline that never
+      # skips a level, and no interactive control carrying a drop shadow.
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: UI rules (runtime)
+        run: |
+          PORT=3030 pnpm start &
+          for i in $(seq 1 60); do
+            if curl -sf http://127.0.0.1:3030/api/health > /dev/null; then
+              break
+            fi
+            sleep 2
+          done
+          if ! curl -sf http://127.0.0.1:3030/api/health > /dev/null; then
+            echo "The application did not start in time." >&2
+            exit 1
+          fi
+          node scripts/check-ui-rules.mjs runtime
 
   ############################################################################
   # docker — build image and run smoke test

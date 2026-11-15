@@ -26,7 +26,9 @@ library. See system reminder `AGENTS.md` update (Context7 MCP rule).
 pnpm install          # corepack enable first; pnpm@10.12.4 is pinned
 cp .env.example .env.local
 pnpm dev              # http://localhost:$PORT
-pnpm check            # tsc --noEmit && eslint .  — run before every commit
+pnpm check            # tsc --noEmit && eslint . && the UI rule scan — run before every commit
+pnpm check:ui:source # UI rule scan on its own (no interactive control may carry a shadow)
+pnpm check:ui:runtime # the same rules in a browser, against a running server
 pnpm test             # vitest run
 pnpm build
 pnpm start
@@ -187,6 +189,11 @@ algorithm is upgraded to a memory-hard KDF.
 - The scroll progress bar (`components/scroll-progress.tsx`) writes to the DOM
   directly rather than React state — a scroll handler fires on every frame, and
   re-rendering the tree that often is wasteful. Do not convert it to `useState`.
+- **No interactive control carries a drop shadow.** Not a button, not a link,
+  not an input, not an icon button, not a variant map that feeds one. Cards,
+  panels, overlays, modals, toasts, chat bubbles and decorative badges keep
+  their elevation — a shadow there communicates layering, not affordance.
+  `pnpm check` ends with a scan that fails on a violation, and CI runs it.
 - `components/site-header.tsx` and `components/site-footer.tsx` are the global
   chrome. Every public page that is not an auth screen should render both.
 - The contact form (`app/contact/`) validates server-side in
@@ -218,6 +225,14 @@ the admin area — reports **0 axe-core violations** for `wcag2a` / `wcag2aa` /
 axe reports gradient backgrounds as *incomplete*, not *violating*, so verify
 contrast on those pages by calculation rather than trusting the audit.
 
+Two rules are outside axe's reach and are enforced by
+`scripts/check-ui-rules.mjs` instead, which CI runs:
+
+- Every page has **exactly one `<h1>`**, and the heading outline **never skips
+  a level**. A heading in an early return is the classic way to lose the
+  `<h1>` — the page still looks right until a branch renders instead.
+- No interactive control carries a **drop shadow** — see UI conventions.
+
 ## Verify before claiming done
 
 Run `pnpm check`, `pnpm test` and `pnpm build`. All three must be clean and
@@ -225,6 +240,11 @@ warning-free. For UI changes, exercise the real flow in a browser —
 `*.localhost` subdomains, the admin sign-in, the 404 page, and the emoji
 picker — because the test suite cannot see layout, contrast or focus
 behaviour.
+
+The test suite is **not tracked** (`.gitignore` excludes `tests/`), so CI
+cannot run it and a fresh clone has nothing to run — `pnpm test` then reports
+"no test files" and exits cleanly. Anything that must hold in CI has to live
+in tracked code: that is why the UI rules are a script and not a test file.
 
 When touching auth, verify both halves of invariant 3, not just the page.
 Use the *public* entry point: `/auth/admin` answers 404 while `ADMIN_PATH`
