@@ -11,6 +11,8 @@ All notable changes to this project will be documented in this file.
 - Expanded /faq with grouped answers, breadcrumb, jump links and CTA (dbb4744)
 
 ### Changed
+- Upgraded Next.js and eslint-config-next from 16.4.3 to 16.4.6, fixing two Next.js advisories (information disclosure in `unstable_cache()` root params, and the `>=16.2.0 <=16.4.4` advisory), and added a `postcss-selector-parser >=6.1.5` override for the quadratic-complexity advisory. `pnpm audit` is clean
+- Removed the unused `buildSystemPrompt()` and `containsSecret()` exports from the SAM modules
 - Restored the floating bar globally via root layout (1bbacac)
 - Reset page: added CITGROUP logo, sr-only hidden labels, Link fix (e4bd6d5)
 - Auth form labels hidden visually with sr-only; placeholders kept (5ffe44a)
@@ -35,6 +37,9 @@ All notable changes to this project will be documented in this file.
 - Added `scripts/check-ui-rules.mjs`, which enforces the UI rules from tracked code: a static scan that no interactive control carries a drop shadow, and a browser pass that checks every page for exactly one `h1` and a heading outline that never skips a level. CI runs both, because the test suite is untracked
 
 ### Fixed
+- The sessions feature was dead code: admin and tenant logins minted stateless JWTs but nothing ever wrote `admin_sessions`/`tenant_sessions`, so `/api/v1/sessions` was always empty, the Active Sessions page never listed a session (and its "Revoke all other sessions" button never rendered), and revoking a session row would not have signed the cookie out anyway because `getAdminSession()`/`getTenantSession()` never consulted the table. Logins now persist a session row keyed by the JWT's `jti`, session validation requires that row to be alive, logout deletes it, and expired rows are purged at login. Tenant `lastLoginAt` in the members UI is populated again
+- `DELETE /api/v1/sessions` with an API key and no body silently matched nothing (`user_id = NULL`) and reported `{ revoked: 0 }` as success. Key callers now revoke every admin session in scope, matching `listSessions`' admin scope, and `revokeAllExcept()` guards the empty-conditions SQL
+- Deleting a tenant that had SAM chat history always failed with a 500 and rolled back: mysql2 prepared statements bind an array to a single `?` as one value, so `IN (?)` with an array matched no `messages` rows and the conversation delete died on the foreign key. `deleteTenant()` and `bulkDeleteTenants()` now build one placeholder per id
 - The admin dashboard's tenant detail modal always showed `—` for the owner: `getTenantDetails()` hardcoded `ownerEmail: null` instead of running the owner aggregate, so the Owner field could never populate. It now returns the active owner's email, the same way `getAdminTenants()` and `getTenantBySubdomain()` already did
 - CI failed on every push: the test suite is untracked, so a checkout left Vitest with no files to run and `pnpm test` exited 1. Vitest now passes with no tests present, and the setup file and `server-only` alias are only wired up when the suite exists
 - /kb lost its `h1` whenever the search matched nothing, or no sections had been published — the empty state rendered from an early return, so the page had no `h1` and its outline started at an `h3`
