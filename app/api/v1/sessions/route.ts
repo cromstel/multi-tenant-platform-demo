@@ -74,7 +74,9 @@ export async function GET() {
  * ("sign out everywhere else").
  *
  * The request body may carry `{ keepSessionId }` to identify the session to
- * preserve. Without it, every session for the authenticated user is revoked.
+ * preserve. Without it, every session in scope is revoked: a session cookie
+ * revokes that user's sessions, while an API key — admin scope, no user
+ * context — revokes every admin session.
  */
 export async function DELETE(request: Request) {
   const scope = await resolveAuthScope();
@@ -87,15 +89,14 @@ export async function DELETE(request: Request) {
   try {
     body = (await request.json()) ?? null;
   } catch {
-    // No body is valid — revoke everything for the user.
+    // No body is valid — revoke everything in scope.
   }
 
   const keepSessionId = body?.keepSessionId ?? null;
   const revoked = await revokeAllExcept(
     scope.table,
-    scope.userId!,
-    keepSessionId,
-    undefined
+    scope.all ? null : scope.userId,
+    keepSessionId
   );
 
   return ok({ revoked });

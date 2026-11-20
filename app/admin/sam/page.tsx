@@ -122,7 +122,7 @@ export default async function SAMAdminPage() {
 
         <section aria-label="PII filter status" className="mt-6 bg-blue-50 border border-[#005cb3]/20 rounded-xl p-4">
           <h2 className="font-semibold text-[#005cb3] mb-1">Filter status</h2>
-          <p className="text-xs text-slate-600">Messages masked via lib/sam/filter (sanitizePII, containsSecret, maskMessage). No PII or secret values exposed in this view.</p>
+          <p className="text-xs text-slate-600">Messages masked via lib/sam/filter (sanitizePII, maskMessage). No PII or secret values exposed in this view.</p>
         </section>
       </div>
     </main>

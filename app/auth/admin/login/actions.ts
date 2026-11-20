@@ -6,6 +6,12 @@ import { cookies } from 'next/headers';
 import { randomUUID } from 'node:crypto';
 
 import { getMySQLPool } from '@/lib/db/mysql';
+import {
+  createSession,
+  deleteSession,
+  isSessionAlive,
+  purgeExpiredSessions,
+} from '@/lib/db/sessions';
 import { hashPassword, safeEqual, verifyPassword } from '@/lib/password';
 import { LOGIN_LIMIT, check, consume, reset } from '@/lib/rate-limit';
 import { adminUrl } from '@/lib/admin-path';
@@ -138,13 +144,26 @@ export async function loginAction(
 
     await reset("admin_login", LOGIN_LIMIT);
 
+    // The JWT's `jti` doubles as the admin_sessions row id: the row's
+    // existence is what lets the sessions page list and revoke sessions, and
+    // its absence is what makes a revoked session actually signed out.
+    const sessionId = randomUUID();
+
     const token = await new SignJWT({ userId: user.id, email: user.email, role: user.role })
       .setProtectedHeader({ alg: "HS256" })
       .setIssuedAt()
       .setIssuer("multi-tenant-admin")
       .setExpirationTime(SESSION_TTL + "s")
-      .setJti(randomUUID())
+      .setJti(sessionId)
       .sign(await getSessionSecret());
+
+    // Drop this admin's already-expired rows, then record the new session.
+    await purgeExpiredSessions("admin_sessions", user.id);
+    await createSession("admin_sessions", {
+      id: sessionId,
+      userId: user.id,
+      expiresAt: Date.now() + SESSION_TTL * 1000,
+    });
 
     const cookieStore = await cookies();
     cookieStore.set(SESSION_COOKIE, token, {
@@ -186,6 +205,19 @@ export async function loginAction(
 export async function logoutAction() {
   try {
     const cookieStore = await cookies();
+    const token = cookieStore.get(SESSION_COOKIE)?.value;
+    if (token) {
+      try {
+        // Delete this session's row so the sign-out is visible on the
+        // sessions page and the cookie can never be replayed as "active".
+        const { payload } = await jwtVerify(token, await getSessionSecret(), { issuer: "multi-tenant-admin" });
+        if (typeof payload.jti === "string") {
+          await deleteSession("admin_sessions", payload.jti);
+        }
+      } catch {
+        // An expired or tampered cookie has no row to delete.
+      }
+    }
     cookieStore.delete(SESSION_COOKIE);
     cookieStore.delete(AUTH_COOKIE);
     redirect(adminUrl('/login'));
@@ -210,6 +242,15 @@ export async function getAdminSession(): Promise<{ userId: number; email: string
 
   try {
     const { payload } = await jwtVerify(token, await getSessionSecret(), { issuer: "multi-tenant-admin" });
+
+    // A valid signature alone is not enough: the session row must still exist
+    // and be unexpired. Revoking a session deletes its row, which signs the
+    // cookie out on its very next use.
+    const jti = typeof payload.jti === "string" ? payload.jti : null;
+    if (!jti || !(await isSessionAlive("admin_sessions", jti))) {
+      return null;
+    }
+
     return { userId: payload.userId as number, email: payload.email as string, role: (payload.role as string) || 'admin' };
   } catch {
     return null;

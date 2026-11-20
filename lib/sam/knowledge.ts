@@ -22,10 +22,3 @@ export async function getTenantContext(subdomain: string): Promise<{ subdomain: 
   if (!row) return null;
   return { subdomain: row.subdomain, name: row.subdomain, icon: row.icon };
 }
-
-export function buildSystemPrompt(context: { docs: Array<{ title: string; body: string; role: string }>; tenant?: { subdomain: string; name: string; icon: string } } | null): string {
-  const docs = context?.docs || [];
-  const docsText = docs.map((d) => `[${d.role}] ${d.title}: ${d.body}`).join('\n');
-  const tenantText = context?.tenant ? `Tenant: ${context.tenant.name} (subdomain: ${context.tenant.subdomain}, icon: ${context.tenant.icon})` : 'No tenant specified.';
-  return `You are a support assistant.\nDocumentation:\n${docsText}\n${tenantText}`;
-}

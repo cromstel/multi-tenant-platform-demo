@@ -4,6 +4,12 @@ import { redirect } from 'next/navigation';
 import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 import { getMySQLPool } from '@/lib/db/mysql';
+import {
+  createSession,
+  deleteSession,
+  isSessionAlive,
+  purgeExpiredSessions,
+} from '@/lib/db/sessions';
 import { verifyPassword } from '@/lib/password';
 import { LOGIN_LIMIT, check, consume, reset } from '@/lib/rate-limit';
 import { protocol, rootDomain, getTenantSessionSecret, isRedirectError, minutesLabel, validateSubdomain } from '@/lib/utils';
@@ -83,9 +89,13 @@ export async function loginAction(
 
     await reset(`tenant_login:${tenantId}`, LOGIN_LIMIT);
 
-    // Create session
-    const token = await new SignJWT({ 
-      userId: user.id, 
+    // Create session. The JWT's `jti` doubles as the tenant_sessions row id,
+    // so the session can be listed and revoked — and a revoked row actually
+    // signs the cookie out on its next use.
+    const sessionId = crypto.randomUUID();
+
+    const token = await new SignJWT({
+      userId: user.id,
       tenantId,
       email,
       role: (user as { role?: string }).role || 'member'
@@ -94,8 +104,17 @@ export async function loginAction(
       .setIssuedAt()
       .setIssuer('multi-tenant-tenant')
       .setExpirationTime(`${SESSION_TTL}s`)
-      .setJti(crypto.randomUUID())
+      .setJti(sessionId)
       .sign(await getTenantSessionSecret());
+
+    // Drop this user's already-expired rows, then record the new session.
+    await purgeExpiredSessions('tenant_sessions', user.id);
+    await createSession('tenant_sessions', {
+      id: sessionId,
+      userId: user.id,
+      tenantId,
+      expiresAt: Date.now() + SESSION_TTL * 1000,
+    });
 
     const cookieStore = await cookies();
     cookieStore.set(SESSION_COOKIE, token, {
@@ -138,6 +157,19 @@ export async function loginAction(
 export async function logoutAction() {
   try {
     const cookieStore = await cookies();
+    const token = cookieStore.get(SESSION_COOKIE)?.value;
+    if (token) {
+      try {
+        // Delete this session's row so the sign-out is real: the cookie can
+        // never be replayed as an active session afterwards.
+        const { payload } = await jwtVerify(token, await getTenantSessionSecret(), { issuer: 'multi-tenant-tenant' });
+        if (typeof payload.jti === 'string') {
+          await deleteSession('tenant_sessions', payload.jti);
+        }
+      } catch {
+        // An expired or tampered cookie has no row to delete.
+      }
+    }
     cookieStore.delete(SESSION_COOKIE);
     cookieStore.delete(AUTH_COOKIE);
     redirect('/auth/login');
@@ -164,9 +196,18 @@ export async function getTenantSession(): Promise<{ userId: number; tenantId: nu
     const { payload } = await jwtVerify(token, await getTenantSessionSecret(), {
       issuer: 'multi-tenant-tenant'
     });
-    return { 
-      userId: payload.userId as number, 
-      tenantId: payload.tenantId as number, 
+
+    // A valid signature alone is not enough: the session row must still exist
+    // and be unexpired. Revoking a session deletes its row, which signs the
+    // cookie out on its very next use.
+    const jti = typeof payload.jti === 'string' ? payload.jti : null;
+    if (!jti || !(await isSessionAlive('tenant_sessions', jti))) {
+      return null;
+    }
+
+    return {
+      userId: payload.userId as number,
+      tenantId: payload.tenantId as number,
       email: payload.email as string,
       role: (payload.role as string) || 'member'
     };
