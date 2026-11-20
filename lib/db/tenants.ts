@@ -290,12 +290,21 @@ export async function deleteTenant(subdomain: string): Promise<boolean> {
     );
     const conversationIds = (convRows as Array<{ id: string }>).map((c) => c.id);
     if (conversationIds.length > 0) {
-      await conn.execute('DELETE FROM messages WHERE conversation_id IN (?)', [
-        conversationIds,
-      ]);
-      await conn.execute('DELETE FROM escalations WHERE conversation_id IN (?)', [
-        conversationIds,
-      ]);
+      // mysql2 prepared statements bind an array to a single `?` as one
+      // value, so `IN (?)` with an array matches nothing — and the
+      // conversation delete below would die on the messages foreign key.
+      // Build one placeholder per id instead.
+      const conversationPlaceholders = conversationIds
+        .map(() => '?')
+        .join(', ');
+      await conn.execute(
+        `DELETE FROM messages WHERE conversation_id IN (${conversationPlaceholders})`,
+        conversationIds
+      );
+      await conn.execute(
+        `DELETE FROM escalations WHERE conversation_id IN (${conversationPlaceholders})`,
+        conversationIds
+      );
     }
     await conn.execute('DELETE FROM conversations WHERE subdomain = ?', [
       sanitizeSubdomain(subdomain),
@@ -351,12 +360,19 @@ export async function bulkDeleteTenants(subdomains: string[]): Promise<number> {
         (c) => c.id
       );
       if (conversationIds.length > 0) {
-        await conn.execute('DELETE FROM messages WHERE conversation_id IN (?)', [
-          conversationIds,
-        ]);
-        await conn.execute('DELETE FROM escalations WHERE conversation_id IN (?)', [
-          conversationIds,
-        ]);
+        // Same mysql2 caveat as deleteTenant: an array bound to a single `?`
+        // matches nothing under prepared statements.
+        const conversationPlaceholders = conversationIds
+          .map(() => '?')
+          .join(', ');
+        await conn.execute(
+          `DELETE FROM messages WHERE conversation_id IN (${conversationPlaceholders})`,
+          conversationIds
+        );
+        await conn.execute(
+          `DELETE FROM escalations WHERE conversation_id IN (${conversationPlaceholders})`,
+          conversationIds
+        );
       }
       await conn.execute('DELETE FROM conversations WHERE subdomain = ?', [
         subdomain,
